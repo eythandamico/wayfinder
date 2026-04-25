@@ -51,12 +51,12 @@ export function PortfolioPanel() {
             </div>
           </div>
           <div className="flex items-center justify-between gap-3">
-            <span className="text-meta tabular-nums text-muted-foreground">
+            <span className="text-body tabular-nums text-muted-foreground">
               {short}
             </span>
             <span
               aria-label="Session expires in 59 minutes 33 seconds"
-              className="inline-flex items-center gap-1.5 text-meta uppercase tracking-wider text-muted-foreground"
+              className="inline-flex items-center gap-1.5 text-body text-muted-foreground"
             >
               <ClockIcon />
               <span className="tabular-nums">Session · 59m 33s</span>
@@ -66,14 +66,14 @@ export function PortfolioPanel() {
 
         {/* Portfolio hero — full width, left-aligned column */}
         <div className="flex flex-col gap-1.5">
-          <span className="text-meta uppercase tracking-wider text-muted-foreground">
+          <span className="text-body text-muted-foreground">
             Portfolio
           </span>
           <span className="text-display font-semibold leading-none tabular-nums text-foreground">
             $0.00
           </span>
-          <span className="inline-flex items-center gap-1.5 text-meta tabular-nums text-muted-foreground">
-            <span aria-hidden className="text-meta">—</span>
+          <span className="inline-flex items-center gap-1.5 text-body tabular-nums text-muted-foreground">
+            <span aria-hidden className="text-body">—</span>
             $0.00
             <span aria-hidden>·</span>
             0.00%
@@ -201,12 +201,12 @@ function WalletDropdown({
                 <span className="truncate text-body text-foreground">
                   {w.name}
                   {w.primary && (
-                    <span className="ml-1.5 text-meta uppercase tracking-wider text-muted-foreground">
+                    <span className="ml-1.5 text-body text-muted-foreground">
                       · primary
                     </span>
                   )}
                 </span>
-                <span className="text-meta tabular-nums text-muted-foreground">
+                <span className="text-body tabular-nums text-muted-foreground">
                   {shortAddr}
                 </span>
               </span>
@@ -221,7 +221,7 @@ function WalletDropdown({
           className="flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-body text-foreground/85 transition-colors hover:bg-white/[0.05]"
         >
           <span>Add wallet</span>
-          <span aria-hidden className="text-meta text-muted-foreground">+</span>
+          <span aria-hidden className="text-body text-muted-foreground">+</span>
         </button>
       </div>
     </div>
@@ -276,15 +276,15 @@ function VenueRow({
       >
         <span
           aria-hidden
-          className="flex size-7 shrink-0 items-center justify-center rounded-md bg-white/[0.06] text-meta font-semibold text-foreground/90 transition-colors group-hover:bg-white/[0.09]"
+          className="flex size-7 shrink-0 items-center justify-center rounded-md bg-white/[0.06] text-body font-semibold text-foreground/90 transition-colors group-hover:bg-white/[0.09]"
         >
           {glyph}
         </span>
         <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-          <span className="text-meta uppercase tracking-wider text-foreground">
+          <span className="text-body text-foreground">
             {name}
           </span>
-          <span className="text-meta tabular-nums text-muted-foreground">
+          <span className="text-body tabular-nums text-muted-foreground">
             {count} {count === 1 ? "position" : "positions"}
           </span>
         </div>
@@ -307,7 +307,7 @@ function VenueRow({
           <span className="text-body text-muted-foreground">{empty}</span>
           <button
             type="button"
-            className="text-meta uppercase tracking-wider text-primary transition-[filter] duration-150 ease-out hover:brightness-110"
+            className="text-body text-primary transition-[filter] duration-150 ease-out hover:brightness-110"
           >
             {cta} →
           </button>
@@ -320,7 +320,7 @@ function VenueRow({
 function SectionLabel({ label }: { label: string }) {
   return (
     <div className="flex items-center gap-3">
-      <span className="text-meta uppercase tracking-wider text-muted-foreground/70">
+      <span className="text-body text-muted-foreground/70">
         {label}
       </span>
       <span aria-hidden className="h-px flex-1 bg-white/5" />

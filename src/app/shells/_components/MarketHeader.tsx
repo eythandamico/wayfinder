@@ -97,7 +97,7 @@ function UsagePill({ usage }: { usage: UsageData }) {
         className="inline-flex h-[var(--ui-h-pill)] items-center gap-2 rounded-full bg-white/5 px-3 text-muted-foreground transition-[background-color,color,scale] duration-150 ease-out hover:bg-white/10 hover:text-foreground active:scale-[0.96]"
       >
         <InfinityIcon />
-        <span aria-hidden className="text-meta tabular-nums text-foreground">
+        <span aria-hidden className="text-body tabular-nums text-foreground">
           {formatTokens(usage.tokens.used)}
           <span className="text-muted-foreground">
             {" / "}
@@ -128,7 +128,7 @@ function UsagePill({ usage }: { usage: UsageData }) {
           <span className="text-body font-semibold text-foreground">
             Session usage
           </span>
-          <span className="inline-flex items-center gap-1.5 text-meta text-muted-foreground tabular-nums">
+          <span className="inline-flex items-center gap-1.5 text-body text-muted-foreground tabular-nums">
             <span aria-hidden className="size-1.5 rounded-full bg-primary shadow-[0_0_6px_var(--primary)]" />
             {usage.sessionDuration} · Active
           </span>
@@ -212,11 +212,11 @@ function UsageMetricRow({
   return (
     <div className="flex flex-col gap-1.5">
       <div className="flex items-center justify-between">
-        <span className="inline-flex items-center gap-1.5 text-meta uppercase tracking-wider text-muted-foreground">
+        <span className="inline-flex items-center gap-1.5 text-body text-muted-foreground">
           {icon}
           {label}
         </span>
-        <span className="text-meta tabular-nums text-foreground">
+        <span className="text-body tabular-nums text-foreground">
           {value}
         </span>
       </div>
@@ -343,7 +343,7 @@ function ConnectedPill({ address }: { address: string }) {
         className="inline-flex h-[var(--ui-h-pill)] items-center gap-2 rounded-full bg-white/5 px-3 text-muted-foreground transition-[background-color,color,scale] duration-150 ease-out hover:bg-white/10 hover:text-foreground active:scale-[0.96]"
       >
         <span aria-hidden className="size-1.5 rounded-full bg-primary shadow-[0_0_6px_var(--primary)]" />
-        <span aria-hidden className="text-meta tabular-nums text-foreground">
+        <span aria-hidden className="text-body tabular-nums text-foreground">
           {short}
         </span>
         <ChevronDownIcon
@@ -366,7 +366,7 @@ function ConnectedPill({ address }: { address: string }) {
         )}
       >
         <div className="px-3 py-2">
-          <div className="text-meta uppercase tracking-wider text-muted-foreground">
+          <div className="text-body text-muted-foreground">
             Connected
           </div>
           <div className="mt-1 text-body tabular-nums text-foreground">
@@ -401,13 +401,13 @@ function ConnectedPill({ address }: { address: string }) {
 function DensityRow() {
   const { density, setDensity } = useDensity();
   const options: { value: Density; label: string; size: string }[] = [
-    { value: "small", label: "Small", size: "text-[11px]" },
-    { value: "medium", label: "Medium", size: "text-[13px]" },
-    { value: "large", label: "Large", size: "text-[15px]" },
+    { value: "small", label: "Small", size: "text-[13px]" },
+    { value: "medium", label: "Medium", size: "text-[14px]" },
+    { value: "large", label: "Large", size: "text-[16px]" },
   ];
   return (
     <div className="px-2 py-1.5">
-      <div className="px-1 pb-1.5 text-meta uppercase tracking-wider text-muted-foreground">
+      <div className="px-1 pb-1.5 text-body text-muted-foreground">
         Display density
       </div>
       <div className="flex items-center gap-1 rounded-md bg-white/[0.04] p-0.5 ring-1 ring-inset ring-white/[0.04]">

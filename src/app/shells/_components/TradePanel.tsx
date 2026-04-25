@@ -89,13 +89,13 @@ export function TradePanel() {
           <div className="flex items-center justify-between">
             <label
               htmlFor="trade-size"
-              className="text-meta uppercase tracking-wider text-muted-foreground"
+              className="text-body text-muted-foreground"
             >
               Size
             </label>
             <span
               aria-hidden
-              className="text-meta tabular-nums text-muted-foreground"
+              className="text-body tabular-nums text-muted-foreground"
             >
               ≈ $0.00
             </span>
@@ -103,7 +103,7 @@ export function TradePanel() {
           <div className="flex h-12 items-center gap-2.5 rounded-lg bg-white/5 px-3.5 transition-[background-color,box-shadow] duration-150 ease-out hover:bg-white/[0.07] focus-within:bg-white/[0.07] focus-within:ring-2 focus-within:ring-primary/50 focus-within:ring-offset-0">
             <span
               aria-hidden
-              className="flex size-5 shrink-0 items-center justify-center rounded-full text-meta font-bold text-black"
+              className="flex size-5 shrink-0 items-center justify-center rounded-full text-body font-bold text-black"
               style={{ backgroundColor: "#f7931a" }}
             >
               ₿
@@ -119,11 +119,11 @@ export function TradePanel() {
             <button
               type="button"
               aria-label="Set max size"
-              className="rounded-md bg-white/10 px-2 py-0.5 text-meta uppercase tracking-wider text-muted-foreground transition-colors hover:bg-white/[0.15] hover:text-foreground focus-visible:bg-white/[0.15] focus-visible:text-foreground focus-visible:outline-none"
+              className="rounded-md bg-white/10 px-2 py-0.5 text-body text-muted-foreground transition-colors hover:bg-white/[0.15] hover:text-foreground focus-visible:bg-white/[0.15] focus-visible:text-foreground focus-visible:outline-none"
             >
               Max
             </button>
-            <span aria-hidden className="text-meta text-muted-foreground">
+            <span aria-hidden className="text-body text-muted-foreground">
               BTC
             </span>
           </div>
@@ -246,7 +246,7 @@ function ParamDropdown({
           rounded === "r" && "rounded-r-lg",
         )}
       >
-        <span className="text-meta uppercase tracking-wider text-muted-foreground">
+        <span className="text-body text-muted-foreground">
           {label}
         </span>
         <span className="flex items-center justify-between gap-1">
@@ -342,7 +342,7 @@ function SideButton({
       <span
         aria-hidden
         className={cn(
-          "inline-block text-meta transition-opacity",
+          "inline-block text-body transition-opacity",
           active ? "opacity-90" : "opacity-50",
         )}
       >
@@ -363,7 +363,7 @@ function StatCell({
 }) {
   return (
     <div className="flex flex-col gap-0.5">
-      <span className="text-meta uppercase tracking-wider text-muted-foreground">
+      <span className="text-body text-muted-foreground">
         {label}
       </span>
       <div className="flex items-baseline gap-1.5">
@@ -383,7 +383,7 @@ function StatCell({
 function SectionLabel({ label }: { label: string }) {
   return (
     <div className="flex items-center gap-3">
-      <span className="text-meta uppercase tracking-wider text-muted-foreground/70">
+      <span className="text-body text-muted-foreground/70">
         {label}
       </span>
       <span aria-hidden className="h-px flex-1 bg-white/5" />

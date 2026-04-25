@@ -345,7 +345,7 @@ function HistoryDropdown({
                 )}
               >
                 <span className="truncate">{s.name}</span>
-                <span className="text-meta text-muted-foreground tabular-nums">
+                <span className="text-body text-muted-foreground tabular-nums">
                   {s.age}
                 </span>
               </button>
@@ -423,7 +423,7 @@ function PathRow({
           <span className="truncate text-body text-foreground">
             {path.name}
           </span>
-          <span className="truncate text-meta text-muted-foreground">
+          <span className="truncate text-body text-muted-foreground">
             {path.author}
             {path.version ? ` · v${path.version}` : ""}
           </span>
@@ -521,7 +521,7 @@ function JobRow({
         />
         <div className="flex min-w-0 flex-1 flex-col gap-0.5">
           <span className="truncate text-body">{job.name}</span>
-          <span className="truncate text-meta text-muted-foreground">
+          <span className="truncate text-body text-muted-foreground">
             {job.cadence}
             {job.lastRunAt ? ` · ran ${job.lastRunAt}` : ""}
             {job.status === "paused" ? " · paused" : ""}
@@ -597,7 +597,7 @@ function UpgradeBanner({ onDismiss }: { onDismiss: () => void }) {
   return (
     <div
       className={cn(
-        "relative mb-2 flex items-center gap-2 overflow-hidden rounded-lg px-3 py-2 text-meta transition-[opacity,transform] duration-300 ease-[var(--ease-strong)] motion-reduce:transition-none",
+        "relative mb-2 flex items-center gap-2 overflow-hidden rounded-lg px-3 py-2 text-body transition-[opacity,transform] duration-300 ease-[var(--ease-strong)] motion-reduce:transition-none",
         !entered || leaving
           ? "opacity-0 -translate-y-1"
           : "opacity-100 translate-y-0",
@@ -627,7 +627,7 @@ function UpgradeBanner({ onDismiss }: { onDismiss: () => void }) {
         href="https://checkout.stripe.com/c/pay/cs_test_b16tiEiHftbAenCNDBPf1SS17U4Tz1KChWZmRxeTci0hgZOWUzkUISdOoS#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSd2cGd2ZndsdXFsamtQa2x0cGBrYHZ2QGtkZ2lgYSc%2FY2RpdmApJ2JwZGZkaGppYFNkd2xka3EnPydmamtxd2ppJyknZHVsTmB8Jz8ndW5acWB2cVowNFZ%2FS11PNkZoQVVTS2lyc2xTRFxiQFBRZDJcTUowb319QmJwSEBENld8bUpuQDVBQHZpV1wwNzVVbjFdbTRgT3xiS0RJaHUycGtdTzRKYmQ0cDN9NVB9PTU1aWlXNF1mYW0nKSdjd2poVmB3c2B3Jz9xd3BgKSdnZGZuYndqcGthRmppancnPycmNWQ1YzVkJyknaWR8anBxUXx1YCc%2FJ2hwaXFsWmxxYGgnKSdga2RnaWBVaWRmYG1qaWFgd3YnP3F3cGB4JSUl"
         target="_blank"
         rel="noopener noreferrer"
-        className="relative shrink-0 text-meta font-semibold transition-[opacity,scale] duration-150 ease-out hover:opacity-80 active:scale-[0.96]"
+        className="relative shrink-0 text-body font-semibold transition-[opacity,scale] duration-150 ease-out hover:opacity-80 active:scale-[0.96]"
         style={{ color: "var(--wf-pro-gold)" }}
       >
         Upgrade
@@ -999,7 +999,7 @@ function Message({ message }: { message: ChatMessage }) {
       <div className="whitespace-pre-wrap text-body text-foreground/90">
         {message.text}
       </div>
-      <span className="text-meta text-muted-foreground">
+      <span className="text-body text-muted-foreground">
         {message.meta}
       </span>
     </div>

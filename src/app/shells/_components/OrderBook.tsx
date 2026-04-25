@@ -28,7 +28,7 @@ export function OrderBookPanel() {
 
       {tab === "book" ? (
         <div id="orderbook-panel-book" role="tabpanel" className="flex min-h-0 flex-1 flex-col px-3 py-2">
-          <div className="grid grid-cols-[1fr_1fr_1fr] gap-2 px-2 py-1.5 text-meta uppercase tracking-wider text-muted-foreground">
+          <div className="grid grid-cols-[1fr_1fr_1fr] gap-2 px-2 py-1.5 text-body text-muted-foreground">
             <span>Price</span>
             <span className="text-right">Size</span>
             <span className="text-right">Total ($)</span>
@@ -39,7 +39,7 @@ export function OrderBookPanel() {
                 <OrderRow key={a.price} {...a} tone="ask" />
               ))}
             </div>
-            <div className="grid grid-cols-[1fr_1fr_1fr] gap-2 border-y border-white/5 bg-white/[0.02] px-2 py-1.5 text-meta tabular-nums">
+            <div className="grid grid-cols-[1fr_1fr_1fr] gap-2 border-y border-white/5 bg-white/[0.02] px-2 py-1.5 text-body tabular-nums">
               <span className="font-semibold">75766.5</span>
               <span />
               <span className="text-right text-muted-foreground">0.13 BPS</span>
@@ -103,7 +103,7 @@ function OrderRow({
   tone: "ask" | "bid";
 }) {
   return (
-    <div className="grid grid-cols-[1fr_1fr_1fr] gap-2 px-2 py-[3px] text-meta tabular-nums">
+    <div className="grid grid-cols-[1fr_1fr_1fr] gap-2 px-2 py-[3px] text-body tabular-nums">
       <span
         className={tone === "ask" ? "text-[#f07575]" : "text-primary"}
         aria-label={`${tone === "ask" ? "Ask" : "Bid"} price ${price}`}

@@ -36,7 +36,7 @@ export function MobileTopBar() {
 
       <div className="flex items-center gap-1.5">
         <span
-          className="inline-flex h-8 items-center gap-1.5 rounded-full bg-white/5 px-2.5 text-meta tabular-nums text-foreground"
+          className="inline-flex h-8 items-center gap-1.5 rounded-full bg-white/5 px-2.5 text-body tabular-nums text-foreground"
           aria-label={`Wallet ${short}`}
         >
           <span
@@ -69,9 +69,9 @@ function MoreMenu() {
   }, [open]);
 
   const options: { value: Density; size: string }[] = [
-    { value: "small", size: "text-[11px]" },
-    { value: "medium", size: "text-[13px]" },
-    { value: "large", size: "text-[15px]" },
+    { value: "small", size: "text-[13px]" },
+    { value: "medium", size: "text-[14px]" },
+    { value: "large", size: "text-[16px]" },
   ];
 
   return (
@@ -96,7 +96,7 @@ function MoreMenu() {
             : "pointer-events-none opacity-0 -translate-y-1 scale-[0.98]",
         )}
       >
-        <div className="px-1 pb-1.5 text-meta uppercase tracking-wider text-muted-foreground">
+        <div className="px-1 pb-1.5 text-body text-muted-foreground">
           Display density
         </div>
         <div className="flex items-center gap-1 rounded-md bg-white/[0.04] p-0.5 ring-1 ring-inset ring-white/[0.04]">
