@@ -54,16 +54,43 @@ export function BottomSheet({
               className="h-1 w-10 rounded-full bg-white/15"
             />
           </div>
-          {title ? (
-            <Dialog.Title className="shrink-0 px-4 pb-2 text-sm font-semibold text-foreground">
-              {title}
-            </Dialog.Title>
-          ) : (
-            <Dialog.Title className="sr-only">Panel</Dialog.Title>
-          )}
+          <div className="flex shrink-0 items-center justify-between gap-2 px-4 pb-2">
+            {title ? (
+              <Dialog.Title className="text-sm font-semibold text-foreground">
+                {title}
+              </Dialog.Title>
+            ) : (
+              <Dialog.Title className="sr-only">Panel</Dialog.Title>
+            )}
+            <Dialog.Close
+              aria-label="Close"
+              className={cn(
+                "ml-auto flex size-8 shrink-0 items-center justify-center rounded-full bg-white/[0.06] text-muted-foreground transition-[background-color,color,scale] duration-150 ease-out hover:bg-white/[0.10] hover:text-foreground active:scale-[0.94]",
+              )}
+            >
+              <CloseIcon />
+            </Dialog.Close>
+          </div>
           <div className="min-h-0 flex-1 overflow-y-auto">{children}</div>
         </Dialog.Popup>
       </Dialog.Portal>
     </Dialog.Root>
+  );
+}
+
+function CloseIcon() {
+  return (
+    <svg
+      aria-hidden
+      viewBox="0 0 16 16"
+      className="size-3.5"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      strokeLinecap="round"
+    >
+      <path d="M4 4L12 12" />
+      <path d="M12 4L4 12" />
+    </svg>
   );
 }
