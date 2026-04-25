@@ -371,7 +371,7 @@ function StatCell({
           {value}
         </span>
         {meta && (
-          <span className="text-[11px] text-muted-foreground/70">
+          <span className="text-[13px] tabular-nums text-muted-foreground/70">
             {meta}
           </span>
         )}
