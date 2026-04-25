@@ -202,6 +202,19 @@
   }
 }
 
+/* Stop iOS Safari auto-zooming when an input is focused. Trigger threshold
+ * is font-size < 16px. Forcing 16px on mobile inputs keeps the page from
+ * scaling up when you tap a textarea or search field. !important wins
+ * against Tailwind text-* utilities. Doesn't affect accessibility pinch-
+ * zoom — only auto-zoom-on-focus. */
+@media (max-width: 767px) {
+  input,
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
