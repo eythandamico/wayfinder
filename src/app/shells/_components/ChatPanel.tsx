@@ -1037,7 +1037,7 @@ function ThinkingIndicator() {
         />
       </svg>
       <span>thinking…</span>
-      <span className="text-[11px] tabular-nums text-muted-foreground/70">
+      <span className="tabular-nums text-muted-foreground/70">
         {timeStr} · {tokens} tokens
       </span>
     </div>
