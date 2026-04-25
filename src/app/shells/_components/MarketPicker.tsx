@@ -164,7 +164,7 @@ export function MarketPicker({
                 setHighlightedIndex(0);
               }}
               className={cn(
-                "relative px-3 py-3 text-sm font-medium transition-colors",
+                "relative px-3 py-3 text-[13px] font-medium transition-colors",
                 venue === v.id
                   ? "text-foreground"
                   : "text-muted-foreground hover:text-foreground",
@@ -179,7 +179,7 @@ export function MarketPicker({
         </div>
 
         {/* Column headers */}
-        <div className="grid grid-cols-[1fr_120px_90px_120px] gap-4 border-b border-white/5 px-4 py-2 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+        <div className="grid grid-cols-[1fr_120px_90px_120px] gap-4 border-b border-white/5 px-4 py-2 text-[10px] uppercase tracking-wider text-muted-foreground">
           <span>Symbol</span>
           <span className="text-right">Last price</span>
           <span className="text-right">24H</span>
@@ -195,7 +195,7 @@ export function MarketPicker({
           className="scroll-thin max-h-[480px] overflow-y-auto"
         >
           {filtered.length === 0 ? (
-            <div role="status" className="flex items-center justify-center py-12 text-sm text-muted-foreground">
+            <div role="status" className="flex items-center justify-center py-12 text-[13px] text-muted-foreground">
               No markets match {query ? `"${query}"` : "this venue"}
             </div>
           ) : (
@@ -221,7 +221,7 @@ export function MarketPicker({
                     className={cn(
                       "flex size-6 shrink-0 items-center justify-center rounded-full font-bold",
                       m.iconChar.length > 1
-                        ? "font-mono text-[9px]"
+                        ? "text-[10px]"
                         : "text-[11px]",
                     )}
                     style={{
@@ -231,31 +231,31 @@ export function MarketPicker({
                   >
                     {m.iconChar}
                   </span>
-                  <span className="truncate text-sm text-foreground">
+                  <span className="truncate text-[13px] text-foreground">
                     {m.symbol}
                   </span>
-                  <span className="shrink-0 font-mono text-[10px] text-muted-foreground">
+                  <span className="shrink-0 text-[10px] text-muted-foreground">
                     {m.leverage}
                   </span>
                 </div>
-                <span className="text-right font-mono text-sm tabular-nums text-foreground">
+                <span className="text-right text-[13px] tabular-nums text-foreground">
                   {m.lastPrice}
                 </span>
                 <span
                   aria-label={`24h change ${m.change24hTone === "positive" ? "up" : "down"} ${m.change24h}`}
                   className={cn(
-                    "flex items-center justify-end gap-1 text-right font-mono text-sm tabular-nums",
+                    "flex items-center justify-end gap-1 text-right text-[13px] tabular-nums",
                     m.change24hTone === "positive"
                       ? "text-primary"
                       : "text-[#f07575]",
                   )}
                 >
-                  <span aria-hidden className="text-[9px]">
+                  <span aria-hidden className="text-[10px]">
                     {m.change24hTone === "positive" ? "▲" : "▼"}
                   </span>
                   {m.change24h}
                 </span>
-                <span className="text-right font-mono text-sm tabular-nums text-muted-foreground">
+                <span className="text-right text-[13px] tabular-nums text-muted-foreground">
                   {m.volume}
                 </span>
               </button>

@@ -20,7 +20,7 @@ export function CommandSearchBar() {
         className="inline-flex h-9 w-full items-center gap-2 rounded-full bg-white/5 px-3 text-muted-foreground transition-[background-color,color] duration-150 ease-out hover:bg-white/10 hover:text-foreground"
       >
         <SearchIcon />
-        <span className="flex-1 truncate text-left text-sm">
+        <span className="flex-1 truncate text-left text-[13px]">
           Search tokens or paths…
         </span>
         <kbd aria-hidden className={cn(kbdClass, "hidden sm:inline-flex")}>
@@ -50,7 +50,7 @@ type ResultItem =
   | { kind: "path"; value: Path };
 
 const kbdClass =
-  "inline-flex items-center justify-center rounded bg-white/[0.08] min-w-[1.25rem] px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-wider text-muted-foreground";
+  "inline-flex items-center justify-center rounded bg-white/[0.08] min-w-[1.25rem] px-1.5 py-0.5 text-[10px] uppercase tracking-wider text-muted-foreground";
 
 export function CommandBar() {
   const { open, closeCommand, toggleCommand } = useCommandBar();
@@ -246,7 +246,7 @@ export function CommandBar() {
                 {items.length === 0 ? (
                   <div
                     role="status"
-                    className="flex flex-col items-center gap-2 px-4 py-14 text-center text-sm text-muted-foreground"
+                    className="flex flex-col items-center gap-2 px-4 py-14 text-center text-[13px] text-muted-foreground"
                   >
                     <span>
                       Nothing matches{" "}
@@ -256,7 +256,7 @@ export function CommandBar() {
                       href={PATHS_CATALOG_URL}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="font-mono text-[11px] uppercase tracking-wider text-primary transition-[filter] hover:brightness-110"
+                      className="text-[11px] uppercase tracking-wider text-primary transition-[filter] hover:brightness-110"
                     >
                       Browse all paths →
                     </a>
@@ -270,7 +270,7 @@ export function CommandBar() {
                     return (
                       <Fragment key={id}>
                         {showHeader && (
-                          <div className="px-4 pb-1 pt-3 font-mono text-[10px] uppercase tracking-wider text-muted-foreground/70">
+                          <div className="px-4 pb-1 pt-3 text-[10px] uppercase tracking-wider text-muted-foreground/70">
                             {item.kind === "token"
                               ? query
                                 ? "Tokens"
@@ -307,7 +307,7 @@ export function CommandBar() {
 
               {/* Footer */}
               <div className="flex items-center justify-between border-t border-white/5 px-4 py-2.5">
-                <div className="flex items-center gap-4 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+                <div className="flex items-center gap-4 text-[10px] uppercase tracking-wider text-muted-foreground">
                   <span className="inline-flex items-center gap-1.5">
                     <kbd aria-hidden className={kbdClass}>
                       ↑
@@ -328,7 +328,7 @@ export function CommandBar() {
                   href={PATHS_CATALOG_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="font-mono text-[10.5px] uppercase tracking-wider text-primary transition-[filter] hover:brightness-110"
+                  className="text-[10px] uppercase tracking-wider text-primary transition-[filter] hover:brightness-110"
                 >
                   View all on strategies.wayfinder.ai ↗
                 </a>
@@ -375,7 +375,7 @@ function TokenRow({
         aria-hidden
         className={cn(
           "flex size-8 shrink-0 items-center justify-center rounded-full font-bold",
-          market.iconChar.length > 1 ? "font-mono text-[9.5px]" : "text-[13px]",
+          market.iconChar.length > 1 ? "text-[10px]" : "text-[13px]",
         )}
         style={{
           backgroundColor: market.iconBg,
@@ -386,31 +386,31 @@ function TokenRow({
       </span>
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
         <div className="flex items-center gap-2">
-          <span className="truncate text-[14px] font-medium text-foreground">
+          <span className="truncate text-[13px] font-medium text-foreground">
             {market.symbol}
           </span>
-          <span className="shrink-0 rounded-full bg-white/[0.06] px-2 py-0.5 font-mono text-[9.5px] uppercase tracking-wider text-muted-foreground">
+          <span className="shrink-0 rounded-full bg-white/[0.06] px-2 py-0.5 text-[10px] uppercase tracking-wider text-muted-foreground">
             {market.leverage}
           </span>
         </div>
-        <span className="font-mono text-[10.5px] uppercase tracking-wider text-muted-foreground">
+        <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
           HL Perps
         </span>
       </div>
       <div className="flex shrink-0 flex-col items-end gap-0.5">
-        <span className="font-mono text-[13px] tabular-nums text-foreground">
+        <span className="text-[13px] tabular-nums text-foreground">
           {market.lastPrice}
         </span>
         <span
           aria-label={`24h change ${market.change24hTone === "positive" ? "up" : "down"} ${market.change24h}`}
           className={cn(
-            "inline-flex items-center gap-0.5 font-mono text-[11px] tabular-nums",
+            "inline-flex items-center gap-0.5 text-[11px] tabular-nums",
             market.change24hTone === "positive"
               ? "text-primary"
               : "text-[#f07575]",
           )}
         >
-          <span aria-hidden className="text-[8px]">
+          <span aria-hidden className="text-[10px]">
             {market.change24hTone === "positive" ? "▲" : "▼"}
           </span>
           {market.change24h}
@@ -450,19 +450,19 @@ function PathRow({
     >
       <span
         aria-hidden
-        className="flex size-8 shrink-0 items-center justify-center rounded-md bg-white/[0.06] font-mono text-[13px] font-semibold text-foreground/90"
+        className="flex size-8 shrink-0 items-center justify-center rounded-md bg-white/[0.06] text-[13px] font-semibold text-foreground/90"
       >
         {initial}
       </span>
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
         <div className="flex items-center gap-2">
-          <span className="truncate text-[14px] font-medium text-foreground">
+          <span className="truncate text-[13px] font-medium text-foreground">
             {path.name}
           </span>
           {path.tags.slice(0, 1).map((t) => (
             <span
               key={t}
-              className="shrink-0 rounded-full bg-white/[0.06] px-2 py-0.5 font-mono text-[9.5px] uppercase tracking-wider text-muted-foreground"
+              className="shrink-0 rounded-full bg-white/[0.06] px-2 py-0.5 text-[10px] uppercase tracking-wider text-muted-foreground"
             >
               {t}
             </span>
@@ -474,10 +474,10 @@ function PathRow({
       </div>
       <div className="flex shrink-0 items-center gap-3">
         <div className="hidden flex-col items-end gap-0.5 md:flex">
-          <span className="font-mono text-[11px] tabular-nums text-foreground/80">
+          <span className="text-[11px] tabular-nums text-foreground/80">
             {path.cost}
           </span>
-          <span className="font-mono text-[9.5px] uppercase tracking-wider text-muted-foreground">
+          <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
             {path.installs} installs
           </span>
         </div>
@@ -485,7 +485,7 @@ function PathRow({
           type="button"
           onClick={onInstall}
           aria-label={`Install ${path.name}`}
-          className="rounded-md bg-primary/15 px-3 py-1 font-mono text-[10.5px] uppercase tracking-wider text-primary transition-colors hover:bg-primary/25 focus-visible:bg-primary/25 focus-visible:outline-none"
+          className="rounded-md bg-primary/15 px-3 py-1 text-[10px] uppercase tracking-wider text-primary transition-colors hover:bg-primary/25 focus-visible:bg-primary/25 focus-visible:outline-none"
         >
           Install
         </button>

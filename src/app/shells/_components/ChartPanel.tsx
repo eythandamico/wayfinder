@@ -34,7 +34,7 @@ export function ChartPanel() {
             className={cn(
               "flex size-6 shrink-0 items-center justify-center rounded-full font-bold",
               market.iconChar.length > 1
-                ? "font-mono text-[9px]"
+                ? "text-[10px]"
                 : "text-[11px]",
             )}
             style={{
@@ -44,10 +44,10 @@ export function ChartPanel() {
           >
             {market.iconChar}
           </span>
-          <span aria-hidden className="font-heading text-sm font-semibold">
+          <span aria-hidden className="text-[13px] font-semibold">
             {market.symbol}
           </span>
-          <span aria-hidden className="font-mono text-[11px] text-muted-foreground">
+          <span aria-hidden className="text-[11px] text-muted-foreground">
             {market.leverage}
           </span>
           <ChevronDownIcon aria-hidden className="size-3 text-muted-foreground" />
@@ -66,12 +66,12 @@ export function ChartPanel() {
         <div className="scroll-thin flex min-w-0 flex-1 items-center gap-5 overflow-x-auto">
           {MARKET_METRICS.map((m) => (
             <div key={m.label} className="flex shrink-0 flex-col gap-0.5">
-              <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+              <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
                 {m.label}
               </span>
               <span
                 className={cn(
-                  "font-mono text-[12.5px] tabular-nums",
+                  "text-[12px] tabular-nums",
                   m.tone === "positive" && "text-primary",
                 )}
                 aria-label={
@@ -99,7 +99,7 @@ export function ChartPanel() {
               aria-label={`Timeframe ${t}`}
               onClick={() => setTf(t)}
               className={cn(
-                "rounded-md px-2 py-1 font-mono text-[11px] uppercase tracking-wider transition-[background-color,color,scale] duration-150 ease-out active:scale-[0.96]",
+                "rounded-md px-2 py-1 text-[11px] uppercase tracking-wider transition-[background-color,color,scale] duration-150 ease-out active:scale-[0.96]",
                 tf === t
                   ? "bg-white/10 text-foreground"
                   : "text-muted-foreground hover:text-foreground",

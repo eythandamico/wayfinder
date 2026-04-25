@@ -59,7 +59,7 @@ export function BottomSheet({
           </div>
           <div className="flex shrink-0 items-center justify-between gap-2 px-4 pb-2">
             {title ? (
-              <Dialog.Title className="text-sm font-semibold text-foreground">
+              <Dialog.Title className="text-[13px] font-semibold text-foreground">
                 {title}
               </Dialog.Title>
             ) : (

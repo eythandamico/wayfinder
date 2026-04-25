@@ -140,7 +140,7 @@ export function ChatPanel() {
         >
           <div className="px-4 pt-4">
             <div className="mb-3 flex items-center justify-between gap-2">
-              <span className="truncate px-2 py-1 text-sm font-semibold text-foreground">
+              <span className="truncate px-2 py-1 text-[13px] font-semibold text-foreground">
                 {activeSession.name}
               </span>
               <div className="flex shrink-0 items-center gap-0.5">
@@ -226,7 +226,7 @@ function TabButton({
       {label}
       <span
         className={cn(
-          "font-mono text-[10px] tabular-nums",
+          "text-[10px] tabular-nums",
           active ? "text-muted-foreground" : "text-muted-foreground/70",
         )}
       >
@@ -310,13 +310,13 @@ function HistoryDropdown({
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search sessions..."
-              className="w-full rounded-md bg-white/[0.04] py-1.5 pl-8 pr-2.5 text-[12.5px] text-foreground outline-none placeholder:text-muted-foreground/60 focus-visible:bg-white/[0.08] focus-visible:ring-1 focus-visible:ring-white/10"
+              className="w-full rounded-md bg-white/[0.04] py-1.5 pl-8 pr-2.5 text-[12px] text-foreground outline-none placeholder:text-muted-foreground/60 focus-visible:bg-white/[0.08] focus-visible:ring-1 focus-visible:ring-white/10"
             />
           </div>
         </div>
         <div className="scroll-thin max-h-72 overflow-y-auto p-1">
           {filtered.length === 0 ? (
-            <div className="px-3 py-6 text-center text-xs text-muted-foreground">
+            <div className="px-3 py-6 text-center text-[12px] text-muted-foreground">
               No sessions match &ldquo;{query}&rdquo;.
             </div>
           ) : (
@@ -332,12 +332,12 @@ function HistoryDropdown({
                   setQuery("");
                 }}
                 className={cn(
-                  "flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-sm transition-colors hover:bg-white/[0.05]",
+                  "flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-[13px] transition-colors hover:bg-white/[0.05]",
                   s.id === active.id && "bg-white/[0.04]",
                 )}
               >
                 <span className="truncate">{s.name}</span>
-                <span className="font-mono text-[11px] text-muted-foreground tabular-nums">
+                <span className="text-[11px] text-muted-foreground tabular-nums">
                   {s.age}
                 </span>
               </button>
@@ -359,13 +359,13 @@ function PathsPanel({
   if (paths.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center gap-1.5 px-6 py-12 text-center">
-        <p className="text-sm text-foreground">No paths installed.</p>
-        <p className="max-w-[260px] text-xs text-muted-foreground">
+        <p className="text-[13px] text-foreground">No paths installed.</p>
+        <p className="max-w-[260px] text-[12px] text-muted-foreground">
           Browse the catalog and install one to run here.
         </p>
         <Link
           href="/paths"
-          className="mt-3 rounded-md bg-primary/15 px-3 py-1.5 text-xs font-semibold text-primary ring-1 ring-inset ring-primary/20 transition-colors hover:bg-primary/20"
+          className="mt-3 rounded-md bg-primary/15 px-3 py-1.5 text-[12px] font-semibold text-primary ring-1 ring-inset ring-primary/20 transition-colors hover:bg-primary/20"
         >
           Browse paths →
         </Link>
@@ -383,7 +383,7 @@ function PathsPanel({
       ))}
       <Link
         href="/paths"
-        className="mt-2 flex items-center justify-center gap-1 rounded-md px-3 py-2 text-xs text-muted-foreground transition-colors hover:bg-white/[0.04] hover:text-foreground"
+        className="mt-2 flex items-center justify-center gap-1 rounded-md px-3 py-2 text-[12px] text-muted-foreground transition-colors hover:bg-white/[0.04] hover:text-foreground"
       >
         Browse more paths →
       </Link>
@@ -415,7 +415,7 @@ function PathRow({
           <span className="truncate text-[13px] text-foreground">
             {path.name}
           </span>
-          <span className="truncate font-mono text-[10px] text-muted-foreground">
+          <span className="truncate text-[10px] text-muted-foreground">
             {path.author}
             {path.version ? ` · v${path.version}` : ""}
           </span>
@@ -446,8 +446,8 @@ function JobsPanel({
   if (jobs.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center gap-1.5 px-6 py-12 text-center">
-        <p className="text-sm text-foreground">No jobs yet.</p>
-        <p className="max-w-[260px] text-xs text-muted-foreground">
+        <p className="text-[13px] text-foreground">No jobs yet.</p>
+        <p className="max-w-[260px] text-[12px] text-muted-foreground">
           Ask your agent to set one up — e.g. &ldquo;every 15m monitor my BTC
           funding&rdquo;.
         </p>
@@ -513,7 +513,7 @@ function JobRow({
         />
         <div className="flex min-w-0 flex-1 flex-col gap-0.5">
           <span className="truncate text-[13px]">{job.name}</span>
-          <span className="truncate font-mono text-[10.5px] text-muted-foreground">
+          <span className="truncate text-[10px] text-muted-foreground">
             {job.cadence}
             {job.lastRunAt ? ` · ran ${job.lastRunAt}` : ""}
             {job.status === "paused" ? " · paused" : ""}
@@ -589,7 +589,7 @@ function UpgradeBanner({ onDismiss }: { onDismiss: () => void }) {
   return (
     <div
       className={cn(
-        "relative mb-2 flex items-center gap-2 overflow-hidden rounded-lg px-3 py-2 text-[11.5px] transition-[opacity,transform] duration-300 ease-[var(--ease-strong)] motion-reduce:transition-none",
+        "relative mb-2 flex items-center gap-2 overflow-hidden rounded-lg px-3 py-2 text-[11px] transition-[opacity,transform] duration-300 ease-[var(--ease-strong)] motion-reduce:transition-none",
         !entered || leaving
           ? "opacity-0 -translate-y-1"
           : "opacity-100 translate-y-0",
@@ -619,7 +619,7 @@ function UpgradeBanner({ onDismiss }: { onDismiss: () => void }) {
         href="https://checkout.stripe.com/c/pay/cs_test_b16tiEiHftbAenCNDBPf1SS17U4Tz1KChWZmRxeTci0hgZOWUzkUISdOoS#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSd2cGd2ZndsdXFsamtQa2x0cGBrYHZ2QGtkZ2lgYSc%2FY2RpdmApJ2JwZGZkaGppYFNkd2xka3EnPydmamtxd2ppJyknZHVsTmB8Jz8ndW5acWB2cVowNFZ%2FS11PNkZoQVVTS2lyc2xTRFxiQFBRZDJcTUowb319QmJwSEBENld8bUpuQDVBQHZpV1wwNzVVbjFdbTRgT3xiS0RJaHUycGtdTzRKYmQ0cDN9NVB9PTU1aWlXNF1mYW0nKSdjd2poVmB3c2B3Jz9xd3BgKSdnZGZuYndqcGthRmppancnPycmNWQ1YzVkJyknaWR8anBxUXx1YCc%2FJ2hwaXFsWmxxYGgnKSdga2RnaWBVaWRmYG1qaWFgd3YnP3F3cGB4JSUl"
         target="_blank"
         rel="noopener noreferrer"
-        className="relative shrink-0 text-[11.5px] font-semibold transition-[opacity,scale] duration-150 ease-out hover:opacity-80 active:scale-[0.96]"
+        className="relative shrink-0 text-[11px] font-semibold transition-[opacity,scale] duration-150 ease-out hover:opacity-80 active:scale-[0.96]"
         style={{ color: "var(--wf-pro-gold)" }}
       >
         Upgrade
@@ -789,7 +789,7 @@ function ChatComposer({
           onChange={(e) => onChange(e.target.value)}
           onKeyDown={onKeyDown}
           rows={3}
-          className="resize-none bg-transparent px-4 pt-3.5 pb-2 text-sm leading-[1.55] text-foreground outline-none placeholder:text-muted-foreground/60"
+          className="resize-none bg-transparent px-4 pt-3.5 pb-2 text-[13px] leading-[1.55] text-foreground outline-none placeholder:text-muted-foreground/60"
         />
         <div className="flex items-center justify-between px-2 pb-2">
           <div className="flex items-center gap-1">
@@ -901,7 +901,7 @@ function AgentPill() {
         className="inline-flex h-9 items-center gap-1.5 rounded-full bg-white/5 px-3 text-muted-foreground transition-[background-color,color,scale] duration-150 ease-out hover:bg-white/10 hover:text-foreground active:scale-[0.96]"
       >
         <InfinityIcon />
-        <span className="text-sm font-medium text-foreground">{model.label}</span>
+        <span className="text-[13px] font-medium text-foreground">{model.label}</span>
         <ChevronDownIcon
           aria-hidden
           className={cn(
@@ -921,7 +921,7 @@ function AgentPill() {
             : "pointer-events-none opacity-0 translate-y-1 scale-[0.98]",
         )}
       >
-        <div className="px-3 pb-1.5 pt-2 text-sm text-muted-foreground">
+        <div className="px-3 pb-1.5 pt-2 text-[13px] text-muted-foreground">
           {MODEL_PROVIDER}
         </div>
         {MODELS.map((m) => {
@@ -943,7 +943,7 @@ function AgentPill() {
             >
               <span
                 className={cn(
-                  "text-sm",
+                  "text-[13px]",
                   active ? "text-primary" : "text-foreground",
                 )}
               >
@@ -963,7 +963,7 @@ function ModePill({ label }: { label: string }) {
     <button
       type="button"
       aria-label={`Chat mode: ${label} (locked)`}
-      className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-sm text-muted-foreground transition-[color,scale] duration-150 ease-out hover:text-foreground active:scale-[0.96]"
+      className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-[13px] text-muted-foreground transition-[color,scale] duration-150 ease-out hover:text-foreground active:scale-[0.96]"
     >
       {label}
       <LockIcon />
@@ -1012,7 +1012,7 @@ function ThinkingIndicator() {
       role="status"
       aria-live="polite"
       aria-atomic="true"
-      className="flex items-center gap-2 text-sm text-muted-foreground"
+      className="flex items-center gap-2 text-[13px] text-muted-foreground"
     >
       <svg
         aria-hidden
@@ -1037,7 +1037,7 @@ function ThinkingIndicator() {
         />
       </svg>
       <span>thinking…</span>
-      <span className="font-mono text-[11.5px] tabular-nums text-muted-foreground/70">
+      <span className="text-[11px] tabular-nums text-muted-foreground/70">
         {timeStr} · {tokens} tokens
       </span>
     </div>
@@ -1048,7 +1048,7 @@ function Message({ message }: { message: ChatMessage }) {
   if (message.role === "user") {
     return (
       <div className="flex justify-end">
-        <div className="max-w-[70%] rounded-2xl bg-white/[0.06] px-4 py-2 text-sm text-foreground">
+        <div className="max-w-[70%] rounded-2xl bg-white/[0.06] px-4 py-2 text-[13px] text-foreground">
           {message.text}
         </div>
       </div>
@@ -1056,10 +1056,10 @@ function Message({ message }: { message: ChatMessage }) {
   }
   return (
     <div className="flex flex-col gap-1">
-      <div className="whitespace-pre-wrap text-sm text-foreground/90">
+      <div className="whitespace-pre-wrap text-[13px] text-foreground/90">
         {message.text}
       </div>
-      <span className="font-mono text-[10.5px] text-muted-foreground">
+      <span className="text-[10px] text-muted-foreground">
         {message.meta}
       </span>
     </div>

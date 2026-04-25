@@ -28,7 +28,7 @@ export function OrderBookPanel() {
 
       {tab === "book" ? (
         <div id="orderbook-panel-book" role="tabpanel" className="flex min-h-0 flex-1 flex-col px-3 py-2">
-          <div className="grid grid-cols-[1fr_1fr_1fr] gap-2 px-2 py-1.5 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+          <div className="grid grid-cols-[1fr_1fr_1fr] gap-2 px-2 py-1.5 text-[10px] uppercase tracking-wider text-muted-foreground">
             <span>Price</span>
             <span className="text-right">Size</span>
             <span className="text-right">Total ($)</span>
@@ -39,7 +39,7 @@ export function OrderBookPanel() {
                 <OrderRow key={a.price} {...a} tone="ask" />
               ))}
             </div>
-            <div className="grid grid-cols-[1fr_1fr_1fr] gap-2 border-y border-white/5 bg-white/[0.02] px-2 py-1.5 font-mono text-[11.5px] tabular-nums">
+            <div className="grid grid-cols-[1fr_1fr_1fr] gap-2 border-y border-white/5 bg-white/[0.02] px-2 py-1.5 text-[11px] tabular-nums">
               <span className="font-semibold">75766.5</span>
               <span />
               <span className="text-right text-muted-foreground">0.13 BPS</span>
@@ -52,7 +52,7 @@ export function OrderBookPanel() {
           </div>
         </div>
       ) : (
-        <div id="orderbook-panel-trades" role="tabpanel" className="flex h-full items-center justify-center p-6 text-sm text-muted-foreground">
+        <div id="orderbook-panel-trades" role="tabpanel" className="flex h-full items-center justify-center p-6 text-[13px] text-muted-foreground">
           No recent trades
         </div>
       )}
@@ -79,7 +79,7 @@ function PanelTab({
       aria-controls={controls}
       onClick={onClick}
       className={cn(
-        "relative flex-1 py-3 text-center text-sm font-semibold transition-[color,scale] duration-150 ease-out active:scale-[0.96]",
+        "relative flex-1 py-3 text-center text-[13px] font-semibold transition-[color,scale] duration-150 ease-out active:scale-[0.96]",
         active ? "text-foreground" : "text-muted-foreground hover:text-foreground",
       )}
     >
@@ -103,7 +103,7 @@ function OrderRow({
   tone: "ask" | "bid";
 }) {
   return (
-    <div className="grid grid-cols-[1fr_1fr_1fr] gap-2 px-2 py-[3px] font-mono text-[11.5px] tabular-nums">
+    <div className="grid grid-cols-[1fr_1fr_1fr] gap-2 px-2 py-[3px] text-[11px] tabular-nums">
       <span
         className={tone === "ask" ? "text-[#f07575]" : "text-primary"}
         aria-label={`${tone === "ask" ? "Ask" : "Bid"} price ${price}`}

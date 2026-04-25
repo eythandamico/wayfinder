@@ -89,13 +89,13 @@ export function TradePanel() {
           <div className="flex items-center justify-between">
             <label
               htmlFor="trade-size"
-              className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground"
+              className="text-[10px] uppercase tracking-wider text-muted-foreground"
             >
               Size
             </label>
             <span
               aria-hidden
-              className="font-mono text-[11px] tabular-nums text-muted-foreground"
+              className="text-[11px] tabular-nums text-muted-foreground"
             >
               ≈ $0.00
             </span>
@@ -114,16 +114,16 @@ export function TradePanel() {
               inputMode="decimal"
               value={size}
               onChange={(e) => setSize(e.target.value)}
-              className="min-w-0 flex-1 bg-transparent font-mono text-base text-foreground outline-none tabular-nums"
+              className="min-w-0 flex-1 bg-transparent text-[15px] text-foreground outline-none tabular-nums"
             />
             <button
               type="button"
               aria-label="Set max size"
-              className="rounded-md bg-white/10 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-muted-foreground transition-colors hover:bg-white/[0.15] hover:text-foreground focus-visible:bg-white/[0.15] focus-visible:text-foreground focus-visible:outline-none"
+              className="rounded-md bg-white/10 px-2 py-0.5 text-[10px] uppercase tracking-wider text-muted-foreground transition-colors hover:bg-white/[0.15] hover:text-foreground focus-visible:bg-white/[0.15] focus-visible:text-foreground focus-visible:outline-none"
             >
               Max
             </button>
-            <span aria-hidden className="font-mono text-[11px] text-muted-foreground">
+            <span aria-hidden className="text-[11px] text-muted-foreground">
               BTC
             </span>
           </div>
@@ -142,7 +142,7 @@ export function TradePanel() {
             </div>
             <span
               aria-hidden
-              className="shrink-0 font-mono text-[12px] tabular-nums text-muted-foreground"
+              className="shrink-0 text-[12px] tabular-nums text-muted-foreground"
             >
               {pct}%
             </span>
@@ -173,7 +173,7 @@ export function TradePanel() {
         <button
           type="button"
           className={cn(
-            "group relative overflow-hidden rounded-lg py-3 text-sm font-semibold transition-[filter,scale] duration-150 ease-out hover:brightness-[1.04] active:scale-[0.96]",
+            "group relative overflow-hidden rounded-lg py-3 text-[13px] font-semibold transition-[filter,scale] duration-150 ease-out hover:brightness-[1.04] active:scale-[0.96]",
             side === "long"
               ? "bg-primary text-primary-foreground"
               : "bg-[#f07575] text-black",
@@ -246,15 +246,15 @@ function ParamDropdown({
           rounded === "r" && "rounded-r-lg",
         )}
       >
-        <span className="font-mono text-[9.5px] uppercase tracking-wider text-muted-foreground">
+        <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
           {label}
         </span>
         <span className="flex items-center justify-between gap-1">
           <span
             className={cn(
-              "truncate text-sm",
+              "truncate text-[13px]",
               accent
-                ? "font-mono tabular-nums text-primary"
+                ? "tabular-nums text-primary"
                 : "text-foreground",
             )}
           >
@@ -294,7 +294,7 @@ function ParamDropdown({
                 setOpen(false);
               }}
               className={cn(
-                "flex w-full items-center justify-between gap-3 whitespace-nowrap rounded-md px-3 py-1.5 text-left text-sm transition-colors",
+                "flex w-full items-center justify-between gap-3 whitespace-nowrap rounded-md px-3 py-1.5 text-left text-[13px] transition-colors",
                 active ? "bg-primary/10" : "hover:bg-white/[0.04]",
               )}
             >
@@ -327,7 +327,7 @@ function SideButton({
       aria-pressed={active}
       onClick={onClick}
       className={cn(
-        "relative flex items-center justify-center gap-1.5 rounded-md py-2 text-sm font-semibold transition-[background-color,color,scale] duration-150 ease-out active:scale-[0.96]",
+        "relative flex items-center justify-center gap-1.5 rounded-md py-2 text-[13px] font-semibold transition-[background-color,color,scale] duration-150 ease-out active:scale-[0.96]",
         active
           ? cn(
               direction === "up"
@@ -342,7 +342,7 @@ function SideButton({
       <span
         aria-hidden
         className={cn(
-          "inline-block text-[9px] transition-opacity",
+          "inline-block text-[10px] transition-opacity",
           active ? "opacity-90" : "opacity-50",
         )}
       >
@@ -363,15 +363,15 @@ function StatCell({
 }) {
   return (
     <div className="flex flex-col gap-0.5">
-      <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+      <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
         {label}
       </span>
       <div className="flex items-baseline gap-1.5">
-        <span className="font-mono text-sm tabular-nums text-foreground">
+        <span className="text-[13px] tabular-nums text-foreground">
           {value}
         </span>
         {meta && (
-          <span className="font-mono text-[10px] text-muted-foreground/70">
+          <span className="text-[10px] text-muted-foreground/70">
             {meta}
           </span>
         )}
@@ -383,7 +383,7 @@ function StatCell({
 function SectionLabel({ label }: { label: string }) {
   return (
     <div className="flex items-center gap-3">
-      <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground/70">
+      <span className="text-[10px] uppercase tracking-wider text-muted-foreground/70">
         {label}
       </span>
       <span aria-hidden className="h-px flex-1 bg-white/5" />
@@ -393,9 +393,9 @@ function SectionLabel({ label }: { label: string }) {
 
 function RiskRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-center justify-between text-sm">
+    <div className="flex items-center justify-between text-[13px]">
       <span className="text-muted-foreground">{label}</span>
-      <span className="font-mono tabular-nums text-foreground/80">{value}</span>
+      <span className="tabular-nums text-foreground/80">{value}</span>
     </div>
   );
 }

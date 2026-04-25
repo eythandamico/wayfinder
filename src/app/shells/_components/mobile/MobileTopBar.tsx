@@ -32,7 +32,7 @@ export function MobileTopBar() {
 
       <div className="flex items-center gap-1.5">
         <span
-          className="inline-flex h-8 items-center gap-1.5 rounded-full bg-white/5 px-2.5 font-mono text-[11px] tabular-nums text-foreground"
+          className="inline-flex h-8 items-center gap-1.5 rounded-full bg-white/5 px-2.5 text-[11px] tabular-nums text-foreground"
           aria-label={`Wallet ${short}`}
         >
           <span
