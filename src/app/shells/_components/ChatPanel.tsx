@@ -226,7 +226,7 @@ function TabButton({
       {label}
       <span
         className={cn(
-          "text-[10px] tabular-nums",
+          "text-[11px] tabular-nums",
           active ? "text-muted-foreground" : "text-muted-foreground/70",
         )}
       >
@@ -415,7 +415,7 @@ function PathRow({
           <span className="truncate text-[13px] text-foreground">
             {path.name}
           </span>
-          <span className="truncate text-[10px] text-muted-foreground">
+          <span className="truncate text-[11px] text-muted-foreground">
             {path.author}
             {path.version ? ` · v${path.version}` : ""}
           </span>
@@ -513,7 +513,7 @@ function JobRow({
         />
         <div className="flex min-w-0 flex-1 flex-col gap-0.5">
           <span className="truncate text-[13px]">{job.name}</span>
-          <span className="truncate text-[10px] text-muted-foreground">
+          <span className="truncate text-[11px] text-muted-foreground">
             {job.cadence}
             {job.lastRunAt ? ` · ran ${job.lastRunAt}` : ""}
             {job.status === "paused" ? " · paused" : ""}
@@ -1059,7 +1059,7 @@ function Message({ message }: { message: ChatMessage }) {
       <div className="whitespace-pre-wrap text-[13px] text-foreground/90">
         {message.text}
       </div>
-      <span className="text-[10px] text-muted-foreground">
+      <span className="text-[11px] text-muted-foreground">
         {message.meta}
       </span>
     </div>

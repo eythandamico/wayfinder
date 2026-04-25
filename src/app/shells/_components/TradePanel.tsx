@@ -89,7 +89,7 @@ export function TradePanel() {
           <div className="flex items-center justify-between">
             <label
               htmlFor="trade-size"
-              className="text-[10px] uppercase tracking-wider text-muted-foreground"
+              className="text-[11px] uppercase tracking-wider text-muted-foreground"
             >
               Size
             </label>
@@ -119,7 +119,7 @@ export function TradePanel() {
             <button
               type="button"
               aria-label="Set max size"
-              className="rounded-md bg-white/10 px-2 py-0.5 text-[10px] uppercase tracking-wider text-muted-foreground transition-colors hover:bg-white/[0.15] hover:text-foreground focus-visible:bg-white/[0.15] focus-visible:text-foreground focus-visible:outline-none"
+              className="rounded-md bg-white/10 px-2 py-0.5 text-[11px] uppercase tracking-wider text-muted-foreground transition-colors hover:bg-white/[0.15] hover:text-foreground focus-visible:bg-white/[0.15] focus-visible:text-foreground focus-visible:outline-none"
             >
               Max
             </button>
@@ -246,7 +246,7 @@ function ParamDropdown({
           rounded === "r" && "rounded-r-lg",
         )}
       >
-        <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
+        <span className="text-[11px] uppercase tracking-wider text-muted-foreground">
           {label}
         </span>
         <span className="flex items-center justify-between gap-1">
@@ -342,7 +342,7 @@ function SideButton({
       <span
         aria-hidden
         className={cn(
-          "inline-block text-[10px] transition-opacity",
+          "inline-block text-[11px] transition-opacity",
           active ? "opacity-90" : "opacity-50",
         )}
       >
@@ -363,7 +363,7 @@ function StatCell({
 }) {
   return (
     <div className="flex flex-col gap-0.5">
-      <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
+      <span className="text-[11px] uppercase tracking-wider text-muted-foreground">
         {label}
       </span>
       <div className="flex items-baseline gap-1.5">
@@ -371,7 +371,7 @@ function StatCell({
           {value}
         </span>
         {meta && (
-          <span className="text-[10px] text-muted-foreground/70">
+          <span className="text-[11px] text-muted-foreground/70">
             {meta}
           </span>
         )}
@@ -383,7 +383,7 @@ function StatCell({
 function SectionLabel({ label }: { label: string }) {
   return (
     <div className="flex items-center gap-3">
-      <span className="text-[10px] uppercase tracking-wider text-muted-foreground/70">
+      <span className="text-[11px] uppercase tracking-wider text-muted-foreground/70">
         {label}
       </span>
       <span aria-hidden className="h-px flex-1 bg-white/5" />

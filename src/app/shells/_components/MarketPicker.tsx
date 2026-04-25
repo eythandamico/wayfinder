@@ -179,7 +179,7 @@ export function MarketPicker({
         </div>
 
         {/* Column headers */}
-        <div className="grid grid-cols-[1fr_120px_90px_120px] gap-4 border-b border-white/5 px-4 py-2 text-[10px] uppercase tracking-wider text-muted-foreground">
+        <div className="grid grid-cols-[1fr_120px_90px_120px] gap-4 border-b border-white/5 px-4 py-2 text-[11px] uppercase tracking-wider text-muted-foreground">
           <span>Symbol</span>
           <span className="text-right">Last price</span>
           <span className="text-right">24H</span>
@@ -221,7 +221,7 @@ export function MarketPicker({
                     className={cn(
                       "flex size-6 shrink-0 items-center justify-center rounded-full font-bold",
                       m.iconChar.length > 1
-                        ? "text-[10px]"
+                        ? "text-[11px]"
                         : "text-[11px]",
                     )}
                     style={{
@@ -234,7 +234,7 @@ export function MarketPicker({
                   <span className="truncate text-[13px] text-foreground">
                     {m.symbol}
                   </span>
-                  <span className="shrink-0 text-[10px] text-muted-foreground">
+                  <span className="shrink-0 text-[11px] text-muted-foreground">
                     {m.leverage}
                   </span>
                 </div>
@@ -250,7 +250,7 @@ export function MarketPicker({
                       : "text-[#f07575]",
                   )}
                 >
-                  <span aria-hidden className="text-[10px]">
+                  <span aria-hidden className="text-[11px]">
                     {m.change24hTone === "positive" ? "▲" : "▼"}
                   </span>
                   {m.change24h}

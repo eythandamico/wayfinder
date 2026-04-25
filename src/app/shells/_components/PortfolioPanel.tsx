@@ -56,7 +56,7 @@ export function PortfolioPanel() {
             </span>
             <span
               aria-label="Session expires in 59 minutes 33 seconds"
-              className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-muted-foreground"
+              className="inline-flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-muted-foreground"
             >
               <ClockIcon />
               <span className="tabular-nums">Session · 59m 33s</span>
@@ -66,14 +66,14 @@ export function PortfolioPanel() {
 
         {/* Portfolio hero — full width, left-aligned column */}
         <div className="flex flex-col gap-1.5">
-          <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
+          <span className="text-[11px] uppercase tracking-wider text-muted-foreground">
             Portfolio
           </span>
           <span className="text-[22px] font-semibold leading-none tabular-nums text-foreground">
             $0.00
           </span>
-          <span className="inline-flex items-center gap-1.5 text-[10px] tabular-nums text-muted-foreground">
-            <span aria-hidden className="text-[10px]">—</span>
+          <span className="inline-flex items-center gap-1.5 text-[11px] tabular-nums text-muted-foreground">
+            <span aria-hidden className="text-[11px]">—</span>
             $0.00
             <span aria-hidden>·</span>
             0.00%
@@ -201,12 +201,12 @@ function WalletDropdown({
                 <span className="truncate text-[13px] text-foreground">
                   {w.name}
                   {w.primary && (
-                    <span className="ml-1.5 text-[10px] uppercase tracking-wider text-muted-foreground">
+                    <span className="ml-1.5 text-[11px] uppercase tracking-wider text-muted-foreground">
                       · primary
                     </span>
                   )}
                 </span>
-                <span className="text-[10px] tabular-nums text-muted-foreground">
+                <span className="text-[11px] tabular-nums text-muted-foreground">
                   {shortAddr}
                 </span>
               </span>
@@ -281,10 +281,10 @@ function VenueRow({
           {glyph}
         </span>
         <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-          <span className="text-[10px] uppercase tracking-wider text-foreground">
+          <span className="text-[11px] uppercase tracking-wider text-foreground">
             {name}
           </span>
-          <span className="text-[10px] tabular-nums text-muted-foreground">
+          <span className="text-[11px] tabular-nums text-muted-foreground">
             {count} {count === 1 ? "position" : "positions"}
           </span>
         </div>
@@ -307,7 +307,7 @@ function VenueRow({
           <span className="text-[13px] text-muted-foreground">{empty}</span>
           <button
             type="button"
-            className="text-[10px] uppercase tracking-wider text-primary transition-[filter] duration-150 ease-out hover:brightness-110"
+            className="text-[11px] uppercase tracking-wider text-primary transition-[filter] duration-150 ease-out hover:brightness-110"
           >
             {cta} →
           </button>
@@ -320,7 +320,7 @@ function VenueRow({
 function SectionLabel({ label }: { label: string }) {
   return (
     <div className="flex items-center gap-3">
-      <span className="text-[10px] uppercase tracking-wider text-muted-foreground/70">
+      <span className="text-[11px] uppercase tracking-wider text-muted-foreground/70">
         {label}
       </span>
       <span aria-hidden className="h-px flex-1 bg-white/5" />

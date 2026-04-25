@@ -34,7 +34,7 @@ export function ChartPanel() {
             className={cn(
               "flex size-6 shrink-0 items-center justify-center rounded-full font-bold",
               market.iconChar.length > 1
-                ? "text-[10px]"
+                ? "text-[11px]"
                 : "text-[11px]",
             )}
             style={{
@@ -66,7 +66,7 @@ export function ChartPanel() {
         <div className="scroll-thin flex min-w-0 flex-1 items-center gap-5 overflow-x-auto">
           {MARKET_METRICS.map((m) => (
             <div key={m.label} className="flex shrink-0 flex-col gap-0.5">
-              <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
+              <span className="text-[11px] uppercase tracking-wider text-muted-foreground">
                 {m.label}
               </span>
               <span
