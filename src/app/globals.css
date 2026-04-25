@@ -171,19 +171,36 @@
  *   text-display — hero numbers
  */
 :root {
+  /* Text */
   --text-meta: 11px;
   --text-body: 13px;
   --text-display: 22px;
+  /* Interactive chrome — scales with density alongside text */
+  --ui-y: 0.625rem;       /* py-2.5 — tabs */
+  --ui-y-tight: 0.25rem;  /* py-1 — timeframe pills */
+  --ui-x-tight: 0.5rem;   /* px-2 — timeframe pills */
+  --ui-h-pill: 2.25rem;   /* h-9 — wallet/usage pills, action strip */
+  --ui-h-input: 2.75rem;  /* h-11 — compact composer */
 }
 [data-density="small"] {
   --text-meta: 10px;
   --text-body: 12px;
   --text-display: 20px;
+  --ui-y: 0.4375rem;
+  --ui-y-tight: 0.1875rem;
+  --ui-x-tight: 0.375rem;
+  --ui-h-pill: 1.875rem;
+  --ui-h-input: 2.5rem;
 }
 [data-density="large"] {
   --text-meta: 12px;
   --text-body: 15px;
   --text-display: 26px;
+  --ui-y: 0.8125rem;
+  --ui-y-tight: 0.3125rem;
+  --ui-x-tight: 0.625rem;
+  --ui-h-pill: 2.5rem;
+  --ui-h-input: 3rem;
 }
 
 @layer utilities {

@@ -48,7 +48,7 @@ function ActionButton({
       type="button"
       onClick={onClick}
       className={cn(
-        "inline-flex h-9 flex-1 items-center justify-center gap-1.5 rounded-full px-3 text-body font-medium transition-[background-color,color,scale] duration-150 ease-out active:scale-[0.96]",
+        "inline-flex h-[var(--ui-h-pill)] flex-1 items-center justify-center gap-1.5 rounded-full px-3 text-body font-medium transition-[background-color,color,scale] duration-150 ease-out active:scale-[0.96]",
         primary
           ? "bg-primary/15 text-primary hover:bg-primary/20"
           : "bg-white/5 text-muted-foreground hover:bg-white/10 hover:text-foreground",

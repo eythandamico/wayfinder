@@ -225,7 +225,7 @@ function TabButton({
       aria-controls={controls}
       onClick={onClick}
       className={cn(
-        "relative inline-flex items-center gap-1.5 rounded-t-md px-3 py-2.5 text-body font-medium transition-colors",
+        "relative inline-flex items-center gap-1.5 rounded-t-md px-3 py-[var(--ui-y)] text-body font-medium transition-colors",
         active
           ? "text-foreground"
           : "text-muted-foreground hover:text-foreground",
@@ -838,7 +838,7 @@ function AgentPill() {
         aria-controls="agent-menu"
         aria-label={`Model: ${model.label}. Choose model`}
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex h-9 items-center gap-1.5 rounded-full bg-white/5 px-3 text-muted-foreground transition-[background-color,color,scale] duration-150 ease-out hover:bg-white/10 hover:text-foreground active:scale-[0.96]"
+        className="inline-flex h-[var(--ui-h-pill)] items-center gap-1.5 rounded-full bg-white/5 px-3 text-muted-foreground transition-[background-color,color,scale] duration-150 ease-out hover:bg-white/10 hover:text-foreground active:scale-[0.96]"
       >
         <InfinityIcon />
         <span className="text-body font-medium text-foreground">{model.label}</span>

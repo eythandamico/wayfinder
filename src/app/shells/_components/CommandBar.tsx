@@ -17,7 +17,7 @@ export function CommandSearchBar() {
         aria-haspopup="dialog"
         aria-label="Search tokens and paths"
         onClick={openCommand}
-        className="inline-flex h-9 w-full items-center gap-2 rounded-full bg-white/5 px-3 text-muted-foreground transition-[background-color,color] duration-150 ease-out hover:bg-white/10 hover:text-foreground"
+        className="inline-flex h-[var(--ui-h-pill)] w-full items-center gap-2 rounded-full bg-white/5 px-3 text-muted-foreground transition-[background-color,color] duration-150 ease-out hover:bg-white/10 hover:text-foreground"
       >
         <SearchIcon />
         <span className="flex-1 truncate text-left text-body">

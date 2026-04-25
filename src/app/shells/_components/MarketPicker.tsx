@@ -164,7 +164,7 @@ export function MarketPicker({
                 setHighlightedIndex(0);
               }}
               className={cn(
-                "relative px-3 py-2.5 text-body font-medium transition-colors",
+                "relative px-3 py-[var(--ui-y)] text-body font-medium transition-colors",
                 venue === v.id
                   ? "text-foreground"
                   : "text-muted-foreground hover:text-foreground",

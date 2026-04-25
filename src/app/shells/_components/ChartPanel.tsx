@@ -99,7 +99,7 @@ export function ChartPanel() {
               aria-label={`Timeframe ${t}`}
               onClick={() => setTf(t)}
               className={cn(
-                "rounded-md px-2 py-1 text-meta uppercase tracking-wider transition-[background-color,color,scale] duration-150 ease-out active:scale-[0.96]",
+                "rounded-md px-[var(--ui-x-tight)] py-[var(--ui-y-tight)] text-meta uppercase tracking-wider transition-[background-color,color,scale] duration-150 ease-out active:scale-[0.96]",
                 tf === t
                   ? "bg-white/10 text-foreground"
                   : "text-muted-foreground hover:text-foreground",
