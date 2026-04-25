@@ -68,7 +68,7 @@ export function BottomSheet({
             <Dialog.Close
               aria-label="Close"
               className={cn(
-                "ml-auto flex size-8 shrink-0 items-center justify-center rounded-full bg-white/[0.06] text-muted-foreground transition-[background-color,color,scale] duration-150 ease-out hover:bg-white/[0.10] hover:text-foreground active:scale-[0.94]",
+                "ml-auto flex size-8 shrink-0 items-center justify-center rounded-full bg-white/[0.06] text-muted-foreground transition-[background-color,color,scale] duration-150 ease-out hover:bg-white/[0.10] hover:text-foreground active:scale-[0.96]",
               )}
             >
               <CloseIcon />

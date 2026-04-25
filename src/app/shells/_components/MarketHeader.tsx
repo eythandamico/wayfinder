@@ -92,7 +92,7 @@ function UsagePill({ usage }: { usage: UsageData }) {
         aria-controls="usage-menu"
         aria-label={`Session usage: ${formatTokens(usage.tokens.used)} of ${formatTokens(usage.tokens.total)} tokens used`}
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex h-9 items-center gap-2 rounded-full bg-white/5 px-3 text-muted-foreground transition-[background-color,color,scale] duration-150 ease-out hover:bg-white/10 hover:text-foreground active:scale-[0.97]"
+        className="inline-flex h-9 items-center gap-2 rounded-full bg-white/5 px-3 text-muted-foreground transition-[background-color,color,scale] duration-150 ease-out hover:bg-white/10 hover:text-foreground active:scale-[0.96]"
       >
         <InfinityIcon />
         <span aria-hidden className="font-mono text-[12px] tabular-nums text-foreground">
@@ -180,7 +180,7 @@ function GoProButton() {
     <button
       type="button"
       aria-label="Upgrade to Pro"
-      className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full px-3 text-[12.5px] font-semibold transition-[filter,scale] duration-150 ease-out hover:brightness-110 active:scale-[0.97]"
+      className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full px-3 text-[12.5px] font-semibold transition-[filter,scale] duration-150 ease-out hover:brightness-110 active:scale-[0.96]"
       style={{
         background: "var(--wf-pro-gold)",
         color: "var(--wf-pro-indigo)",
@@ -347,7 +347,7 @@ function ConnectedPill({ address }: { address: string }) {
         aria-controls="wallet-menu"
         aria-label={`Wallet connected: ${short}`}
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex h-9 items-center gap-2 rounded-full bg-white/5 px-3 text-muted-foreground transition-[background-color,color,scale] duration-150 ease-out hover:bg-white/10 hover:text-foreground active:scale-[0.97]"
+        className="inline-flex h-9 items-center gap-2 rounded-full bg-white/5 px-3 text-muted-foreground transition-[background-color,color,scale] duration-150 ease-out hover:bg-white/10 hover:text-foreground active:scale-[0.96]"
       >
         <span aria-hidden className="size-1.5 rounded-full bg-primary shadow-[0_0_6px_var(--primary)]" />
         <span aria-hidden className="font-mono text-[12px] tabular-nums text-foreground">

@@ -898,7 +898,7 @@ function AgentPill() {
         aria-controls="agent-menu"
         aria-label={`Model: ${model.label}. Choose model`}
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex h-9 items-center gap-1.5 rounded-full bg-white/5 px-3 text-muted-foreground transition-[background-color,color,scale] duration-150 ease-out hover:bg-white/10 hover:text-foreground active:scale-[0.97]"
+        className="inline-flex h-9 items-center gap-1.5 rounded-full bg-white/5 px-3 text-muted-foreground transition-[background-color,color,scale] duration-150 ease-out hover:bg-white/10 hover:text-foreground active:scale-[0.96]"
       >
         <InfinityIcon />
         <span className="text-sm font-medium text-foreground">{model.label}</span>
@@ -963,7 +963,7 @@ function ModePill({ label }: { label: string }) {
     <button
       type="button"
       aria-label={`Chat mode: ${label} (locked)`}
-      className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-sm text-muted-foreground transition-[color,scale] duration-150 ease-out hover:text-foreground active:scale-[0.97]"
+      className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-sm text-muted-foreground transition-[color,scale] duration-150 ease-out hover:text-foreground active:scale-[0.96]"
     >
       {label}
       <LockIcon />

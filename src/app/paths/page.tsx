@@ -425,7 +425,7 @@ function SectionTitle({
       <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
         {eyebrow}
       </span>
-      <h2 className="font-heading text-2xl font-semibold leading-tight text-foreground md:text-[28px]">
+      <h2 className="font-heading text-2xl font-semibold leading-tight text-balance text-foreground md:text-[28px]">
         {title}
       </h2>
     </div>

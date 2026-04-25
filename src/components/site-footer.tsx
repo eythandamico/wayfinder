@@ -47,7 +47,7 @@ export function SiteFooter() {
               className="h-6 w-auto opacity-95"
             />
           </Link>
-          <p className="max-w-xs text-sm leading-relaxed text-muted-foreground">
+          <p className="max-w-xs text-pretty text-sm leading-relaxed text-muted-foreground">
             High-performance infrastructure for the next generation of digital
             finance.
           </p>

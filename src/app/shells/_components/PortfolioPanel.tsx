@@ -238,7 +238,7 @@ function SmallIconButton({
       type="button"
       {...rest}
       className={cn(
-        "relative flex size-7 items-center justify-center rounded-md text-muted-foreground transition-[background-color,color,scale] duration-150 ease-out hover:bg-white/[0.05] hover:text-foreground active:scale-[0.94]",
+        "relative flex size-7 items-center justify-center rounded-md text-muted-foreground transition-[background-color,color,scale] duration-150 ease-out hover:bg-white/[0.05] hover:text-foreground active:scale-[0.96]",
         "before:absolute before:-inset-1 before:content-['']",
         className,
       )}

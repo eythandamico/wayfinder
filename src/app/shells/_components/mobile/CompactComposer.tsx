@@ -9,7 +9,7 @@ export function CompactComposer({ onActivate }: { onActivate: () => void }) {
       <button
         type="button"
         onClick={onActivate}
-        className="flex h-11 w-full items-center gap-2 rounded-full bg-white/5 px-4 text-left text-[13px] text-muted-foreground/80 transition-colors hover:bg-white/10 active:scale-[0.99]"
+        className="flex h-11 w-full items-center gap-2 rounded-full bg-white/5 px-4 text-left text-[13px] text-muted-foreground/80 transition-[background-color,color,scale] duration-150 ease-out hover:bg-white/10 active:scale-[0.96]"
       >
         <span className="flex-1 truncate">Ask your agent…</span>
         <span

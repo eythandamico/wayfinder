@@ -173,7 +173,7 @@ export function TradePanel() {
         <button
           type="button"
           className={cn(
-            "group relative overflow-hidden rounded-lg py-3 text-sm font-semibold transition-[filter,scale] duration-150 ease-out hover:brightness-[1.04] active:scale-[0.98]",
+            "group relative overflow-hidden rounded-lg py-3 text-sm font-semibold transition-[filter,scale] duration-150 ease-out hover:brightness-[1.04] active:scale-[0.96]",
             side === "long"
               ? "bg-primary text-primary-foreground"
               : "bg-[#f07575] text-black",
@@ -327,7 +327,7 @@ function SideButton({
       aria-pressed={active}
       onClick={onClick}
       className={cn(
-        "relative flex items-center justify-center gap-1.5 rounded-md py-2 text-sm font-semibold transition-[background-color,color,scale] duration-150 ease-out active:scale-[0.97]",
+        "relative flex items-center justify-center gap-1.5 rounded-md py-2 text-sm font-semibold transition-[background-color,color,scale] duration-150 ease-out active:scale-[0.96]",
         active
           ? cn(
               direction === "up"
