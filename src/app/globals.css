@@ -252,6 +252,14 @@
   }
 }
 
+/* Disable iOS Safari text autosizing. Without this, Safari boosts font-size
+ * in long readable blocks (chat messages, paragraphs) but not in short UI
+ * labels (tabs, buttons), which breaks our type scale on mobile. */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
 /* Stop iOS Safari auto-zooming when an input is focused. Trigger threshold
  * is font-size < 16px. Forcing 16px on mobile inputs keeps the page from
  * scaling up when you tap a textarea or search field. !important wins
