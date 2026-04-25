@@ -589,7 +589,7 @@ function UpgradeBanner({ onDismiss }: { onDismiss: () => void }) {
   return (
     <div
       className={cn(
-        "relative mb-2 flex items-center gap-2 overflow-hidden rounded-lg px-3 py-2 text-[11.5px] transition-[opacity,transform] duration-300 ease-out motion-reduce:transition-none",
+        "relative mb-2 flex items-center gap-2 overflow-hidden rounded-lg px-3 py-2 text-[11.5px] transition-[opacity,transform] duration-300 ease-[var(--ease-strong)] motion-reduce:transition-none",
         !entered || leaving
           ? "opacity-0 -translate-y-1"
           : "opacity-100 translate-y-0",
@@ -915,7 +915,7 @@ function AgentPill() {
         role="menu"
         aria-hidden={!open}
         className={cn(
-          "absolute bottom-full left-0 z-20 mb-2 w-64 origin-bottom rounded-lg bg-background p-1 shadow-xl ring-1 ring-white/5 transition-[opacity,transform] duration-150 ease-out",
+          "absolute bottom-full left-0 z-20 mb-2 w-64 origin-bottom-left rounded-lg bg-background p-1 shadow-xl ring-1 ring-white/5 transition-[opacity,transform] duration-150 ease-[var(--ease-strong)]",
           open
             ? "opacity-100 translate-y-0 scale-100"
             : "pointer-events-none opacity-0 translate-y-1 scale-[0.98]",

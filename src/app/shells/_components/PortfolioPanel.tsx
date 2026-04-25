@@ -173,7 +173,7 @@ function WalletDropdown({
         role="menu"
         aria-hidden={!open}
         className={cn(
-          "absolute left-0 top-full z-20 mt-1 w-72 origin-top rounded-lg bg-background p-1 shadow-xl ring-1 ring-white/5 transition-[opacity,transform] duration-150 ease-out",
+          "absolute left-0 top-full z-20 mt-1 w-72 origin-top-left rounded-lg bg-background p-1 shadow-xl ring-1 ring-white/5 transition-[opacity,transform] duration-150 ease-[var(--ease-strong)]",
           open
             ? "opacity-100 translate-y-0 scale-100"
             : "pointer-events-none opacity-0 -translate-y-1 scale-[0.98]",
