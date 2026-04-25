@@ -168,12 +168,12 @@ function DesktopShell() {
       <MarketHeader />
       <div
         ref={containerRef}
-        className="mt-1 flex min-h-0 min-w-0 flex-1 gap-1"
+        className="mt-1 flex min-h-0 min-w-0 flex-1"
       >
         {/* Left column: Chart / Portfolio */}
         <div
           ref={leftColRef}
-          className="flex min-h-0 min-w-0 flex-col gap-1"
+          className="flex min-h-0 min-w-0 flex-col"
           style={{ flexBasis: `${cols[0]}%`, flexShrink: 0, flexGrow: 0 }}
         >
           <div
@@ -196,7 +196,7 @@ function DesktopShell() {
         {/* Middle column: Trade / Order book */}
         <div
           ref={midColRef}
-          className="flex min-h-0 min-w-0 flex-col gap-1"
+          className="flex min-h-0 min-w-0 flex-col"
           style={{ flexBasis: `${cols[1]}%`, flexShrink: 0, flexGrow: 0 }}
         >
           <div
