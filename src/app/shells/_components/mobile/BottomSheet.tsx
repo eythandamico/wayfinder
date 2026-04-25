@@ -46,7 +46,10 @@ export function BottomSheet({
             "data-[starting-style]:translate-y-full data-[ending-style]:translate-y-full",
             className,
           )}
-          style={{ maxHeight: `${heightFraction * 100}dvh` }}
+          style={{
+            height: `${heightFraction * 100}dvh`,
+            maxHeight: `${heightFraction * 100}dvh`,
+          }}
         >
           <div className="flex shrink-0 items-center justify-center pt-2.5 pb-2">
             <span
