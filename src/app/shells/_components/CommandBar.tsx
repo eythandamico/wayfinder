@@ -256,7 +256,7 @@ export function CommandBar() {
                       href={PATHS_CATALOG_URL}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-[11px] uppercase tracking-wider text-primary transition-[filter] hover:brightness-110"
+                      className="text-[10px] uppercase tracking-wider text-primary transition-[filter] hover:brightness-110"
                     >
                       Browse all paths →
                     </a>

@@ -217,9 +217,9 @@ function TabButton({
       aria-controls={controls}
       onClick={onClick}
       className={cn(
-        "relative inline-flex items-center gap-1.5 rounded-t-md px-3 py-2 text-[13px] transition-colors",
+        "relative inline-flex items-center gap-1.5 rounded-t-md px-3 py-2.5 text-[13px] font-medium transition-colors",
         active
-          ? "font-medium text-foreground"
+          ? "text-foreground"
           : "text-muted-foreground hover:text-foreground",
       )}
     >

@@ -164,7 +164,7 @@ export function MarketPicker({
                 setHighlightedIndex(0);
               }}
               className={cn(
-                "relative px-3 py-3 text-[13px] font-medium transition-colors",
+                "relative px-3 py-2.5 text-[13px] font-medium transition-colors",
                 venue === v.id
                   ? "text-foreground"
                   : "text-muted-foreground hover:text-foreground",
@@ -172,7 +172,7 @@ export function MarketPicker({
             >
               {v.label}
               {venue === v.id && (
-                <span aria-hidden className="absolute inset-x-3 bottom-0 h-[2px] bg-foreground" />
+                <span aria-hidden className="absolute inset-x-3 -bottom-px h-px bg-foreground" />
               )}
             </button>
           ))}

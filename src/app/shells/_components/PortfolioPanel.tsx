@@ -281,7 +281,7 @@ function VenueRow({
           {glyph}
         </span>
         <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-          <span className="text-[11px] uppercase tracking-wider text-foreground">
+          <span className="text-[10px] uppercase tracking-wider text-foreground">
             {name}
           </span>
           <span className="text-[10px] tabular-nums text-muted-foreground">

@@ -95,7 +95,7 @@ function UsagePill({ usage }: { usage: UsageData }) {
         className="inline-flex h-9 items-center gap-2 rounded-full bg-white/5 px-3 text-muted-foreground transition-[background-color,color,scale] duration-150 ease-out hover:bg-white/10 hover:text-foreground active:scale-[0.96]"
       >
         <InfinityIcon />
-        <span aria-hidden className="text-[12px] tabular-nums text-foreground">
+        <span aria-hidden className="text-[11px] tabular-nums text-foreground">
           {formatTokens(usage.tokens.used)}
           <span className="text-muted-foreground">
             {" / "}
@@ -350,7 +350,7 @@ function ConnectedPill({ address }: { address: string }) {
         className="inline-flex h-9 items-center gap-2 rounded-full bg-white/5 px-3 text-muted-foreground transition-[background-color,color,scale] duration-150 ease-out hover:bg-white/10 hover:text-foreground active:scale-[0.96]"
       >
         <span aria-hidden className="size-1.5 rounded-full bg-primary shadow-[0_0_6px_var(--primary)]" />
-        <span aria-hidden className="text-[12px] tabular-nums text-foreground">
+        <span aria-hidden className="text-[11px] tabular-nums text-foreground">
           {short}
         </span>
         <ChevronDownIcon
@@ -373,7 +373,7 @@ function ConnectedPill({ address }: { address: string }) {
         )}
       >
         <div className="px-3 py-2">
-          <div className="text-[11px] uppercase tracking-wider text-muted-foreground">
+          <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
             Connected
           </div>
           <div className="mt-1 text-[12px] tabular-nums text-foreground">
