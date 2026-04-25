@@ -38,6 +38,7 @@ export function ShellsProvider({ children }: { children: ReactNode }) {
     try {
       const saved = window.localStorage.getItem(DENSITY_KEY) as Density | null;
       if (saved === "small" || saved === "medium" || saved === "large") {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setDensityState(saved);
       }
     } catch {
