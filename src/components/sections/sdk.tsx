@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { Check, Copy } from "lucide-react";
 import { Button, PageSection, SectionHeader } from "@/components/ds";
 import { cn } from "@/lib/utils";
 
@@ -87,36 +88,11 @@ function QuickstartBlock({
 }
 
 function CopyIcon() {
-  return (
-    <svg
-      aria-hidden
-      viewBox="0 0 16 16"
-      className="size-[15px]"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <rect x="5" y="5" width="8" height="8" rx="1.5" />
-      <path d="M10 5V4a1.5 1.5 0 0 0-1.5-1.5h-5A1.5 1.5 0 0 0 2 4v5a1.5 1.5 0 0 0 1.5 1.5H5" />
-    </svg>
-  );
+  return <Copy strokeWidth={1.5} className="size-[15px]" aria-hidden />;
 }
 
 function CheckIcon() {
   return (
-    <svg
-      aria-hidden
-      viewBox="0 0 16 16"
-      className="size-[15px] text-primary"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.75"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M3.5 8.5 6.5 11.5 12.5 5" />
-    </svg>
+    <Check strokeWidth={1.75} className="size-[15px] text-primary" aria-hidden />
   );
 }

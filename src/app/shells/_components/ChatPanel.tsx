@@ -2,6 +2,14 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import {
+  History,
+  Pause,
+  Play,
+  RotateCw,
+  Search,
+  X,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { ChatMessage, Job, Session } from "../_types";
 import type { Path } from "@/lib/paths";
@@ -638,106 +646,38 @@ function UpgradeBanner({ onDismiss }: { onDismiss: () => void }) {
 }
 
 /* ---------------------------------------------------------- */
-/*  Icons local to this panel                                  */
+/*  Icons local to this panel — wrappers around lucide for     */
+/*  consistent stroke + sizing in this component's context.    */
 /* ---------------------------------------------------------- */
 
 function HistoryIcon() {
-  return (
-    <svg
-      aria-hidden
-      viewBox="0 0 16 16"
-      className="size-[15px]"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M8 2.5A5.5 5.5 0 1 1 2.78 10" />
-      <path d="M2.5 3V6H5.5" />
-      <path d="M8 5V8.5L10.5 10" />
-    </svg>
-  );
+  return <History strokeWidth={1.5} className="size-[15px]" aria-hidden />;
 }
 
 function SearchIcon({ className }: { className?: string }) {
   return (
-    <svg
-      aria-hidden
-      viewBox="0 0 16 16"
+    <Search
+      strokeWidth={1.5}
       className={className ?? "size-3.5"}
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <circle cx="7" cy="7" r="4.5" />
-      <path d="M10.5 10.5L13.5 13.5" />
-    </svg>
+      aria-hidden
+    />
   );
 }
 
 function PauseIcon() {
-  return (
-    <svg
-      aria-hidden
-      viewBox="0 0 12 12"
-      className="size-3"
-      fill="currentColor"
-    >
-      <rect x="3" y="2.5" width="1.8" height="7" rx="0.5" />
-      <rect x="7.2" y="2.5" width="1.8" height="7" rx="0.5" />
-    </svg>
-  );
+  return <Pause strokeWidth={0} fill="currentColor" className="size-3" aria-hidden />;
 }
 
 function PlayIcon() {
-  return (
-    <svg
-      aria-hidden
-      viewBox="0 0 12 12"
-      className="size-3"
-      fill="currentColor"
-    >
-      <path d="M4 2.5L9.5 6L4 9.5V2.5Z" />
-    </svg>
-  );
+  return <Play strokeWidth={0} fill="currentColor" className="size-3" aria-hidden />;
 }
 
 function RetryIcon() {
-  return (
-    <svg
-      aria-hidden
-      viewBox="0 0 12 12"
-      className="size-3"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M9.5 4.5A4 4 0 1 0 10 7.5" />
-      <path d="M10 2V5H7" />
-    </svg>
-  );
+  return <RotateCw strokeWidth={1.5} className="size-3" aria-hidden />;
 }
 
 function CloseIcon() {
-  return (
-    <svg
-      aria-hidden
-      viewBox="0 0 12 12"
-      className="size-3"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.75"
-      strokeLinecap="round"
-    >
-      <path d="M3 3L9 9" />
-      <path d="M9 3L3 9" />
-    </svg>
-  );
+  return <X strokeWidth={1.75} className="size-3" aria-hidden />;
 }
 
 /* ---------------------------------------------------------- */

@@ -20,6 +20,7 @@ import {
   ExternalLinkIcon,
   InfinityIcon,
 } from "./icons";
+import { Sparkles } from "lucide-react";
 import { CommandSearchBar } from "./CommandBar";
 
 export function MarketHeader() {
@@ -193,16 +194,7 @@ function GoProButton() {
 }
 
 function SparkleIcon() {
-  return (
-    <svg
-      aria-hidden
-      viewBox="0 0 16 16"
-      className="size-3.5"
-      fill="currentColor"
-    >
-      <path d="M8 1.2L9.35 6.05L14.2 8L9.35 9.95L8 14.8L6.65 9.95L1.8 8L6.65 6.05Z" />
-    </svg>
-  );
+  return <Sparkles strokeWidth={1.75} className="size-3.5" aria-hidden />;
 }
 
 function UsageMetricRow({

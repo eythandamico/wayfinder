@@ -5,6 +5,16 @@ import Image from "next/image";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
+import {
+  ArrowUp,
+  ChevronDown,
+  Infinity,
+  Loader2,
+  Lock,
+  MoreVertical,
+  Plus,
+  Search,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 if (typeof window !== "undefined") {
@@ -661,28 +671,12 @@ function ChatPane() {
         </div>
         {thinking && (
           <div className="flex items-center gap-2 text-[12px] text-muted-foreground">
-            <svg
+            <Loader2
               aria-hidden
-              viewBox="0 0 16 16"
+              strokeWidth={1.75}
               className="size-3 animate-spin text-primary"
               style={{ animationDuration: "900ms" }}
-              fill="none"
-            >
-              <circle
-                cx="8"
-                cy="8"
-                r="6"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                opacity="0.18"
-              />
-              <path
-                d="M14 8a6 6 0 0 0-6-6"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-              />
-            </svg>
+            />
             thinking…
           </div>
         )}
@@ -730,120 +724,52 @@ function ChatPane() {
 
 function ChevronDownIcon({ className }: { className?: string }) {
   return (
-    <svg
-      aria-hidden
-      viewBox="0 0 16 16"
+    <ChevronDown
+      strokeWidth={1.5}
       className={className ?? "size-3"}
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M4 6L8 10L12 6" />
-    </svg>
+      aria-hidden
+    />
   );
 }
 
 function SearchIcon({ className }: { className?: string }) {
   return (
-    <svg
-      aria-hidden
-      viewBox="0 0 16 16"
+    <Search
+      strokeWidth={1.5}
       className={className ?? "size-3.5"}
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <circle cx="7" cy="7" r="4.5" />
-      <path d="M10.5 10.5 13.5 13.5" />
-    </svg>
+      aria-hidden
+    />
   );
 }
 
 function InfinityIcon() {
   return (
-    <svg
-      aria-hidden
-      viewBox="0 0 24 24"
+    <Infinity
+      strokeWidth={2}
       className="size-3.5 text-primary"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M12 12c-2-2.67-4-4-6-4a4 4 0 1 0 0 8c2 0 4-1.33 6-4zm0 0c2 2.67 4 4 6 4a4 4 0 1 0 0-8c-2 0-4 1.33-6 4z" />
-    </svg>
+      aria-hidden
+    />
   );
 }
 
 function LockIcon() {
   return (
-    <svg
-      aria-hidden
-      viewBox="0 0 16 16"
+    <Lock
+      strokeWidth={1.5}
       className="size-3 text-muted-foreground/70"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <rect x="4" y="7.5" width="8" height="5.5" rx="1" />
-      <path d="M5.5 7.5V5.5a2.5 2.5 0 0 1 5 0v2" />
-    </svg>
+      aria-hidden
+    />
   );
 }
 
 function PlusIcon() {
-  return (
-    <svg
-      aria-hidden
-      viewBox="0 0 16 16"
-      className="size-3.5"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-    >
-      <path d="M8 3V13" />
-      <path d="M3 8H13" />
-    </svg>
-  );
+  return <Plus strokeWidth={1.5} className="size-3.5" aria-hidden />;
 }
 
 function MoreIcon() {
-  return (
-    <svg
-      aria-hidden
-      viewBox="0 0 16 16"
-      className="size-3.5"
-      fill="currentColor"
-    >
-      <circle cx="8" cy="3.5" r="1.25" />
-      <circle cx="8" cy="8" r="1.25" />
-      <circle cx="8" cy="12.5" r="1.25" />
-    </svg>
-  );
+  return <MoreVertical strokeWidth={1.5} className="size-3.5" aria-hidden />;
 }
 
 function ArrowUpIcon() {
-  return (
-    <svg
-      aria-hidden
-      viewBox="0 0 16 16"
-      className="size-3.5"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M8 13V3" />
-      <path d="M3 8l5-5 5 5" />
-    </svg>
-  );
+  return <ArrowUp strokeWidth={2} className="size-3.5" aria-hidden />;
 }

@@ -4,6 +4,7 @@ import { useEffect, useRef, type ReactNode } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
+import { Loader2, Route, Wallet } from "lucide-react";
 import { PageSection, SectionHeader, StackCard } from "@/components/ds";
 import { cn } from "@/lib/utils";
 
@@ -246,28 +247,12 @@ function ChatArt() {
           </span>
         </div>
         <div className="mt-auto inline-flex items-center gap-2 text-[12px] text-muted-foreground">
-          <svg
+          <Loader2
             aria-hidden
-            viewBox="0 0 16 16"
+            strokeWidth={1.75}
             className="size-3 animate-spin text-primary"
             style={{ animationDuration: "900ms" }}
-            fill="none"
-          >
-            <circle
-              cx="8"
-              cy="8"
-              r="6"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              opacity="0.18"
-            />
-            <path
-              d="M14 8a6 6 0 0 0-6-6"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-            />
-          </svg>
+          />
           thinking…
         </div>
       </div>
@@ -468,35 +453,20 @@ function PathsArt() {
 
 function WalletGlyph() {
   return (
-    <svg
-      aria-hidden
-      viewBox="0 0 16 16"
+    <Wallet
+      strokeWidth={1.6}
       className="size-3.5 text-[var(--wf-accent-sky)]"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.6"
-    >
-      <rect x="2" y="4" width="12" height="8" rx="2" />
-      <circle cx="11" cy="8" r="1" fill="currentColor" />
-    </svg>
+      aria-hidden
+    />
   );
 }
 
 function PathsGlyph() {
   return (
-    <svg
-      aria-hidden
-      viewBox="0 0 16 16"
+    <Route
+      strokeWidth={1.6}
       className="size-3.5 text-[var(--wf-accent-violet)]"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.6"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M3 12L6 5L9 10L13 4" />
-      <circle cx="3" cy="12" r="1.25" fill="currentColor" />
-      <circle cx="13" cy="4" r="1.25" fill="currentColor" />
-    </svg>
+      aria-hidden
+    />
   );
 }

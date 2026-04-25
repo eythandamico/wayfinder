@@ -3,6 +3,7 @@
 import { useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { ChevronDown, Download, Search, Star } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { Button, PageSection, Reveal } from "@/components/ds";
@@ -156,19 +157,11 @@ export default function PathsPage() {
               <label htmlFor="paths-hero-search" className="sr-only">
                 Search paths
               </label>
-              <svg
-                aria-hidden
-                viewBox="0 0 16 16"
+              <Search
+                strokeWidth={1.5}
                 className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-muted-foreground"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <circle cx="7" cy="7" r="4.5" />
-                <path d="M10.5 10.5 13.5 13.5" />
-              </svg>
+                aria-hidden
+              />
               <input
                 id="paths-hero-search"
                 type="text"
@@ -269,18 +262,11 @@ export default function PathsPage() {
                       </option>
                     ))}
                   </select>
-                  <svg
-                    aria-hidden
-                    viewBox="0 0 16 16"
+                  <ChevronDown
+                    strokeWidth={1.5}
                     className="pointer-events-none absolute right-2.5 top-1/2 size-3 -translate-y-1/2 text-muted-foreground"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M4 6L8 10L12 6" />
-                  </svg>
+                    aria-hidden
+                  />
                 </div>
                 <Button
                   size="sm"
@@ -433,54 +419,17 @@ function SectionTitle({
 }
 
 function DownloadIcon() {
-  return (
-    <svg
-      aria-hidden
-      viewBox="0 0 16 16"
-      className="size-3.5"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.75"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M8 3v7" />
-      <path d="M4.5 7.5 8 11l3.5-3.5" />
-      <path d="M3 13h10" />
-    </svg>
-  );
+  return <Download strokeWidth={1.75} className="size-3.5" aria-hidden />;
 }
 
 function StarIcon() {
   return (
-    <svg
-      aria-hidden
-      viewBox="0 0 16 16"
-      className="size-3"
-      fill="currentColor"
-    >
-      <path d="M8 1.5l1.95 3.95 4.35.63-3.15 3.07.74 4.33L8 11.43l-3.89 2.05.74-4.33L1.7 6.08l4.35-.63L8 1.5z" />
-    </svg>
+    <Star strokeWidth={0} fill="currentColor" className="size-3" aria-hidden />
   );
 }
 
 function InstallsIcon() {
-  return (
-    <svg
-      aria-hidden
-      viewBox="0 0 16 16"
-      className="size-3"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.6"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M8 2.5v6.5" />
-      <path d="M5 6.5 8 9l3-2.5" />
-      <path d="M2.75 12h10.5" />
-    </svg>
-  );
+  return <Download strokeWidth={1.6} className="size-3" aria-hidden />;
 }
 
 function Hairline() {

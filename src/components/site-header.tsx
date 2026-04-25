@@ -6,6 +6,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
+import { ArrowUpRight, Home } from "lucide-react";
 import { Button } from "@/components/ds";
 import { cn } from "@/lib/utils";
 
@@ -244,35 +245,21 @@ export function SiteHeader() {
 
 function ExternalIcon() {
   return (
-    <svg
-      aria-hidden
-      viewBox="0 0 12 12"
+    <ArrowUpRight
+      strokeWidth={1.5}
       className="size-3 opacity-70"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M4 2.5H9.5V8" />
-      <path d="M9.5 2.5L3 9" />
-    </svg>
+      aria-hidden
+    />
   );
 }
 
 function HomeIcon({ active }: { active: boolean }) {
   return (
-    <svg
+    <Home
       aria-hidden
-      viewBox="0 0 20 20"
       className="size-[18px] transition-[fill] duration-200 motion-reduce:transition-none"
       fill={active ? "currentColor" : "none"}
-      stroke="currentColor"
       strokeWidth={active ? 0 : 1.75}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M3.5 9.2 10 3.75l6.5 5.45V16a1 1 0 0 1-1 1h-3.25v-4.5h-4.5V17H4.5a1 1 0 0 1-1-1V9.2Z" />
-    </svg>
+    />
   );
 }

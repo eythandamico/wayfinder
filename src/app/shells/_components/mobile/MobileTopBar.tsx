@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { MoreHorizontal } from "lucide-react";
 import { WALLET_ADDRESS } from "../../_data/mocks";
 import { CommandSearchIconButton } from "../CommandBar";
 
@@ -47,16 +48,7 @@ export function MobileTopBar() {
           aria-label="More"
           className="flex size-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-white/5 hover:text-foreground"
         >
-          <svg
-            aria-hidden
-            viewBox="0 0 16 16"
-            className="size-4"
-            fill="currentColor"
-          >
-            <circle cx="3.5" cy="8" r="1.25" />
-            <circle cx="8" cy="8" r="1.25" />
-            <circle cx="12.5" cy="8" r="1.25" />
-          </svg>
+          <MoreHorizontal strokeWidth={1.5} className="size-4" aria-hidden />
         </button>
       </div>
     </div>

@@ -1,5 +1,6 @@
 "use client";
 
+import { Briefcase, BookOpen, TrendingUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type Sheet = "trade" | "portfolio" | "orderbook";
@@ -15,17 +16,17 @@ export function ActionStrip({
         label="Trade"
         primary
         onClick={() => onOpen("trade")}
-        icon={<TradeIcon />}
+        icon={<TrendingUp strokeWidth={1.5} className="size-3.5" />}
       />
       <ActionButton
         label="Order book"
         onClick={() => onOpen("orderbook")}
-        icon={<OrderBookIcon />}
+        icon={<BookOpen strokeWidth={1.5} className="size-3.5" />}
       />
       <ActionButton
         label="Portfolio"
         onClick={() => onOpen("portfolio")}
-        icon={<PortfolioIcon />}
+        icon={<Briefcase strokeWidth={1.5} className="size-3.5" />}
       />
     </div>
   );
@@ -56,60 +57,5 @@ function ActionButton({
       {icon}
       {label}
     </button>
-  );
-}
-
-function TradeIcon() {
-  return (
-    <svg
-      aria-hidden
-      viewBox="0 0 16 16"
-      className="size-3.5"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.6"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M3 11L7 7L10 10L14 5" />
-      <path d="M14 5H10.5" />
-      <path d="M14 5V8" />
-    </svg>
-  );
-}
-
-function OrderBookIcon() {
-  return (
-    <svg
-      aria-hidden
-      viewBox="0 0 16 16"
-      className="size-3.5"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.6"
-      strokeLinecap="round"
-    >
-      <path d="M3 4.5H13" />
-      <path d="M3 8H10" />
-      <path d="M3 11.5H12" />
-    </svg>
-  );
-}
-
-function PortfolioIcon() {
-  return (
-    <svg
-      aria-hidden
-      viewBox="0 0 16 16"
-      className="size-3.5"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <rect x="2.5" y="5" width="11" height="8" rx="1.5" />
-      <path d="M5.5 5V3.5A1 1 0 0 1 6.5 2.5H9.5A1 1 0 0 1 10.5 3.5V5" />
-    </svg>
   );
 }

@@ -1,5 +1,7 @@
 "use client";
 
+import { Mic } from "lucide-react";
+
 export function CompactComposer({ onActivate }: { onActivate: () => void }) {
   return (
     <div
@@ -16,28 +18,9 @@ export function CompactComposer({ onActivate }: { onActivate: () => void }) {
           aria-hidden
           className="flex size-7 shrink-0 items-center justify-center rounded-full bg-white/10 text-muted-foreground"
         >
-          <MicIcon />
+          <Mic strokeWidth={1.5} className="size-3.5" />
         </span>
       </button>
     </div>
-  );
-}
-
-function MicIcon() {
-  return (
-    <svg
-      aria-hidden
-      viewBox="0 0 16 16"
-      className="size-3.5"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <rect x="6" y="2.5" width="4" height="7" rx="2" />
-      <path d="M4 8.5A4 4 0 0 0 12 8.5" />
-      <path d="M8 12.5V14" />
-    </svg>
   );
 }

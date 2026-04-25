@@ -1,6 +1,7 @@
 "use client";
 
 import { Dialog } from "@base-ui/react/dialog";
+import { X } from "lucide-react";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
@@ -82,18 +83,5 @@ export function BottomSheet({
 }
 
 function CloseIcon() {
-  return (
-    <svg
-      aria-hidden
-      viewBox="0 0 16 16"
-      className="size-3.5"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.75"
-      strokeLinecap="round"
-    >
-      <path d="M4 4L12 12" />
-      <path d="M12 4L4 12" />
-    </svg>
-  );
+  return <X strokeWidth={1.75} className="size-3.5" aria-hidden />;
 }
