@@ -39,3 +39,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local AI tooling (not part of the app)
+/.agents
+/.claude
+/.windsurf
+/skills-lock.json
