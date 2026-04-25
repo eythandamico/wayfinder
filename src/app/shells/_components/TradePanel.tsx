@@ -371,7 +371,7 @@ function StatCell({
           {value}
         </span>
         {meta && (
-          <span className="text-body tabular-nums text-muted-foreground/70">
+          <span className="text-body tabular-nums text-muted-foreground">
             {meta}
           </span>
         )}
@@ -383,7 +383,7 @@ function StatCell({
 function SectionLabel({ label }: { label: string }) {
   return (
     <div className="flex items-center gap-3">
-      <span className="text-body text-muted-foreground/70">
+      <span className="text-body text-muted-foreground">
         {label}
       </span>
       <span aria-hidden className="h-px flex-1 bg-white/5" />
@@ -395,7 +395,7 @@ function RiskRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between text-body">
       <span className="text-muted-foreground">{label}</span>
-      <span className="tabular-nums text-foreground/80">{value}</span>
+      <span className="tabular-nums text-foreground">{value}</span>
     </div>
   );
 }

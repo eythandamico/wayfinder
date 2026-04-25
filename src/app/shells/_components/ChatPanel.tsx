@@ -235,7 +235,7 @@ function TabButton({
       <span
         className={cn(
           "tabular-nums",
-          active ? "text-muted-foreground" : "text-muted-foreground/70",
+          active ? "text-muted-foreground" : "text-muted-foreground",
         )}
       >
         {count}
@@ -318,7 +318,7 @@ function HistoryDropdown({
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search sessions..."
-              className="w-full rounded-md bg-white/[0.04] py-1.5 pl-8 pr-2.5 text-body text-foreground outline-none placeholder:text-muted-foreground/60 focus-visible:bg-white/[0.08] focus-visible:ring-1 focus-visible:ring-white/10"
+              className="w-full rounded-md bg-white/[0.04] py-1.5 pl-8 pr-2.5 text-body text-foreground outline-none placeholder:text-muted-foreground focus-visible:bg-white/[0.08] focus-visible:ring-1 focus-visible:ring-white/10"
             />
           </div>
         </div>
@@ -729,7 +729,7 @@ function ChatComposer({
           onChange={(e) => onChange(e.target.value)}
           onKeyDown={onKeyDown}
           rows={3}
-          className="resize-none bg-transparent px-4 pt-3.5 pb-2 text-body leading-[1.55] text-foreground outline-none placeholder:text-muted-foreground/60"
+          className="resize-none bg-transparent px-4 pt-3.5 pb-2 text-body leading-[1.55] text-foreground outline-none placeholder:text-muted-foreground"
         />
         <div className="flex items-center justify-between px-2 pb-2">
           <div className="flex items-center gap-1">
@@ -977,7 +977,7 @@ function ThinkingIndicator() {
         />
       </svg>
       <span>thinking…</span>
-      <span className="tabular-nums text-muted-foreground/70">
+      <span className="tabular-nums text-muted-foreground">
         {timeStr} · {tokens} tokens
       </span>
     </div>
@@ -996,7 +996,7 @@ function Message({ message }: { message: ChatMessage }) {
   }
   return (
     <div className="flex flex-col gap-1">
-      <div className="whitespace-pre-wrap text-body text-foreground/90">
+      <div className="whitespace-pre-wrap text-body text-foreground">
         {message.text}
       </div>
       <span className="text-body text-muted-foreground">

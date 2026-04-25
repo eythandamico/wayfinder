@@ -163,11 +163,11 @@ function UsagePill({ usage }: { usage: UsageData }) {
         </div>
 
         <div className="mt-2 flex flex-col gap-0.5">
-          <button type="button" role="menuitem" className="flex items-center justify-between rounded-md px-1 py-1.5 text-body text-foreground/85 transition-colors hover:bg-white/[0.05]">
+          <button type="button" role="menuitem" className="flex items-center justify-between rounded-md px-1 py-1.5 text-body text-foreground transition-colors hover:bg-white/[0.05]">
             <span>View detailed usage</span>
             <ExternalLinkIcon />
           </button>
-          <button type="button" role="menuitem" className="flex items-center justify-between rounded-md px-1 py-1.5 text-body text-foreground/85 transition-colors hover:bg-white/[0.05]">
+          <button type="button" role="menuitem" className="flex items-center justify-between rounded-md px-1 py-1.5 text-body text-foreground transition-colors hover:bg-white/[0.05]">
             <span>Manage limits</span>
             <ExternalLinkIcon />
           </button>
@@ -288,7 +288,7 @@ function AppMenu({ current }: { current: string }) {
               className={cn(
                 "flex items-center justify-between rounded-md px-3 py-2 text-body transition-colors hover:bg-white/[0.05]",
                 isActive && "bg-white/[0.04] text-foreground",
-                !isActive && "text-foreground/85",
+                !isActive && "text-foreground",
               )}
             >
               <span>{s.label}</span>
@@ -378,12 +378,12 @@ function ConnectedPill({ address }: { address: string }) {
           type="button"
           role="menuitem"
           onClick={copy}
-          className="flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-body text-foreground/85 transition-colors hover:bg-white/[0.05]"
+          className="flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-body text-foreground transition-colors hover:bg-white/[0.05]"
         >
           <span>{copied ? "Copied" : "Copy address"}</span>
           <CopyIcon />
         </button>
-        <button type="button" role="menuitem" className="flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-body text-foreground/85 transition-colors hover:bg-white/[0.05]">
+        <button type="button" role="menuitem" className="flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-body text-foreground transition-colors hover:bg-white/[0.05]">
           <span>View on Etherscan</span>
           <ExternalLinkIcon />
         </button>

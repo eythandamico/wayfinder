@@ -218,7 +218,7 @@ function WalletDropdown({
         <button
           type="button"
           role="menuitem"
-          className="flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-body text-foreground/85 transition-colors hover:bg-white/[0.05]"
+          className="flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-body text-foreground transition-colors hover:bg-white/[0.05]"
         >
           <span>Add wallet</span>
           <span aria-hidden className="text-body text-muted-foreground">+</span>
@@ -276,7 +276,7 @@ function VenueRow({
       >
         <span
           aria-hidden
-          className="flex size-7 shrink-0 items-center justify-center rounded-md bg-white/[0.06] text-body font-semibold text-foreground/90 transition-colors group-hover:bg-white/[0.09]"
+          className="flex size-7 shrink-0 items-center justify-center rounded-md bg-white/[0.06] text-body font-semibold text-foreground transition-colors group-hover:bg-white/[0.09]"
         >
           {glyph}
         </span>
@@ -288,7 +288,7 @@ function VenueRow({
             {count} {count === 1 ? "position" : "positions"}
           </span>
         </div>
-        <span className="text-body tabular-nums text-foreground/90">
+        <span className="text-body tabular-nums text-foreground">
           {value}
         </span>
         <ChevronDownIcon
@@ -320,7 +320,7 @@ function VenueRow({
 function SectionLabel({ label }: { label: string }) {
   return (
     <div className="flex items-center gap-3">
-      <span className="text-body text-muted-foreground/70">
+      <span className="text-body text-muted-foreground">
         {label}
       </span>
       <span aria-hidden className="h-px flex-1 bg-white/5" />

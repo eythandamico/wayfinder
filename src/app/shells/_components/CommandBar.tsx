@@ -228,7 +228,7 @@ export function CommandBar() {
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Search tokens, tags, or path names…"
                   tabIndex={open ? 0 : -1}
-                  className="flex-1 bg-transparent text-body text-foreground outline-none placeholder:text-muted-foreground/70"
+                  className="flex-1 bg-transparent text-body text-foreground outline-none placeholder:text-muted-foreground"
                 />
                 <kbd aria-hidden className={kbdClass}>
                   esc
@@ -270,7 +270,7 @@ export function CommandBar() {
                     return (
                       <Fragment key={id}>
                         {showHeader && (
-                          <div className="px-4 pb-1 pt-3 text-body text-muted-foreground/70">
+                          <div className="px-4 pb-1 pt-3 text-body text-muted-foreground">
                             {item.kind === "token"
                               ? query
                                 ? "Tokens"
@@ -450,7 +450,7 @@ function PathRow({
     >
       <span
         aria-hidden
-        className="flex size-8 shrink-0 items-center justify-center rounded-md bg-white/[0.06] text-body font-semibold text-foreground/90"
+        className="flex size-8 shrink-0 items-center justify-center rounded-md bg-white/[0.06] text-body font-semibold text-foreground"
       >
         {initial}
       </span>
@@ -474,7 +474,7 @@ function PathRow({
       </div>
       <div className="flex shrink-0 items-center gap-3">
         <div className="hidden flex-col items-end gap-0.5 md:flex">
-          <span className="text-body tabular-nums text-foreground/80">
+          <span className="text-body tabular-nums text-foreground">
             {path.cost}
           </span>
           <span className="text-body text-muted-foreground">

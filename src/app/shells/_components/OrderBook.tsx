@@ -110,7 +110,7 @@ function OrderRow({
       >
         {price}
       </span>
-      <span className="text-right text-foreground/90">{size}</span>
+      <span className="text-right text-foreground">{size}</span>
       <span className="text-right text-muted-foreground">{total}</span>
     </div>
   );
