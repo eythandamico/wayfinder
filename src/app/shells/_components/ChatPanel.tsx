@@ -226,7 +226,7 @@ function TabButton({
       {label}
       <span
         className={cn(
-          "text-[11px] tabular-nums",
+          "tabular-nums",
           active ? "text-muted-foreground" : "text-muted-foreground/70",
         )}
       >
