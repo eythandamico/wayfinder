@@ -51,12 +51,12 @@ export function PortfolioPanel() {
             </div>
           </div>
           <div className="flex items-center justify-between gap-3">
-            <span className="text-[11px] tabular-nums text-muted-foreground">
+            <span className="text-meta tabular-nums text-muted-foreground">
               {short}
             </span>
             <span
               aria-label="Session expires in 59 minutes 33 seconds"
-              className="inline-flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-muted-foreground"
+              className="inline-flex items-center gap-1.5 text-meta uppercase tracking-wider text-muted-foreground"
             >
               <ClockIcon />
               <span className="tabular-nums">Session · 59m 33s</span>
@@ -66,14 +66,14 @@ export function PortfolioPanel() {
 
         {/* Portfolio hero — full width, left-aligned column */}
         <div className="flex flex-col gap-1.5">
-          <span className="text-[11px] uppercase tracking-wider text-muted-foreground">
+          <span className="text-meta uppercase tracking-wider text-muted-foreground">
             Portfolio
           </span>
-          <span className="text-[22px] font-semibold leading-none tabular-nums text-foreground">
+          <span className="text-display font-semibold leading-none tabular-nums text-foreground">
             $0.00
           </span>
-          <span className="inline-flex items-center gap-1.5 text-[11px] tabular-nums text-muted-foreground">
-            <span aria-hidden className="text-[11px]">—</span>
+          <span className="inline-flex items-center gap-1.5 text-meta tabular-nums text-muted-foreground">
+            <span aria-hidden className="text-meta">—</span>
             $0.00
             <span aria-hidden>·</span>
             0.00%
@@ -149,7 +149,7 @@ function WalletDropdown({
         aria-controls="wallet-select-menu"
         aria-label={`Current wallet: ${label}. Switch wallet`}
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex max-w-full items-center gap-1.5 rounded-md px-1.5 py-1 text-left text-[15px] transition-colors hover:bg-white/[0.04]"
+        className="inline-flex max-w-full items-center gap-1.5 rounded-md px-1.5 py-1 text-left text-body transition-colors hover:bg-white/[0.04]"
       >
         <span className="truncate">
           <span className="font-semibold text-foreground">{active.name}</span>
@@ -198,15 +198,15 @@ function WalletDropdown({
               )}
             >
               <span className="flex min-w-0 flex-col">
-                <span className="truncate text-[13px] text-foreground">
+                <span className="truncate text-body text-foreground">
                   {w.name}
                   {w.primary && (
-                    <span className="ml-1.5 text-[11px] uppercase tracking-wider text-muted-foreground">
+                    <span className="ml-1.5 text-meta uppercase tracking-wider text-muted-foreground">
                       · primary
                     </span>
                   )}
                 </span>
-                <span className="text-[11px] tabular-nums text-muted-foreground">
+                <span className="text-meta tabular-nums text-muted-foreground">
                   {shortAddr}
                 </span>
               </span>
@@ -218,10 +218,10 @@ function WalletDropdown({
         <button
           type="button"
           role="menuitem"
-          className="flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-[13px] text-foreground/85 transition-colors hover:bg-white/[0.05]"
+          className="flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-body text-foreground/85 transition-colors hover:bg-white/[0.05]"
         >
           <span>Add wallet</span>
-          <span aria-hidden className="text-[11px] text-muted-foreground">+</span>
+          <span aria-hidden className="text-meta text-muted-foreground">+</span>
         </button>
       </div>
     </div>
@@ -276,19 +276,19 @@ function VenueRow({
       >
         <span
           aria-hidden
-          className="flex size-7 shrink-0 items-center justify-center rounded-md bg-white/[0.06] text-[11px] font-semibold text-foreground/90 transition-colors group-hover:bg-white/[0.09]"
+          className="flex size-7 shrink-0 items-center justify-center rounded-md bg-white/[0.06] text-meta font-semibold text-foreground/90 transition-colors group-hover:bg-white/[0.09]"
         >
           {glyph}
         </span>
         <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-          <span className="text-[11px] uppercase tracking-wider text-foreground">
+          <span className="text-meta uppercase tracking-wider text-foreground">
             {name}
           </span>
-          <span className="text-[11px] tabular-nums text-muted-foreground">
+          <span className="text-meta tabular-nums text-muted-foreground">
             {count} {count === 1 ? "position" : "positions"}
           </span>
         </div>
-        <span className="text-[13px] tabular-nums text-foreground/90">
+        <span className="text-body tabular-nums text-foreground/90">
           {value}
         </span>
         <ChevronDownIcon
@@ -304,10 +304,10 @@ function VenueRow({
           id={panelId}
           className="flex items-center justify-between gap-3 pb-3 pl-10 pr-1"
         >
-          <span className="text-[13px] text-muted-foreground">{empty}</span>
+          <span className="text-body text-muted-foreground">{empty}</span>
           <button
             type="button"
-            className="text-[11px] uppercase tracking-wider text-primary transition-[filter] duration-150 ease-out hover:brightness-110"
+            className="text-meta uppercase tracking-wider text-primary transition-[filter] duration-150 ease-out hover:brightness-110"
           >
             {cta} →
           </button>
@@ -320,7 +320,7 @@ function VenueRow({
 function SectionLabel({ label }: { label: string }) {
   return (
     <div className="flex items-center gap-3">
-      <span className="text-[11px] uppercase tracking-wider text-muted-foreground/70">
+      <span className="text-meta uppercase tracking-wider text-muted-foreground/70">
         {label}
       </span>
       <span aria-hidden className="h-px flex-1 bg-white/5" />

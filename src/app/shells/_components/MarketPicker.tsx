@@ -147,7 +147,7 @@ export function MarketPicker({
               setHighlightedIndex(0);
             }}
             placeholder="Search markets..."
-            className="flex-1 bg-transparent text-[15px] text-foreground outline-none placeholder:text-muted-foreground"
+            className="flex-1 bg-transparent text-body text-foreground outline-none placeholder:text-muted-foreground"
           />
         </div>
 
@@ -164,7 +164,7 @@ export function MarketPicker({
                 setHighlightedIndex(0);
               }}
               className={cn(
-                "relative px-3 py-2.5 text-[13px] font-medium transition-colors",
+                "relative px-3 py-2.5 text-body font-medium transition-colors",
                 venue === v.id
                   ? "text-foreground"
                   : "text-muted-foreground hover:text-foreground",
@@ -179,7 +179,7 @@ export function MarketPicker({
         </div>
 
         {/* Column headers */}
-        <div className="grid grid-cols-[1fr_120px_90px_120px] gap-4 border-b border-white/5 px-4 py-2 text-[11px] uppercase tracking-wider text-muted-foreground">
+        <div className="grid grid-cols-[1fr_120px_90px_120px] gap-4 border-b border-white/5 px-4 py-2 text-meta uppercase tracking-wider text-muted-foreground">
           <span>Symbol</span>
           <span className="text-right">Last price</span>
           <span className="text-right">24H</span>
@@ -195,7 +195,7 @@ export function MarketPicker({
           className="scroll-thin max-h-[480px] overflow-y-auto"
         >
           {filtered.length === 0 ? (
-            <div role="status" className="flex items-center justify-center py-12 text-[13px] text-muted-foreground">
+            <div role="status" className="flex items-center justify-center py-12 text-body text-muted-foreground">
               No markets match {query ? `"${query}"` : "this venue"}
             </div>
           ) : (
@@ -221,8 +221,8 @@ export function MarketPicker({
                     className={cn(
                       "flex size-6 shrink-0 items-center justify-center rounded-full font-bold",
                       m.iconChar.length > 1
-                        ? "text-[11px]"
-                        : "text-[11px]",
+                        ? "text-meta"
+                        : "text-meta",
                     )}
                     style={{
                       backgroundColor: m.iconBg,
@@ -231,31 +231,31 @@ export function MarketPicker({
                   >
                     {m.iconChar}
                   </span>
-                  <span className="truncate text-[13px] text-foreground">
+                  <span className="truncate text-body text-foreground">
                     {m.symbol}
                   </span>
-                  <span className="shrink-0 text-[11px] text-muted-foreground">
+                  <span className="shrink-0 text-meta text-muted-foreground">
                     {m.leverage}
                   </span>
                 </div>
-                <span className="text-right text-[13px] tabular-nums text-foreground">
+                <span className="text-right text-body tabular-nums text-foreground">
                   {m.lastPrice}
                 </span>
                 <span
                   aria-label={`24h change ${m.change24hTone === "positive" ? "up" : "down"} ${m.change24h}`}
                   className={cn(
-                    "flex items-center justify-end gap-1 text-right text-[13px] tabular-nums",
+                    "flex items-center justify-end gap-1 text-right text-body tabular-nums",
                     m.change24hTone === "positive"
                       ? "text-primary"
                       : "text-[#f07575]",
                   )}
                 >
-                  <span aria-hidden className="text-[11px]">
+                  <span aria-hidden className="text-meta">
                     {m.change24hTone === "positive" ? "▲" : "▼"}
                   </span>
                   {m.change24h}
                 </span>
-                <span className="text-right text-[13px] tabular-nums text-muted-foreground">
+                <span className="text-right text-body tabular-nums text-muted-foreground">
                   {m.volume}
                 </span>
               </button>

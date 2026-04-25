@@ -163,7 +163,34 @@
   }
 }
 
+/* Shells type scale — 3 semantic tiers, density-controlled.
+ * Apply data-density to the Shells container to override defaults. Marketing
+ * pages don't have the attribute, so they don't get affected.
+ *   text-meta    — eyebrows, chips, pills, kbd hints
+ *   text-body    — tabs, buttons, body, inputs (collapsed from 15px on desktop)
+ *   text-display — hero numbers
+ */
+:root {
+  --text-meta: 11px;
+  --text-body: 13px;
+  --text-display: 22px;
+}
+[data-density="small"] {
+  --text-meta: 10px;
+  --text-body: 12px;
+  --text-display: 20px;
+}
+[data-density="large"] {
+  --text-meta: 12px;
+  --text-body: 15px;
+  --text-display: 26px;
+}
+
 @layer utilities {
+  .text-meta { font-size: var(--text-meta); }
+  .text-body { font-size: var(--text-body); }
+  .text-display { font-size: var(--text-display); }
+
   .text-balance { text-wrap: balance; }
   .text-pretty { text-wrap: pretty; }
   .mask-fade-b {
