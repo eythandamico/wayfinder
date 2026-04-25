@@ -41,7 +41,7 @@ export function BottomSheet({
         <Dialog.Popup
           className={cn(
             "fixed inset-x-0 bottom-0 z-50 flex flex-col overflow-hidden rounded-t-2xl bg-muted shadow-[0_-20px_60px_-20px_rgba(0,0,0,0.65)]",
-            "pb-[env(safe-area-inset-bottom)]",
+            "pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]",
             "transition-transform duration-300 ease-out",
             "data-[starting-style]:translate-y-full data-[ending-style]:translate-y-full",
             className,

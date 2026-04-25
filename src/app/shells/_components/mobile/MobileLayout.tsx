@@ -31,7 +31,7 @@ export function MobileLayout() {
       <BottomSheet
         open={sheet === "chat"}
         onOpenChange={(o) => !o && close()}
-        heightFraction={0.5}
+        heightFraction={1}
       >
         <div className="h-full">
           <ChatPanel />
