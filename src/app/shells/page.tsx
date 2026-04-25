@@ -264,32 +264,44 @@ function ResizeHandle({
 }) {
   const draggingRef = useRef(false);
   const lastPosRef = useRef(0);
+  const pointerIdRef = useRef<number | null>(null);
 
+  // setPointerCapture routes all subsequent events for this pointer to the
+  // handle element until release — even if the cursor moves over an iframe
+  // (TradingView) or any other element that would otherwise consume events.
   const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     e.preventDefault();
+    e.currentTarget.setPointerCapture(e.pointerId);
+    pointerIdRef.current = e.pointerId;
     draggingRef.current = true;
     lastPosRef.current =
       orientation === "horizontal" ? e.clientX : e.clientY;
     document.body.style.cursor =
       orientation === "horizontal" ? "col-resize" : "row-resize";
     document.body.style.userSelect = "none";
+  };
 
-    const onMove = (ev: PointerEvent) => {
-      if (!draggingRef.current) return;
-      const cur = orientation === "horizontal" ? ev.clientX : ev.clientY;
-      const delta = cur - lastPosRef.current;
-      lastPosRef.current = cur;
-      if (delta !== 0) onDrag(delta);
-    };
-    const onUp = () => {
-      draggingRef.current = false;
-      document.body.style.cursor = "";
-      document.body.style.userSelect = "";
-      window.removeEventListener("pointermove", onMove);
-      window.removeEventListener("pointerup", onUp);
-    };
-    window.addEventListener("pointermove", onMove);
-    window.addEventListener("pointerup", onUp);
+  const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!draggingRef.current) return;
+    const cur = orientation === "horizontal" ? e.clientX : e.clientY;
+    const delta = cur - lastPosRef.current;
+    lastPosRef.current = cur;
+    if (delta !== 0) onDrag(delta);
+  };
+
+  const stop = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!draggingRef.current) return;
+    draggingRef.current = false;
+    if (pointerIdRef.current !== null) {
+      try {
+        e.currentTarget.releasePointerCapture(pointerIdRef.current);
+      } catch {
+        // Capture may have been released already (e.g., element detached).
+      }
+      pointerIdRef.current = null;
+    }
+    document.body.style.cursor = "";
+    document.body.style.userSelect = "";
   };
 
   return (
@@ -299,8 +311,12 @@ function ResizeHandle({
         orientation === "horizontal" ? "vertical" : "horizontal"
       }
       onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={stop}
+      onPointerCancel={stop}
+      onLostPointerCapture={stop}
       className={cn(
-        "group/handle relative shrink-0 select-none transition-colors duration-150 ease-out hover:bg-primary/30",
+        "group/handle relative shrink-0 touch-none select-none transition-colors duration-150 ease-out hover:bg-primary/30",
         orientation === "horizontal"
           ? "w-1 cursor-col-resize"
           : "h-1 cursor-row-resize",
