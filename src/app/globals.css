@@ -168,9 +168,6 @@
  * weight (font-medium / font-semibold), NOT size. Robinhood Legend pattern.
  *   text-body    — default for ~95% of UI: nav, sections, tables, buttons, inputs
  *   text-display — hero numbers only (account balance, etc.)
- *
- * For tight chrome controls that need to stay compact (timeframe pills, chart
- * axis labels), hardcode `text-[12px]` directly — that's the project floor.
  */
 :root {
   /* Text */
