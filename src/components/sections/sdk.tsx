@@ -73,7 +73,7 @@ function QuickstartBlock({
       <pre className="overflow-x-auto font-mono text-[13px] leading-[1.8] text-foreground/90">
         <code>
           <span className="text-primary">git</span>
-          {` clone ${REPO_URL}\n`}
+          {` clone ${SDK_REPO_URL}\n`}
           <span className="text-primary">cd</span>
           {" wayfinder-paths-sdk\n"}
           <span className="text-muted-foreground">
