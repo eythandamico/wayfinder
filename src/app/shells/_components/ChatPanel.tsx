@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import { useClickOutside } from "@/lib/hooks/useClickOutside";
 import {
   History,
   Pause,
@@ -818,16 +819,7 @@ function AgentPill() {
   const [model, setModel] = useState(MODELS[0]);
   const ref = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (!open) return;
-    const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, [open]);
+  useClickOutside(ref, () => setOpen(false), open);
 
   return (
     <div ref={ref} className="relative">

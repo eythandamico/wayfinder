@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
+import { useClickOutside } from "@/lib/hooks/useClickOutside";
 import Link from "next/link";
 import Image from "next/image";
 import { MoreHorizontal } from "lucide-react";
@@ -57,16 +58,7 @@ function MoreMenu() {
   const ref = useRef<HTMLDivElement>(null);
   const { density, setDensity } = useDensity();
 
-  useEffect(() => {
-    if (!open) return;
-    const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, [open]);
+  useClickOutside(ref, () => setOpen(false), open);
 
   const options: { value: Density; size: string }[] = [
     { value: "small", size: "text-[13px]" },
