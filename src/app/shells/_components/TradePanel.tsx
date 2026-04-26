@@ -171,13 +171,19 @@ export function TradePanel() {
         </div>
 
         {hasIntent && (
-          <div className="flex flex-col gap-2">
-            <SectionLabel label="Risk" />
-            <div className="flex flex-col gap-1.5">
-              <RiskRow label="Liquidation" value="—" />
-              <RiskRow label="Order Value" value="—" />
-              <RiskRow label="Margin" value="—" />
-            </div>
+          <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 text-body">
+            <span className="inline-flex items-baseline gap-1.5">
+              <span className="text-muted-foreground">Liquidation</span>
+              <span className="tabular-nums text-foreground">—</span>
+            </span>
+            <span className="inline-flex items-baseline gap-1.5">
+              <span className="text-muted-foreground">Order Value</span>
+              <span className="tabular-nums text-foreground">—</span>
+            </span>
+            <span className="inline-flex items-baseline gap-1.5">
+              <span className="text-muted-foreground">Margin</span>
+              <span className="tabular-nums text-foreground">—</span>
+            </span>
           </div>
         )}
       </div>
@@ -358,20 +364,3 @@ function SideButton({
   );
 }
 
-function SectionLabel({ label }: { label: string }) {
-  return (
-    <div className="flex items-center gap-3">
-      <span className="text-body text-muted-foreground">{label}</span>
-      <span aria-hidden className="h-px flex-1 bg-white/5" />
-    </div>
-  );
-}
-
-function RiskRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex items-center justify-between text-body">
-      <span className="text-muted-foreground">{label}</span>
-      <span className="tabular-nums text-foreground">{value}</span>
-    </div>
-  );
-}
