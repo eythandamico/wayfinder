@@ -94,7 +94,7 @@ function UsagePill({ usage }: { usage: UsageData }) {
         aria-controls="usage-menu"
         aria-label={`Session usage: ${formatTokens(usage.tokens.used)} of ${formatTokens(usage.tokens.total)} tokens used`}
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex h-[var(--ui-h-pill)] items-center gap-2 rounded-full bg-white/5 px-3 text-muted-foreground transition-[background-color,color,scale] duration-150 ease-out hover:bg-white/10 hover:text-foreground active:scale-[0.96]"
+        className="inline-flex h-[var(--ui-h-input)] items-center gap-2.5 rounded-lg bg-white/[0.06] px-3.5 text-muted-foreground ring-1 ring-inset ring-white/[0.08] transition-[background-color,color,box-shadow,scale] duration-150 ease-out hover:bg-white/[0.09] hover:text-foreground hover:ring-white/[0.12] active:scale-[0.96]"
       >
         <InfinityIcon />
         <span aria-hidden className="text-body tabular-nums text-foreground">
@@ -182,7 +182,7 @@ function GoProButton() {
     <button
       type="button"
       aria-label="Upgrade to Pro"
-      className="inline-flex h-[var(--ui-h-pill)] shrink-0 items-center gap-1.5 rounded-full px-3 text-body font-semibold transition-[filter,scale] duration-150 ease-out hover:brightness-110 active:scale-[0.96]"
+      className="inline-flex h-[var(--ui-h-input)] shrink-0 items-center gap-2 rounded-lg px-3.5 text-body font-semibold transition-[filter,scale] duration-150 ease-out hover:brightness-110 active:scale-[0.96]"
       style={{
         background: "var(--wf-pro-gold)",
         color: "var(--wf-pro-indigo)",
@@ -254,7 +254,7 @@ function AppMenu({ current }: { current: string }) {
         aria-controls="app-menu"
         aria-label={`Navigate sections (current: ${current})`}
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-body font-medium text-foreground transition-colors hover:bg-white/[0.04]"
+        className="inline-flex h-[var(--ui-h-input)] items-center gap-2 rounded-lg bg-white/[0.06] px-3.5 text-body font-medium text-foreground ring-1 ring-inset ring-white/[0.08] transition-[background-color,color,box-shadow,scale] duration-150 ease-out hover:bg-white/[0.09] hover:ring-white/[0.12] active:scale-[0.96]"
       >
         {current}
         <ChevronDownIcon
@@ -340,7 +340,7 @@ function ConnectedPill({ address }: { address: string }) {
         aria-controls="wallet-menu"
         aria-label={`Wallet connected: ${short}`}
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex h-[var(--ui-h-pill)] items-center gap-2 rounded-full bg-white/5 px-3 text-muted-foreground transition-[background-color,color,scale] duration-150 ease-out hover:bg-white/10 hover:text-foreground active:scale-[0.96]"
+        className="inline-flex h-[var(--ui-h-input)] items-center gap-2.5 rounded-lg bg-white/[0.06] px-3.5 text-muted-foreground ring-1 ring-inset ring-white/[0.08] transition-[background-color,color,box-shadow,scale] duration-150 ease-out hover:bg-white/[0.09] hover:text-foreground hover:ring-white/[0.12] active:scale-[0.96]"
       >
         <span aria-hidden className="size-1.5 rounded-full bg-primary shadow-[0_0_6px_var(--primary)]" />
         <span aria-hidden className="text-body tabular-nums text-foreground">
