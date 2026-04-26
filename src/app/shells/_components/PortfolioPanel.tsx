@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { useClickOutside } from "@/lib/hooks/useClickOutside";
 import { cn } from "@/lib/utils";
+import { shortAddress } from "@/lib/format";
 import type { Wallet } from "../_types";
 import { WALLETS } from "../_data/mocks";
 import { CheckIcon, ChevronDownIcon, ClockIcon, CopyIcon, KeyIcon } from "./icons";
