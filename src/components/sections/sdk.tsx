@@ -5,11 +5,9 @@ import Link from "next/link";
 import { Check, Copy } from "lucide-react";
 import { Button, PageSection, SectionHeader } from "@/components/ds";
 import { cn } from "@/lib/utils";
+import { API_DOCS_URL, SDK_REPO_URL } from "@/lib/links";
 
-const REPO_URL =
-  "https://github.com/WayfinderFoundation/wayfinder-paths-sdk";
-
-const QUICKSTART = `git clone ${REPO_URL}
+const QUICKSTART = `git clone ${SDK_REPO_URL}
 cd wayfinder-paths-sdk
 # Open in your coding agent (Claude Code, Codex, Opencode, etc.)`;
 
@@ -28,7 +26,7 @@ export function SdkSection() {
           <Button
             variant="ghost"
             size="sm"
-            render={<Link href="https://docs.wayfinder.ai" />}
+            render={<Link href={API_DOCS_URL} />}
           >
             Read the Docs →
           </Button>

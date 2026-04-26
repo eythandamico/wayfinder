@@ -12,11 +12,11 @@ import {
   PATH_KIND_LABELS,
   PATH_STATUS_LABELS,
   PATHS,
-  PATHS_CATALOG_URL,
   type Path,
   type PathKind,
   type PathStatus,
 } from "@/lib/paths";
+import { CREATE_PATH_URL, PATHS_CATALOG_URL } from "@/lib/links";
 
 type KindFilter = PathKind | "all";
 type SortKey = "bonded" | "popular" | "yield" | "recent";
@@ -52,8 +52,6 @@ const SUGGESTIONS = [
   "telegram",
   "risk",
 ];
-
-const CREATE_PATH_URL = "https://strategies-dev.wayfinder.ai/paths/create";
 
 const PAGE_SIZE = 9;
 

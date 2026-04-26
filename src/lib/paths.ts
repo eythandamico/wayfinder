@@ -30,7 +30,8 @@ export type Path = {
   cost: string;
 };
 
-export const PATHS_CATALOG_URL = "https://strategies-dev.wayfinder.ai/paths";
+// PATHS_CATALOG_URL moved to @/lib/links so external URLs live in one place.
+export { PATHS_CATALOG_URL } from "./links";
 
 export const PATH_KIND_LABELS: Record<PathKind, string> = {
   strategy: "Strategy",

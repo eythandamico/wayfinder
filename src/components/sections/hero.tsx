@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { Button, PageSection, Reveal, Stack } from "@/components/ds";
+import { DOCS_URL } from "@/lib/links";
 
 export function Hero() {
   return (
@@ -36,7 +37,7 @@ export function Hero() {
               size="lg"
               variant="ghost"
               className="h-12 px-5"
-              render={<Link href="https://wayfinder-1.gitbook.io/wayfinder" />}
+              render={<Link href={DOCS_URL} />}
             >
               Read Docs →
             </Button>

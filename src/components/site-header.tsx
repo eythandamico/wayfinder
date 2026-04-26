@@ -9,6 +9,7 @@ import { useGSAP } from "@gsap/react";
 import { ArrowUpRight, Home } from "lucide-react";
 import { Button } from "@/components/ds";
 import { cn } from "@/lib/utils";
+import { DOCS_URL } from "@/lib/links";
 
 type NavItem =
   | { type: "icon"; href: string; label: string }
@@ -21,7 +22,7 @@ const navItems: NavItem[] = [
   { type: "link", href: "/community", label: "Community", external: true },
   {
     type: "link",
-    href: "https://wayfinder-1.gitbook.io/wayfinder",
+    href: DOCS_URL,
     label: "Read Docs",
     external: true,
   },
