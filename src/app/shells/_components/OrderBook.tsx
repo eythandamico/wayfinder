@@ -105,7 +105,7 @@ function OrderRow({
   return (
     <div className="grid grid-cols-[1fr_1fr_1fr] gap-2 px-2 py-[3px] text-body tabular-nums">
       <span
-        className={tone === "ask" ? "text-[#f07575]" : "text-primary"}
+        className={tone === "ask" ? "text-tone-down" : "text-primary"}
         aria-label={`${tone === "ask" ? "Ask" : "Bid"} price ${price}`}
       >
         {price}

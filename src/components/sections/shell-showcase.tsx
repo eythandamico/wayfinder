@@ -472,7 +472,7 @@ function TradePane() {
           className={cn(
             "rounded-sm py-1.5 text-[12px] font-semibold transition-colors",
             side === "short"
-              ? "bg-[#f07575] text-black shadow-[inset_0_-1.5px_0_rgba(0,0,0,0.12)]"
+              ? "bg-tone-down text-black shadow-[inset_0_-1.5px_0_rgba(0,0,0,0.12)]"
               : "text-muted-foreground",
           )}
         >
@@ -531,7 +531,7 @@ function TradePane() {
           "rounded-md py-2 text-[12px] font-semibold transition-[filter]",
           side === "long"
             ? "bg-primary text-primary-foreground hover:brightness-[1.04]"
-            : "bg-[#f07575] text-black hover:brightness-[1.04]",
+            : "bg-tone-down text-black hover:brightness-[1.04]",
         )}
       >
         Place Market {side === "long" ? "Long" : "Short"} →
@@ -584,7 +584,7 @@ function OrderBookPane() {
               key={p}
               className="grid grid-cols-[1fr_1fr] gap-1 px-1 py-[1px] font-mono text-[10px] tabular-nums"
             >
-              <span className="text-[#f07575]">{p}</span>
+              <span className="text-tone-down">{p}</span>
               <span className="text-right text-foreground/80">{s}</span>
             </div>
           ))}

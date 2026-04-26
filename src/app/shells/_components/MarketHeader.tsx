@@ -390,7 +390,7 @@ function ConnectedPill({ address }: { address: string }) {
         <div className="h-px bg-white/5" />
         <DensityRow />
         <div className="h-px bg-white/5" />
-        <button type="button" role="menuitem" className="flex w-full items-center rounded-md px-3 py-2 text-left text-body text-[#f07575] transition-colors hover:bg-[#f07575]/10">
+        <button type="button" role="menuitem" className="flex w-full items-center rounded-md px-3 py-2 text-left text-body text-tone-down transition-colors hover:bg-tone-down/10">
           Disconnect
         </button>
       </div>

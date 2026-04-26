@@ -247,7 +247,7 @@ export function MarketPicker({
                     "flex items-center justify-end gap-1 text-right text-body tabular-nums",
                     m.change24hTone === "positive"
                       ? "text-primary"
-                      : "text-[#f07575]",
+                      : "text-tone-down",
                   )}
                 >
                   <span aria-hidden className="text-body">

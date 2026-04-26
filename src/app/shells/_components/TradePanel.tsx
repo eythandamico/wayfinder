@@ -196,7 +196,7 @@ export function TradePanel() {
             "group relative w-full overflow-hidden rounded-lg py-3 text-body font-semibold transition-[filter,scale] duration-150 ease-out hover:brightness-[1.04] active:scale-[0.96]",
             side === "long"
               ? "bg-primary text-primary-foreground"
-              : "bg-[#f07575] text-black",
+              : "bg-tone-down text-black",
           )}
         >
           <span
@@ -344,7 +344,7 @@ function SideButton({
           ? cn(
               direction === "up"
                 ? "bg-primary text-primary-foreground"
-                : "bg-[#f07575] text-black",
+                : "bg-tone-down text-black",
               "shadow-[inset_0_-2px_0_rgba(0,0,0,0.12)]",
             )
           : "text-muted-foreground hover:text-foreground",

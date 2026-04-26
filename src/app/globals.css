@@ -28,6 +28,7 @@
   --color-input: var(--input);
   --color-border: var(--border);
   --color-destructive: var(--destructive);
+  --color-tone-down: var(--tone-down);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
   --color-muted-foreground: var(--muted-foreground);
@@ -78,6 +79,11 @@
 
   --destructive: oklch(0.7 0.19 25);
 
+  /* Trading "down" semantic — short side, asks, sells, price-down. Distinct
+   * from --destructive (which is for delete/error UI). Use via the Tailwind
+   * utility text-tone-down / bg-tone-down. */
+  --tone-down: #f07575;
+
   --border: oklch(1 0 0 / 0.09);
   --input: oklch(1 0 0 / 0.12);
   --ring: oklch(0.88 0.17 140 / 0.55);
@@ -123,6 +129,7 @@
   --accent-foreground: oklch(0.96 0.005 180);
 
   --destructive: oklch(0.7 0.19 25);
+  --tone-down: #f07575;
 
   --border: oklch(1 0 0 / 0.09);
   --input: oklch(1 0 0 / 0.12);

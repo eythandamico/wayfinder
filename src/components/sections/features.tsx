@@ -331,7 +331,7 @@ function VenueArt() {
             <div
               className={cn(
                 "font-mono text-[10px] tabular-nums",
-                r.tone === "mint" ? "text-primary" : "text-[#f07575]",
+                r.tone === "mint" ? "text-primary" : "text-tone-down",
               )}
             >
               {r.change}

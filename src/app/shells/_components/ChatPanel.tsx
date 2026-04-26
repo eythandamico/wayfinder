@@ -493,7 +493,7 @@ function JobRow({
       ? "bg-primary shadow-[0_0_6px_var(--primary)]"
       : job.status === "paused"
         ? "bg-white/20"
-        : "bg-[#f07575] shadow-[0_0_6px_#f07575]";
+        : "bg-tone-down shadow-[0_0_6px_var(--tone-down)]";
   const toggleIcon =
     job.status === "active" ? (
       <PauseIcon />
@@ -567,7 +567,7 @@ function RowAction({
       className={cn(
         "flex size-6 items-center justify-center rounded-md text-muted-foreground opacity-0 transition-[opacity,background-color,color] group-hover:opacity-100 focus-visible:opacity-100",
         tone === "danger"
-          ? "hover:bg-[#f07575]/15 hover:text-[#f07575]"
+          ? "hover:bg-tone-down/15 hover:text-tone-down"
           : "hover:bg-white/[0.08] hover:text-foreground",
       )}
     >

@@ -407,7 +407,7 @@ function TokenRow({
             "inline-flex items-center gap-0.5 text-body tabular-nums",
             market.change24hTone === "positive"
               ? "text-primary"
-              : "text-[#f07575]",
+              : "text-tone-down",
           )}
         >
           <span aria-hidden className="text-body">

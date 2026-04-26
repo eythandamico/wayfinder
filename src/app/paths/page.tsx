@@ -568,7 +568,7 @@ const STATUS_STYLES: Record<PathStatus, { bg: string; text: string; dot: string 
   probation: {
     bg: "bg-white/[0.06]",
     text: "text-muted-foreground",
-    dot: "bg-[#f07575]",
+    dot: "bg-tone-down",
   },
 };
 
