@@ -5,10 +5,10 @@ React 19, and Tailwind CSS v4.
 
 The repo holds **two products** under one Next.js app:
 
-- **Marketing site** — `/`, `/paths`, `/openclaw`, `/community` (placeholder),
-  plus the design-system showcase at `/ds`. Sourced from `src/app/page.tsx`,
-  `src/app/paths/`, `src/app/openclaw/`, and the section components in
-  `src/components/sections/`.
+- **Marketing site** — `/`, `/paths`, plus the design-system showcase at
+  `/ds`. Sourced from `src/app/page.tsx`, `src/app/paths/`, and the section
+  components in `src/components/sections/`. (`/openclaw` and `/community`
+  are linked from the nav but not yet implemented as routes.)
 - **Shells terminal** — `/shells`, the agent-driven trading interface. Lives
   in `src/app/shells/` with its own state, mocks, and component tree. Mobile
   variant under `src/app/shells/_components/mobile/`.
@@ -62,7 +62,6 @@ src/
 │   ├── layout.tsx          # Root layout, fonts
 │   ├── ds/                 # Design system showcase route
 │   ├── paths/              # /paths catalog page
-│   ├── openclaw/           # /openclaw marketing
 │   └── shells/             # /shells trading terminal
 │       ├── page.tsx              # Desktop/mobile router + custom resize
 │       ├── _components/          # Terminal panels (Chart, Chat, Trade, ...)
