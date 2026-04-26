@@ -11,7 +11,7 @@ export function PortfolioPanel() {
   const [activeWallet, setActiveWallet] = useState<Wallet>(WALLETS[0]);
   const [copied, setCopied] = useState(false);
 
-  const short = `${activeWallet.address.slice(0, 6)}…${activeWallet.address.slice(-4)}`;
+  const short = shortAddress(activeWallet.address);
 
   const copyAddress = async () => {
     try {
@@ -173,7 +173,7 @@ function WalletDropdown({
       >
         {WALLETS.map((w) => {
           const isActive = w.id === active.id;
-          const shortAddr = `${w.address.slice(0, 6)}…${w.address.slice(-4)}`;
+          const shortAddr = shortAddress(w.address);
           return (
             <button
               key={w.id}

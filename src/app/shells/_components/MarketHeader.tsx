@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { useClickOutside } from "@/lib/hooks/useClickOutside";
+import { formatTokens, shortAddress } from "@/lib/format";
 import type { UsageData } from "../_types";
 import {
   CURRENT_SECTION,
@@ -59,12 +60,6 @@ export function MarketHeader() {
       </div>
     </div>
   );
-}
-
-function formatTokens(n: number) {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
-  return `${n}`;
 }
 
 function UsagePill({ usage }: { usage: UsageData }) {
@@ -293,7 +288,7 @@ function ConnectedPill({ address }: { address: string }) {
 
   useClickOutside(ref, () => setOpen(false), open);
 
-  const short = `${address.slice(0, 6)}…${address.slice(-4)}`;
+  const short = shortAddress(address);
 
   const copy = async () => {
     try {
