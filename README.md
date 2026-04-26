@@ -1,36 +1,89 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Wayfinder
 
-## Getting Started
+Marketing site + Shells trading terminal, built with Next.js 16 (App Router),
+React 19, and Tailwind CSS v4.
 
-First, run the development server:
+The repo holds **two products** under one Next.js app:
+
+- **Marketing site** — `/`, `/paths`, `/openclaw`, `/community` (placeholder),
+  plus the design-system showcase at `/ds`. Sourced from `src/app/page.tsx`,
+  `src/app/paths/`, `src/app/openclaw/`, and the section components in
+  `src/components/sections/`.
+- **Shells terminal** — `/shells`, the agent-driven trading interface. Lives
+  in `src/app/shells/` with its own state, mocks, and component tree. Mobile
+  variant under `src/app/shells/_components/mobile/`.
+
+See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the non-obvious bits a
+new dev needs to know (density tokens, custom resizable panel system, GSAP
+scroll-linked animation, the tailwind-merge custom font-size group, iOS
+text-size-adjust fix). See [`docs/MOCKING.md`](docs/MOCKING.md) for what's
+mocked vs real.
+
+## Local development
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev          # Next dev server on http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Useful scripts:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm run typecheck    # tsc --noEmit
+npm run lint         # eslint
+npm run build        # production build
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Environment
 
-## Learn More
+All env vars are `NEXT_PUBLIC_*` prefixed (inlined at build time, not secrets).
+Every var has a fallback in `src/lib/links.ts` so the app builds and runs
+without an `.env` file. To override, copy `.env.example` to `.env.local`.
 
-To learn more about Next.js, take a look at the following resources:
+If you add server-only secrets (Stripe, DB, etc.), drop the `NEXT_PUBLIC_`
+prefix and document them in both `.env.example` and `docs/ARCHITECTURE.md`.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Deploy
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Project targets static-friendly hosts (Vercel, Cloudflare Pages). For
+Cloudflare Pages, set the **`nodejs_compat`** compatibility flag for both
+production and preview.
 
-## Deploy on Vercel
+CI lives at `.github/workflows/ci.yml` — it runs `lint` and `typecheck` on
+every PR and on pushes to `main`.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Project layout
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+src/
+├── app/
+│   ├── page.tsx            # Marketing home
+│   ├── globals.css         # Theme tokens, density scale, iOS fixes
+│   ├── layout.tsx          # Root layout, fonts
+│   ├── ds/                 # Design system showcase route
+│   ├── paths/              # /paths catalog page
+│   ├── openclaw/           # /openclaw marketing
+│   └── shells/             # /shells trading terminal
+│       ├── page.tsx              # Desktop/mobile router + custom resize
+│       ├── _components/          # Terminal panels (Chart, Chat, Trade, ...)
+│       │   ├── mobile/           # Mobile bottom-sheet variants
+│       │   └── icons.tsx         # Lucide wrappers (use these, not raw lucide)
+│       ├── _state/               # ShellsProvider — activeMarket, command, density
+│       ├── _hooks/               # useVoiceInput
+│       ├── _types/               # Shells-specific types
+│       └── _data/mocks.ts        # All mock data
+├── components/
+│   ├── ds/                 # Design system primitives + RULES.md
+│   ├── sections/           # Marketing sections (hero, features, sdk, ...)
+│   ├── site-header.tsx
+│   └── site-footer.tsx
+└── lib/
+    ├── utils.ts            # cn() — tailwind-merge configured for our custom utilities
+    ├── links.ts            # External URLs, env-driven with fallbacks
+    ├── format.ts           # shortAddress(), formatTokens()
+    ├── paths.ts            # Path catalog data + types
+    └── hooks/
+        └── useClickOutside.ts
+```
+
+`@/` is the path alias for `src/` (configured in `tsconfig.json`).
