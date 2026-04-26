@@ -24,15 +24,19 @@ type OrderTypeOption = (typeof ORDER_TYPE_OPTIONS)[number];
 export function TradePanel() {
   const [side, setSide] = useState<"long" | "short">("long");
   const [size, setSize] = useState("0.00");
-  const [pct, setPct] = useState(16);
+  const [pct, setPct] = useState(0);
   const [margin, setMargin] = useState<MarginOption>("Cross");
   const [leverage, setLeverage] = useState<LeverageOption>("40x");
   const [orderType, setOrderType] = useState<OrderTypeOption>("Market");
 
+  // Risk summary appears once the user expresses an order — empty rows would
+  // otherwise eat ~80px of vertical space on short viewports.
+  const hasIntent = pct > 0 || parseFloat(size) > 0;
+
   return (
     <div className="flex h-full flex-col overflow-hidden rounded-lg bg-muted">
-      <div className="scroll-thin flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto p-3">
-        {/* Order parameters strip */}
+      {/* Header — params + side toggle pinned at top */}
+      <div className="flex shrink-0 flex-col gap-3 px-3 pt-3">
         <div className="grid grid-cols-3 divide-x divide-white/5 rounded-lg bg-background/40 ring-1 ring-inset ring-white/5">
           <ParamDropdown
             label="Margin"
@@ -58,7 +62,6 @@ export function TradePanel() {
           />
         </div>
 
-        {/* Long / Short */}
         <div
           role="group"
           aria-label="Trade side"
@@ -77,14 +80,23 @@ export function TradePanel() {
             direction="down"
           />
         </div>
+      </div>
 
-        {/* Account stats */}
-        <div className="grid grid-cols-2 gap-4">
-          <StatCell label="Available" value="$0.00" meta="USDC" />
-          <StatCell label="Position" value="None" meta="0 BTC" />
+      {/* Body — stats + size + risk; only this region scrolls when cramped */}
+      <div className="scroll-thin flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto px-3 py-3">
+        <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 text-body">
+          <span className="inline-flex items-baseline gap-1.5">
+            <span className="text-muted-foreground">Available</span>
+            <span className="tabular-nums text-foreground">$0.00</span>
+            <span className="text-muted-foreground">USDC</span>
+          </span>
+          <span className="inline-flex items-baseline gap-1.5">
+            <span className="text-muted-foreground">Position</span>
+            <span className="tabular-nums text-foreground">None</span>
+            <span className="text-muted-foreground">0 BTC</span>
+          </span>
         </div>
 
-        {/* Size */}
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between">
             <label
@@ -128,12 +140,11 @@ export function TradePanel() {
             </span>
           </div>
 
-          {/* Slider */}
           <label
             htmlFor="size-slider"
-            className="relative flex h-12 items-center gap-3 rounded-lg bg-white/5 pl-1 pr-4 transition-colors hover:bg-white/[0.07] focus-within:bg-white/[0.07] focus-within:ring-2 focus-within:ring-primary/50"
+            className="relative flex h-9 items-center gap-3 rounded-lg bg-white/5 pl-1 pr-3 transition-colors hover:bg-white/[0.07] focus-within:bg-white/[0.07] focus-within:ring-2 focus-within:ring-primary/50"
           >
-            <div className="relative h-10 flex-1 overflow-hidden rounded-md">
+            <div className="relative h-7 flex-1 overflow-hidden rounded-md">
               <div
                 aria-hidden
                 className="absolute inset-y-0 left-0 rounded-md bg-primary transition-[width] duration-150 ease-out"
@@ -159,27 +170,29 @@ export function TradePanel() {
           </label>
         </div>
 
-        {/* Risk summary */}
-        <div className="mt-auto flex flex-col gap-2">
-          <SectionLabel label="Risk" />
-          <div className="flex flex-col gap-1.5">
-            <RiskRow label="Liquidation" value="—" />
-            <RiskRow label="Order Value" value="—" />
-            <RiskRow label="Margin" value="—" />
+        {hasIntent && (
+          <div className="flex flex-col gap-2">
+            <SectionLabel label="Risk" />
+            <div className="flex flex-col gap-1.5">
+              <RiskRow label="Liquidation" value="—" />
+              <RiskRow label="Order Value" value="—" />
+              <RiskRow label="Margin" value="—" />
+            </div>
           </div>
-        </div>
+        )}
+      </div>
 
-        {/* CTA */}
+      {/* Footer — Place CTA pinned at bottom */}
+      <div className="shrink-0 px-3 pb-3">
         <button
           type="button"
           className={cn(
-            "group relative overflow-hidden rounded-lg py-3 text-body font-semibold transition-[filter,scale] duration-150 ease-out hover:brightness-[1.04] active:scale-[0.96]",
+            "group relative w-full overflow-hidden rounded-lg py-3 text-body font-semibold transition-[filter,scale] duration-150 ease-out hover:brightness-[1.04] active:scale-[0.96]",
             side === "long"
               ? "bg-primary text-primary-foreground"
               : "bg-[#f07575] text-black",
           )}
         >
-          {/* subtle top highlight — premium inset */}
           <span
             aria-hidden
             className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-b from-white/40 to-transparent"
@@ -241,33 +254,26 @@ function ParamDropdown({
         aria-label={`${label}: ${value}`}
         onClick={() => setOpen((v) => !v)}
         className={cn(
-          "flex w-full flex-col gap-0.5 px-3 py-2 text-left transition-colors hover:bg-white/[0.04]",
+          "flex w-full items-center justify-center gap-1.5 px-3 py-2 transition-colors hover:bg-white/[0.04]",
           rounded === "l" && "rounded-l-lg",
           rounded === "r" && "rounded-r-lg",
         )}
       >
-        <span className="text-body text-muted-foreground">
-          {label}
+        <span
+          className={cn(
+            "truncate text-body",
+            accent ? "tabular-nums text-primary" : "text-foreground",
+          )}
+        >
+          {value}
         </span>
-        <span className="flex items-center justify-between gap-1">
-          <span
-            className={cn(
-              "truncate text-body",
-              accent
-                ? "tabular-nums text-primary"
-                : "text-foreground",
-            )}
-          >
-            {value}
-          </span>
-          <ChevronDownIcon
-            aria-hidden
-            className={cn(
-              "size-3 shrink-0 text-muted-foreground transition-transform",
-              open && "rotate-180",
-            )}
-          />
-        </span>
+        <ChevronDownIcon
+          aria-hidden
+          className={cn(
+            "size-3 shrink-0 text-muted-foreground transition-transform",
+            open && "rotate-180",
+          )}
+        />
       </button>
       <div
         id={menuId}
@@ -352,40 +358,10 @@ function SideButton({
   );
 }
 
-function StatCell({
-  label,
-  value,
-  meta,
-}: {
-  label: string;
-  value: string;
-  meta?: string;
-}) {
-  return (
-    <div className="flex flex-col gap-0.5">
-      <span className="text-body text-muted-foreground">
-        {label}
-      </span>
-      <div className="flex items-baseline gap-1.5">
-        <span className="text-body tabular-nums text-foreground">
-          {value}
-        </span>
-        {meta && (
-          <span className="text-body tabular-nums text-muted-foreground">
-            {meta}
-          </span>
-        )}
-      </div>
-    </div>
-  );
-}
-
 function SectionLabel({ label }: { label: string }) {
   return (
     <div className="flex items-center gap-3">
-      <span className="text-body text-muted-foreground">
-        {label}
-      </span>
+      <span className="text-body text-muted-foreground">{label}</span>
       <span aria-hidden className="h-px flex-1 bg-white/5" />
     </div>
   );
