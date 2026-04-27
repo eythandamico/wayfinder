@@ -18,6 +18,7 @@ import {
   InfinityIcon,
 } from "./icons";
 import { CandlestickChart, Compass, Sparkles, type LucideIcon } from "lucide-react";
+import Jazzicon, { jsNumberForAddress } from "react-jazzicon";
 import {
   useDensity,
   useViewMode,
@@ -299,9 +300,14 @@ function ConnectedPill({ address }: { address: string }) {
         aria-controls="wallet-menu"
         aria-label={`Wallet connected: ${short}`}
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex h-[var(--ui-h-input)] items-center gap-2.5 rounded-lg bg-white/[0.08] px-3.5 text-muted-foreground transition-[background-color,color,scale] duration-150 ease-out hover:bg-white/[0.12] hover:text-foreground active:scale-[0.96]"
+        className="inline-flex h-[var(--ui-h-input)] items-center gap-2 rounded-lg bg-white/[0.08] pl-1.5 pr-3 text-muted-foreground transition-[background-color,color,scale] duration-150 ease-out hover:bg-white/[0.12] hover:text-foreground active:scale-[0.96]"
       >
-        <span aria-hidden className="size-1.5 rounded-full bg-primary shadow-[0_0_6px_var(--primary)]" />
+        <span
+          aria-hidden
+          className="flex size-7 items-center justify-center overflow-hidden rounded-full"
+        >
+          <Jazzicon diameter={28} seed={jsNumberForAddress(address)} />
+        </span>
         <span aria-hidden className="text-body tabular-nums text-foreground">
           {short}
         </span>
@@ -324,12 +330,18 @@ function ConnectedPill({ address }: { address: string }) {
             : "pointer-events-none opacity-0 -translate-y-1 scale-[0.98]",
         )}
       >
-        <div className="px-3 py-2">
-          <div className="text-body text-muted-foreground">
-            Connected
-          </div>
-          <div className="mt-1 text-body tabular-nums text-foreground">
-            {short}
+        <div className="flex items-center gap-2.5 px-3 py-2.5">
+          <span
+            aria-hidden
+            className="flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-full"
+          >
+            <Jazzicon diameter={36} seed={jsNumberForAddress(address)} />
+          </span>
+          <div className="min-w-0 flex-1">
+            <div className="text-body text-muted-foreground">Connected</div>
+            <div className="truncate text-body tabular-nums text-foreground">
+              {short}
+            </div>
           </div>
         </div>
         <div className="h-px bg-white/5" />
