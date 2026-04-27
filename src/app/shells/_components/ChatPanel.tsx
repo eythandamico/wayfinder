@@ -563,7 +563,7 @@ function RowAction({
         onClick();
       }}
       className={cn(
-        "flex size-6 items-center justify-center rounded-md text-muted-foreground opacity-0 transition-[opacity,background-color,color] group-hover:opacity-100 focus-visible:opacity-100",
+        "flex size-7 shrink-0 items-center justify-center rounded-md bg-white/[0.04] text-muted-foreground transition-[background-color,color,scale] duration-150 ease-out active:scale-[0.96]",
         tone === "danger"
           ? "hover:bg-tone-down/15 hover:text-tone-down"
           : "hover:bg-white/[0.08] hover:text-foreground",
