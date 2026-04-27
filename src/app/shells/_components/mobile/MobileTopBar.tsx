@@ -50,14 +50,15 @@ export function MobileTopBar() {
 
       <div className="flex items-center gap-1.5">
         <span
-          className="inline-flex h-8 items-center gap-1.5 rounded-full bg-white/5 px-2.5 text-body tabular-nums text-foreground"
+          className="inline-flex size-8 items-center justify-center rounded-full bg-white/5 text-body tabular-nums text-foreground sm:size-auto sm:gap-1.5 sm:px-2.5"
           aria-label={`Wallet ${short}`}
+          title={short}
         >
           <span
             aria-hidden
             className="size-1.5 rounded-full bg-primary shadow-[0_0_6px_var(--primary)]"
           />
-          {short}
+          <span className="hidden sm:inline">{short}</span>
         </span>
         <CommandSearchIconButton />
         <MoreMenu />
