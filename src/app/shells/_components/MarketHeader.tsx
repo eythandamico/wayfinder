@@ -17,7 +17,7 @@ import {
   ExternalLinkIcon,
   InfinityIcon,
 } from "./icons";
-import { Sparkles } from "lucide-react";
+import { CandlestickChart, Compass, Sparkles, type LucideIcon } from "lucide-react";
 import {
   useDensity,
   useViewMode,
@@ -220,55 +220,54 @@ function UsageMetricRow({
 function ViewModeToggle() {
   const { viewMode, setViewMode } = useViewMode();
   return (
-    <div
-      role="tablist"
-      aria-label="App view"
-      className="inline-flex h-[var(--ui-h-input)] items-center gap-0.5 rounded-lg bg-white/[0.04] p-0.5 ring-1 ring-inset ring-white/[0.06]"
-    >
-      <ViewModeTab
+    <div className="flex items-center gap-1">
+      <ViewModeButton
         active={viewMode === "trading"}
         onClick={() => setViewMode("trading")}
         label="Trade"
-        controls="shells-view-trading"
+        target="trading"
+        icon={CandlestickChart}
       />
-      <ViewModeTab
+      <ViewModeButton
         active={viewMode === "explore"}
         onClick={() => setViewMode("explore")}
         label="Paths"
-        controls="shells-view-explore"
+        target="explore"
+        icon={Compass}
       />
     </div>
   );
 }
 
-function ViewModeTab({
+function ViewModeButton({
   active,
   onClick,
   label,
-  controls,
+  target,
+  icon: Icon,
 }: {
   active: boolean;
   onClick: () => void;
   label: string;
-  controls: string;
+  target: ViewMode;
+  icon: LucideIcon;
 }) {
-  const target: ViewMode = label === "Trade" ? "trading" : "explore";
   return (
     <button
       type="button"
-      role="tab"
-      aria-selected={active}
-      aria-controls={controls}
+      aria-label={label}
+      aria-pressed={active}
+      title={label}
       data-target={target}
       onClick={onClick}
       className={cn(
-        "rounded-md px-3 py-1.5 text-body font-medium transition-[background-color,color,scale] duration-150 ease-out active:scale-[0.96]",
+        "flex h-[var(--ui-h-input)] w-[var(--ui-h-input)] items-center justify-center rounded-lg transition-[background-color,color,box-shadow,scale] duration-150 ease-out active:scale-[0.96]",
         active
-          ? "bg-white/[0.10] text-foreground shadow-[inset_0_-1px_0_rgba(0,0,0,0.12)]"
-          : "text-muted-foreground hover:text-foreground",
+          ? "bg-white/[0.08] text-foreground ring-1 ring-inset ring-white/[0.10]"
+          : "text-muted-foreground hover:bg-white/[0.04] hover:text-foreground",
       )}
     >
-      {label}
+      <Icon strokeWidth={1.75} className="size-4" aria-hidden />
     </button>
   );
 }
