@@ -127,7 +127,7 @@ function SearchButton() {
       type="button"
       aria-label="Search tokens and paths"
       onClick={openCommand}
-      className="flex size-9 items-center justify-center rounded-md text-muted-foreground transition-[background-color,color] duration-150 ease-out hover:bg-white/[0.04] hover:text-foreground"
+      className="flex size-9 items-center justify-center rounded-md bg-white/[0.06] text-muted-foreground transition-[background-color,color,scale] duration-150 ease-out hover:bg-white/[0.10] hover:text-foreground active:scale-[0.96]"
     >
       <SearchIcon />
     </button>
