@@ -15,7 +15,7 @@ const STAGES = [
 ] as const;
 
 const TOTAL_MS = STAGES[STAGES.length - 1].end + 120;
-const BAR_WIDTH = 20;
+const BAR_WIDTH = 32;
 
 const SPINNER = "⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏";
 
@@ -129,24 +129,17 @@ export function ShellsBoot({
             </span>
           </div>
 
-          {/* ASCII progress bar — small cells with explicit gap */}
-          <div
-            aria-hidden
-            className="flex items-center gap-2 text-[11px] leading-none"
-          >
+          {/* ASCII progress bar — block-cell strip. Brackets stay at the
+             surrounding 12px font; cells shrink to 9px so they don't tower
+             over the brackets the way full-block glyphs naturally do. */}
+          <div aria-hidden className="flex items-baseline gap-2 leading-none">
             <span className="text-muted-foreground/50">[</span>
-            <div className="flex items-center gap-1">
-              {Array.from({ length: BAR_WIDTH }).map((_, i) => (
-                <span
-                  key={i}
-                  className={cn(
-                    i < filled ? "text-primary" : "text-muted-foreground/25",
-                  )}
-                >
-                  {i < filled ? "▰" : "▱"}
-                </span>
-              ))}
-            </div>
+            <span className="text-[9px] leading-none">
+              <span className="text-primary">{"█".repeat(filled)}</span>
+              <span className="text-muted-foreground/25">
+                {"░".repeat(BAR_WIDTH - filled)}
+              </span>
+            </span>
             <span className="text-muted-foreground/50">]</span>
           </div>
         </div>
