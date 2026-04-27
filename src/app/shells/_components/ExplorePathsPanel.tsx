@@ -449,6 +449,21 @@ function TrendingCarousel({ paths }: { paths: Path[] }) {
     el.scrollBy({ left: el.clientWidth * 0.85 * dir, behavior: "smooth" });
   };
 
+  // Mask-image fade on the scroll container itself — fades the content
+  // (cards) to transparent at the edges instead of overlaying a colored
+  // gradient. Blends with whatever's behind (panel bg) regardless of the
+  // card surface color underneath, fixing the "darker glow" the colored
+  // gradient produced over partially-scrolled cards.
+  const FADE = "2rem";
+  const maskImage = (() => {
+    if (atStart && atEnd) return undefined;
+    if (atStart)
+      return `linear-gradient(to right, black 0, black calc(100% - ${FADE}), transparent 100%)`;
+    if (atEnd)
+      return `linear-gradient(to right, transparent 0, black ${FADE}, black 100%)`;
+    return `linear-gradient(to right, transparent 0, black ${FADE}, black calc(100% - ${FADE}), transparent 100%)`;
+  })();
+
   return (
     <div className="group/carousel relative">
       <div
@@ -456,6 +471,7 @@ function TrendingCarousel({ paths }: { paths: Path[] }) {
         onScroll={updateEdges}
         role="list"
         aria-label="Trending paths"
+        style={{ maskImage, WebkitMaskImage: maskImage }}
         className="scroll-thin -mx-1 flex snap-x gap-3 overflow-x-auto px-1 pb-2"
       >
         {paths.map((p) => (
@@ -471,22 +487,6 @@ function TrendingCarousel({ paths }: { paths: Path[] }) {
           </div>
         ))}
       </div>
-
-      {/* Edge fades — only render on the side that has more to scroll */}
-      <span
-        aria-hidden
-        className={cn(
-          "pointer-events-none absolute inset-y-0 left-0 z-10 w-8 bg-gradient-to-r from-muted to-transparent transition-opacity duration-150",
-          atStart && "opacity-0",
-        )}
-      />
-      <span
-        aria-hidden
-        className={cn(
-          "pointer-events-none absolute inset-y-0 right-0 z-10 w-8 bg-gradient-to-l from-muted to-transparent transition-opacity duration-150",
-          atEnd && "opacity-0",
-        )}
-      />
 
       {/* Click-to-scroll chevrons — fade in on hover, disable at edges */}
       <CarouselButton
