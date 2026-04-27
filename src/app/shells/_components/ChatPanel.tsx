@@ -226,25 +226,18 @@ function TabButton({
       aria-controls={controls}
       onClick={onClick}
       className={cn(
-        "relative inline-flex items-center gap-1.5 rounded-t-md px-3 py-[var(--ui-y)] text-body font-medium transition-colors",
+        "relative inline-flex items-center gap-1.5 px-3 py-[var(--ui-y)] text-body font-medium transition-[color,scale] duration-150 ease-out active:scale-[0.96]",
         active
           ? "text-foreground"
           : "text-muted-foreground hover:text-foreground",
       )}
     >
       {label}
-      <span
-        className={cn(
-          "tabular-nums",
-          active ? "text-muted-foreground" : "text-muted-foreground",
-        )}
-      >
-        {count}
-      </span>
+      <span className="tabular-nums text-muted-foreground">{count}</span>
       {active && (
         <span
           aria-hidden
-          className="pointer-events-none absolute inset-x-2 -bottom-px h-px bg-foreground"
+          className="pointer-events-none absolute inset-x-3 bottom-0 h-px bg-foreground"
         />
       )}
     </button>
