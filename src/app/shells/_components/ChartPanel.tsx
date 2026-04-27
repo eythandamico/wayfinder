@@ -31,7 +31,10 @@ export function ChartPanel({
     <div
       role="tablist"
       aria-label="Chart timeframe"
-      className="flex shrink-0 items-center gap-0.5 rounded-lg bg-background/40 p-1"
+      className={cn(
+        "flex items-center gap-0.5 rounded-lg bg-background/40 p-1",
+        tfPosition === "header" ? "shrink-0" : "w-full",
+      )}
     >
       {TIMEFRAMES.map((t) => (
         <button
@@ -43,6 +46,7 @@ export function ChartPanel({
           onClick={() => setTf(t)}
           className={cn(
             "rounded-md px-[var(--ui-x-tight)] py-[var(--ui-y-tight)] text-body transition-[background-color,color,scale] duration-150 ease-out active:scale-[0.96]",
+            tfPosition === "below" && "flex-1",
             tf === t
               ? "bg-white/10 text-foreground"
               : "text-muted-foreground hover:text-foreground",
@@ -142,9 +146,7 @@ export function ChartPanel({
         />
       </div>
       {tfPosition === "below" && (
-        <div className="flex shrink-0 justify-center px-3 pb-3">
-          {timeframePills}
-        </div>
+        <div className="shrink-0 px-3 pb-3">{timeframePills}</div>
       )}
 
       <MarketPicker
