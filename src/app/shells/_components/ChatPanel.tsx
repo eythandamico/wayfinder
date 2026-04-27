@@ -230,7 +230,7 @@ function TabButton({
       aria-controls={controls}
       onClick={onClick}
       className={cn(
-        "relative flex-1 py-[var(--ui-y)] text-center text-body font-medium transition-[color,scale] duration-150 ease-out active:scale-[0.96]",
+        "relative flex-1 py-3 text-center text-body font-medium transition-[color,scale] duration-150 ease-out active:scale-[0.96]",
         active
           ? "text-foreground"
           : "text-muted-foreground hover:text-foreground",
