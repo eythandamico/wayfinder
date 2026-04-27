@@ -106,7 +106,7 @@ export function ChatPanel() {
 
   return (
     <div className="flex h-full flex-col overflow-hidden rounded-lg bg-muted">
-      <div className="flex items-center gap-1 border-b border-white/5 px-3 pt-3">
+      <div className="flex items-center gap-1 border-b border-white/5 px-3">
         <div role="tablist" aria-label="Agent, paths, and jobs" className="flex items-center gap-0.5">
           <TabButton
             active={tab === "agent"}
@@ -130,7 +130,7 @@ export function ChatPanel() {
             controls="shells-panel-jobs"
           />
         </div>
-        <div className="ml-auto mb-1 flex shrink-0 items-center gap-0.5">
+        <div className="ml-auto flex shrink-0 items-center gap-0.5">
           <HistoryDropdown
             active={activeSession}
             onSelect={setActiveSession}
