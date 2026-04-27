@@ -206,42 +206,6 @@ export function ExplorePathsPanel() {
       aria-label="Paths catalog"
       className="flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-lg bg-muted"
     >
-      {/* Header — search + sort + filters */}
-      <div className="flex shrink-0 flex-col gap-3 border-b border-white/5 px-5 py-4">
-        <div className="flex flex-wrap items-center gap-3">
-          <SearchInput value={query} onChange={setQuery} />
-          <SortDropdown value={sort} onChange={setSort} />
-        </div>
-        <div
-          role="tablist"
-          aria-label="Filter by path kind"
-          className="flex flex-wrap items-center gap-1.5"
-        >
-          <KindChip
-            active={kind === "all"}
-            onClick={() => setKind("all")}
-            count={PATHS.length}
-          >
-            All
-          </KindChip>
-          {KIND_ORDER.map((k) => {
-            const count = kindCounts[k];
-            if (count === 0) return null;
-            return (
-              <KindChip
-                key={k}
-                active={kind === k}
-                onClick={() => setKind(k)}
-                count={count}
-              >
-                {PATH_KIND_LABELS[k]}
-              </KindChip>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Body — trending (when not filtering) + full grid */}
       <div className="scroll-thin flex-1 overflow-y-auto px-5 py-5">
         {!isFiltering && (
           <section className="mb-7">
@@ -255,6 +219,41 @@ export function ExplorePathsPanel() {
             label={isFiltering ? "Results" : "All paths"}
             count={filtered.length}
           />
+          {/* Search + sort + kind filters scoped to this section */}
+          <div className="mb-4 flex flex-col gap-3">
+            <div className="flex flex-wrap items-center gap-3">
+              <SearchInput value={query} onChange={setQuery} />
+              <SortDropdown value={sort} onChange={setSort} />
+            </div>
+            <div
+              role="tablist"
+              aria-label="Filter by path kind"
+              className="flex flex-wrap items-center gap-1.5"
+            >
+              <KindChip
+                active={kind === "all"}
+                onClick={() => setKind("all")}
+                count={PATHS.length}
+              >
+                All
+              </KindChip>
+              {KIND_ORDER.map((k) => {
+                const count = kindCounts[k];
+                if (count === 0) return null;
+                return (
+                  <KindChip
+                    key={k}
+                    active={kind === k}
+                    onClick={() => setKind(k)}
+                    count={count}
+                  >
+                    {PATH_KIND_LABELS[k]}
+                  </KindChip>
+                );
+              })}
+            </div>
+          </div>
+
           {visible.length === 0 ? (
             <EmptyState query={query} />
           ) : (
