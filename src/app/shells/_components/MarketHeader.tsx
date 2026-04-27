@@ -300,16 +300,13 @@ function ConnectedPill({ address }: { address: string }) {
         aria-controls="wallet-menu"
         aria-label={`Wallet connected: ${short}`}
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex h-[var(--ui-h-input)] items-center gap-2 rounded-lg bg-white/[0.08] pl-1.5 pr-3 text-muted-foreground transition-[background-color,color,scale] duration-150 ease-out hover:bg-white/[0.12] hover:text-foreground active:scale-[0.96]"
+        className="inline-flex h-[var(--ui-h-input)] items-center gap-1.5 rounded-lg bg-white/[0.08] pl-1.5 pr-2 text-muted-foreground transition-[background-color,color,scale] duration-150 ease-out hover:bg-white/[0.12] hover:text-foreground active:scale-[0.96]"
       >
         <span
           aria-hidden
           className="flex size-7 items-center justify-center overflow-hidden rounded-full"
         >
           <Jazzicon diameter={28} seed={jsNumberForAddress(address)} />
-        </span>
-        <span aria-hidden className="text-body tabular-nums text-foreground">
-          {short}
         </span>
         <ChevronDownIcon
           aria-hidden
