@@ -1,9 +1,11 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import {
   Activity,
+  ChevronLeft,
+  ChevronRight,
   Code2,
   Download,
   Search,
@@ -419,18 +421,39 @@ function KindChip({
 /* ----- Trending carousel — same card width as grid, scrolls horizontally ----- */
 
 function TrendingCarousel({ paths }: { paths: Path[] }) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [atStart, setAtStart] = useState(true);
+  const [atEnd, setAtEnd] = useState(false);
+
+  const updateEdges = () => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setAtStart(el.scrollLeft <= 1);
+    setAtEnd(el.scrollLeft + el.clientWidth >= el.scrollWidth - 1);
+  };
+
+  // Sync edges on mount and whenever the carousel resizes (viewport changes,
+  // panel resized, etc.). onScroll covers updates during user scrolling.
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    updateEdges();
+    const ro = new ResizeObserver(updateEdges);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  const scroll = (dir: 1 | -1) => {
+    const el = scrollRef.current;
+    if (!el) return;
+    el.scrollBy({ left: el.clientWidth * 0.85 * dir, behavior: "smooth" });
+  };
+
   return (
-    <div className="relative">
-      {/* Edge fades so users see there's more content beyond the viewport */}
-      <span
-        aria-hidden
-        className="pointer-events-none absolute inset-y-0 left-0 z-10 w-6 bg-gradient-to-r from-muted to-transparent"
-      />
-      <span
-        aria-hidden
-        className="pointer-events-none absolute inset-y-0 right-0 z-10 w-6 bg-gradient-to-l from-muted to-transparent"
-      />
+    <div className="group/carousel relative">
       <div
+        ref={scrollRef}
+        onScroll={updateEdges}
         role="list"
         aria-label="Trending paths"
         className="scroll-thin -mx-1 flex snap-x gap-3 overflow-x-auto px-1 pb-2"
@@ -448,7 +471,65 @@ function TrendingCarousel({ paths }: { paths: Path[] }) {
           </div>
         ))}
       </div>
+
+      {/* Edge fades — only render on the side that has more to scroll */}
+      <span
+        aria-hidden
+        className={cn(
+          "pointer-events-none absolute inset-y-0 left-0 z-10 w-8 bg-gradient-to-r from-muted to-transparent transition-opacity duration-150",
+          atStart && "opacity-0",
+        )}
+      />
+      <span
+        aria-hidden
+        className={cn(
+          "pointer-events-none absolute inset-y-0 right-0 z-10 w-8 bg-gradient-to-l from-muted to-transparent transition-opacity duration-150",
+          atEnd && "opacity-0",
+        )}
+      />
+
+      {/* Click-to-scroll chevrons — fade in on hover, disable at edges */}
+      <CarouselButton
+        side="left"
+        disabled={atStart}
+        onClick={() => scroll(-1)}
+      />
+      <CarouselButton
+        side="right"
+        disabled={atEnd}
+        onClick={() => scroll(1)}
+      />
     </div>
+  );
+}
+
+function CarouselButton({
+  side,
+  disabled,
+  onClick,
+}: {
+  side: "left" | "right";
+  disabled: boolean;
+  onClick: () => void;
+}) {
+  const Icon = side === "left" ? ChevronLeft : ChevronRight;
+  return (
+    <button
+      type="button"
+      aria-label={`Scroll trending ${side}`}
+      onClick={onClick}
+      disabled={disabled}
+      className={cn(
+        "absolute top-1/2 z-20 flex size-8 -translate-y-1/2 items-center justify-center rounded-full bg-background/90 text-foreground shadow-lg ring-1 ring-inset ring-white/10 backdrop-blur transition-[opacity,background-color,scale] duration-150 ease-out hover:bg-background active:scale-[0.94] disabled:pointer-events-none",
+        side === "left" ? "left-2" : "right-2",
+        // Hidden by default; revealed on container hover or focus, only when
+        // there's actually somewhere to scroll.
+        "opacity-0 group-hover/carousel:opacity-100 focus-visible:opacity-100",
+        disabled && "!opacity-0",
+      )}
+    >
+      <Icon strokeWidth={1.75} className="size-4" aria-hidden />
+    </button>
   );
 }
 
