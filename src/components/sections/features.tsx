@@ -1,12 +1,35 @@
 "use client";
 
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
-import { Loader2, Route, Wallet } from "lucide-react";
+import {
+  Activity,
+  Eye,
+  Loader2,
+  MoreVertical,
+  Route,
+  TrendingUp,
+  Wallet,
+  Zap,
+  type LucideIcon,
+} from "lucide-react";
 import { PageSection, SectionHeader, StackCard } from "@/components/ds";
 import { cn } from "@/lib/utils";
+
+/* Shared iso treatment — perspective on the stage, rotateX/Z on the pane.
+ * Animations on pane children compose cleanly (iso rotation lives on the
+ * pane only). overflow-hidden on the art container clips edges. */
+const ISO_STAGE: React.CSSProperties = {
+  perspective: "1400px",
+  perspectiveOrigin: "50% 30%",
+  transformStyle: "preserve-3d",
+};
+const ISO_PANE: React.CSSProperties = {
+  transform: "rotateX(22deg) rotateZ(-14deg)",
+  transformStyle: "preserve-3d",
+};
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
@@ -222,38 +245,83 @@ export function Features() {
 /* ------------------------------------------------------------------ */
 
 function ChatArt() {
+  // Looping ellipsis on the agent's "thinking" line — feels alive without
+  // animating layout properties.
+  const [dots, setDots] = useState(0);
+  useEffect(() => {
+    const id = window.setInterval(() => setDots((d) => (d + 1) % 4), 380);
+    return () => window.clearInterval(id);
+  }, []);
+
   return (
     <div className="absolute inset-0 overflow-hidden bg-muted">
+      <Aurora tone="mint" />
+
       <div
-        aria-hidden
-        className="pointer-events-none absolute -inset-10"
-        style={{
-          background:
-            "radial-gradient(55% 55% at 70% 85%, color-mix(in oklch, var(--primary) 28%, transparent) 0%, transparent 70%)",
-          filter: "blur(40px)",
-        }}
-      />
-      <div className="relative flex h-full flex-col gap-4 p-8 md:p-10">
-        <div className="ml-auto max-w-[82%] rounded-2xl bg-white/[0.06] px-3.5 py-2 text-[13px]">
-          Hedge my BTC longs with funding capture
-        </div>
-        <div className="flex flex-col gap-1.5">
-          <div className="text-[13px] leading-relaxed text-foreground/90">
-            Short 0.4 BTC on HL Perps (funding +0.008%/h) against your 0.6
-            spot. Net exposure stays flat, you collect ~$19/day in funding.
+        style={ISO_STAGE}
+        className="absolute inset-0 flex items-center justify-center"
+      >
+        <div
+          style={ISO_PANE}
+          className="w-[78%] max-w-[420px] overflow-hidden rounded-2xl bg-background ring-1 ring-white/[0.08] shadow-[0_30px_60px_-20px_rgba(0,0,0,0.6)]"
+        >
+          {/* Tabs strip */}
+          <div className="flex items-stretch border-b border-white/5">
+            <span className="relative px-3 py-2 text-[11px] font-medium text-foreground">
+              Agent <span className="ml-1 text-muted-foreground">3</span>
+              <span
+                aria-hidden
+                className="absolute inset-x-2 bottom-0 h-px bg-foreground"
+              />
+            </span>
+            <span className="px-3 py-2 text-[11px] font-medium text-muted-foreground">
+              Paths <span className="ml-1">10</span>
+            </span>
+            <span className="px-3 py-2 text-[11px] font-medium text-muted-foreground">
+              Jobs <span className="ml-1">5</span>
+            </span>
           </div>
-          <span className="font-mono text-[10px] text-muted-foreground">
-            kimi-k2.5 · 3.2s · 284 tokens
-          </span>
-        </div>
-        <div className="mt-auto inline-flex items-center gap-2 text-[12px] text-muted-foreground">
-          <Loader2
-            aria-hidden
-            strokeWidth={1.75}
-            className="size-3 animate-spin text-primary"
-            style={{ animationDuration: "900ms" }}
-          />
-          thinking…
+
+          {/* Body */}
+          <div className="space-y-3 px-3.5 py-3.5">
+            <div className="ml-auto max-w-[78%] rounded-2xl bg-white/[0.06] px-3 py-1.5 text-[11.5px]">
+              Hedge my BTC longs with funding capture
+            </div>
+            <div className="space-y-1">
+              <div className="text-[11.5px] leading-relaxed text-foreground/90">
+                Short 0.4 BTC on HL Perps (funding +0.008%/h) against your
+                spot. Net exposure flat, ~$19/day in funding{".".repeat(dots)}
+              </div>
+              <span className="text-[9.5px] text-muted-foreground">
+                kimi-k2.5 · 3.2s · 284 tokens
+              </span>
+            </div>
+            <div className="inline-flex items-center gap-1.5 text-[10.5px] text-muted-foreground">
+              <Loader2
+                aria-hidden
+                strokeWidth={1.75}
+                className="size-3 animate-spin text-primary"
+                style={{ animationDuration: "900ms" }}
+              />
+              thinking
+            </div>
+          </div>
+
+          {/* Composer preview */}
+          <div className="border-t border-white/5 p-2.5">
+            <div className="flex items-center gap-2 rounded-xl bg-white/[0.04] px-3 py-1.5 text-[10.5px] text-muted-foreground">
+              <span className="flex-1 truncate">
+                Plan, Build, / for commands…
+              </span>
+              <span className="inline-flex items-center gap-1 text-foreground/80">
+                <span
+                  aria-hidden
+                  className="size-1.5 rounded-full bg-primary shadow-[0_0_6px_var(--primary)] animate-pulse-soft"
+                />
+                Active
+              </span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -265,9 +333,7 @@ function VenueArt() {
     {
       sym: "BTC-USDC",
       venue: "HL Perps",
-      price: "$75,739.5",
-      change: "+2.36%",
-      tone: "mint" as const,
+      basePrice: 75739.5,
       icon: "₿",
       bg: "#f7931a",
       fg: "#000",
@@ -275,9 +341,7 @@ function VenueArt() {
     {
       sym: "ETH-USDC",
       venue: "HL Spot",
-      price: "$2,310.9",
-      change: "+2.08%",
-      tone: "mint" as const,
+      basePrice: 2310.9,
       icon: "Ξ",
       bg: "#627eea",
       fg: "#fff",
@@ -285,9 +349,7 @@ function VenueArt() {
     {
       sym: "SOL/USDC",
       venue: "Onchain",
-      price: "$85.36",
-      change: "+2.20%",
-      tone: "mint" as const,
+      basePrice: 85.36,
       icon: "S",
       bg: "#9945ff",
       fg: "#fff",
@@ -295,155 +357,317 @@ function VenueArt() {
     {
       sym: "Trump 2028",
       venue: "Polymarket",
-      price: "$0.52",
-      change: "-0.98%",
-      tone: "red" as const,
+      basePrice: 0.52,
       icon: "◆",
       bg: "#2f78c4",
       fg: "#fff",
     },
   ];
+
+  // Pseudo-live prices: each row drifts on its own clock so the cards aren't
+  // all flickering in sync.
+  const [tick, setTick] = useState(0);
+  useEffect(() => {
+    const id = window.setInterval(() => setTick((t) => t + 1), 1500);
+    return () => window.clearInterval(id);
+  }, []);
+
   return (
-    <div className="absolute inset-0 flex flex-col justify-center bg-muted p-8 md:p-10">
-      {rows.map((r, i) => (
-        <div
-          key={r.sym}
-          className={cn(
-            "flex items-center gap-3 py-2.5",
-            i > 0 && "border-t border-white/[0.04]",
-          )}
-        >
-          <span
-            aria-hidden
-            className="flex size-7 items-center justify-center rounded-full text-[11px] font-bold"
-            style={{ backgroundColor: r.bg, color: r.fg }}
-          >
-            {r.icon}
-          </span>
-          <div className="min-w-0 flex-1">
-            <div className="text-[13px] font-semibold">{r.sym}</div>
-            <div className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-              {r.venue}
-            </div>
-          </div>
-          <div className="text-right">
-            <div className="font-mono text-[12px] tabular-nums">{r.price}</div>
-            <div
-              className={cn(
-                "font-mono text-[10px] tabular-nums",
-                r.tone === "mint" ? "text-primary" : "text-tone-down",
-              )}
-            >
-              {r.change}
-            </div>
-          </div>
+    <div className="absolute inset-0 overflow-hidden bg-muted">
+      <Aurora tone="amber" />
+
+      <div
+        style={ISO_STAGE}
+        className="absolute inset-0 flex items-center justify-center"
+      >
+        <div style={ISO_PANE} className="flex flex-col gap-2.5">
+          {rows.map((r, i) => {
+            // simple deterministic-ish price wobble
+            const seed = (tick + i * 7) * 0.31;
+            const drift = Math.sin(seed) * 0.018; // ±1.8%
+            const price = r.basePrice * (1 + drift);
+            const up = drift >= 0;
+            return (
+              <div
+                key={r.sym}
+                className="flex w-[300px] items-center gap-2.5 rounded-xl bg-background px-3 py-2.5 ring-1 ring-white/[0.08] shadow-[0_14px_28px_-16px_rgba(0,0,0,0.7)] animate-float-slow"
+                style={{
+                  animationDelay: `${i * 0.4}s`,
+                  transform: `translateZ(${(rows.length - i) * 6}px)`,
+                }}
+              >
+                <span
+                  aria-hidden
+                  className="flex size-7 shrink-0 items-center justify-center rounded-full text-[11px] font-bold"
+                  style={{ backgroundColor: r.bg, color: r.fg }}
+                >
+                  {r.icon}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <div className="text-[12px] font-semibold leading-tight">
+                    {r.sym}
+                  </div>
+                  <div className="text-[9.5px] uppercase tracking-wider text-muted-foreground">
+                    {r.venue}
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-[11.5px] tabular-nums">
+                    {r.basePrice >= 100
+                      ? `$${price.toLocaleString("en-US", {
+                          minimumFractionDigits: 1,
+                          maximumFractionDigits: 1,
+                        })}`
+                      : `$${price.toFixed(2)}`}
+                  </div>
+                  <div
+                    className={cn(
+                      "text-[9.5px] tabular-nums",
+                      up ? "text-primary" : "text-tone-down",
+                    )}
+                  >
+                    {up ? "+" : ""}
+                    {(drift * 100).toFixed(2)}%
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
-      ))}
+      </div>
     </div>
   );
 }
 
 function PortfolioArt() {
-  const rows: Array<[string, string, string, string]> = [
-    ["H", "Hyperliquid", "$24,102.11", "12 positions"],
-    ["T", "Tokens", "$12,804.77", "6 positions"],
-    ["P", "Polymarket", "$5,411.64", "4 positions"],
-  ];
   return (
-    <div className="absolute inset-0 flex flex-col bg-muted p-8 md:p-10">
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex flex-col gap-1">
-          <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-            Portfolio
-          </span>
-          <span className="font-heading text-[26px] font-semibold leading-none tabular-nums">
-            $42,318.52
-          </span>
-          <span className="font-mono text-[11px] tabular-nums text-primary">
-            + $1,204.88 · +2.93% · 24H
-          </span>
-        </div>
-        <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-white/[0.06] px-2.5 py-1 font-mono text-[10px] tabular-nums text-muted-foreground">
-          <span className="size-1.5 rounded-full bg-primary shadow-[0_0_6px_var(--primary)]" />
-          warm-seeking-fox
-        </span>
-      </div>
-      <div className="mt-5 flex flex-col">
-        {rows.map(([glyph, name, value, meta], i) => (
-          <div
-            key={name}
-            className={cn(
-              "flex items-center gap-3 py-2.5",
-              i > 0 && "border-t border-white/[0.04]",
-            )}
-          >
-            <span className="flex size-6 items-center justify-center rounded-md bg-white/[0.06] font-mono text-[10px] font-semibold">
-              {glyph}
+    <div className="absolute inset-0 overflow-hidden bg-muted">
+      <Aurora tone="sky" />
+
+      <div
+        style={ISO_STAGE}
+        className="absolute inset-0 flex items-center justify-center"
+      >
+        <div
+          style={ISO_PANE}
+          className="w-[80%] max-w-[440px] overflow-hidden rounded-2xl bg-background ring-1 ring-white/[0.08] shadow-[0_30px_60px_-20px_rgba(0,0,0,0.6)]"
+        >
+          {/* Account header */}
+          <div className="flex items-center justify-between gap-2 border-b border-white/5 px-3 py-2">
+            <span className="inline-flex items-center gap-1.5">
+              <span
+                aria-hidden
+                className="size-5 rounded-full"
+                style={{
+                  background:
+                    "conic-gradient(from 140deg at 50% 50%, #6ed7c8, #5a8de0, #c47fdb, #6ed7c8)",
+                }}
+              />
+              <span className="text-[11px] font-medium">warm-seeking-fox</span>
             </span>
-            <div className="flex min-w-0 flex-1 flex-col">
-              <span className="text-[12px] font-medium">{name}</span>
-              <span className="font-mono text-[9.5px] text-muted-foreground">
-                {meta}
+            <div className="flex items-center gap-1 text-muted-foreground">
+              <Eye strokeWidth={1.5} className="size-3.5" aria-hidden />
+              <MoreVertical strokeWidth={1.5} className="size-3.5" aria-hidden />
+            </div>
+          </div>
+
+          {/* Hero */}
+          <div className="flex items-start justify-between gap-3 px-3 pt-3">
+            <div className="flex min-w-0 flex-col gap-1">
+              <span className="text-[24px] font-semibold leading-none tabular-nums">
+                $42,318.52
+              </span>
+              <span className="inline-flex items-baseline gap-1.5 text-[10.5px] tabular-nums text-primary">
+                <span aria-hidden>▲</span>+$1,204.88 (2.93%)
+                <span className="text-muted-foreground">today</span>
               </span>
             </div>
-            <span className="font-mono text-[12px] tabular-nums">{value}</span>
+            <span className="rounded-md bg-white/[0.08] px-2.5 py-1 text-[10.5px] font-medium">
+              Deposit
+            </span>
           </div>
-        ))}
+
+          {/* Sparkline */}
+          <div className="px-3 pb-3 pt-3">
+            <PortfolioArtSparkline />
+          </div>
+        </div>
       </div>
     </div>
   );
 }
 
+function PortfolioArtSparkline() {
+  const data = [
+    9.1, 9.4, 9.0, 9.6, 10.2, 10.5, 10.1, 11.0, 11.4, 11.0, 11.8, 12.4, 12.1,
+    12.9, 13.6, 13.3, 14.1, 14.8, 15.4, 15.1, 16.2, 17.0, 17.6, 17.3, 18.4,
+    19.2, 19.9, 19.5, 20.5, 21.4, 22.1, 21.8, 23.0, 24.0, 24.6, 25.2,
+  ];
+  const max = Math.max(...data);
+  const min = Math.min(...data);
+  const range = max - min || 1;
+  const W = 100;
+  const H = 32;
+  const points = data
+    .map((v, i) => {
+      const x = (i / (data.length - 1)) * W;
+      const y = H - ((v - min) / range) * H;
+      return `${x.toFixed(2)},${y.toFixed(2)}`;
+    })
+    .join(" ");
+  const last = data[data.length - 1];
+  const lastYPct = (1 - (last - min) / range) * 100;
+
+  return (
+    <div className="relative h-12 w-full text-primary">
+      <svg
+        viewBox={`0 0 ${W} ${H}`}
+        preserveAspectRatio="none"
+        aria-hidden
+        className="h-full w-full"
+      >
+        <polyline
+          points={points}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={1.75}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          vectorEffect="non-scaling-stroke"
+          className="animate-spark-trail"
+        />
+      </svg>
+      <span
+        aria-hidden
+        className="pointer-events-none absolute size-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-current animate-pulse-soft shadow-[0_0_0_4px_color-mix(in_oklch,currentColor_25%,transparent)]"
+        style={{ left: "100%", top: `${lastYPct}%` }}
+      />
+    </div>
+  );
+}
+
 function PathsArt() {
-  const paths = [
+  const paths: Array<{
+    name: string;
+    author: string;
+    stars: string;
+    installs: string;
+    tone: "mint" | "violet" | "sky" | "amber";
+    icon: LucideIcon;
+  }> = [
     {
       name: "Delta-Neutral LP",
       author: "@lunar",
       stars: "4.8",
       installs: "3.2K",
-      bg: "#1aa396",
+      tone: "mint",
+      icon: TrendingUp,
     },
     {
       name: "BTC Funding Capture",
       author: "@mercury",
       stars: "4.6",
       installs: "2.1K",
-      bg: "#f7931a",
+      tone: "violet",
+      icon: Zap,
     },
     {
       name: "SOL Momentum Rotation",
       author: "@orbit",
       stars: "4.4",
       installs: "1.8K",
-      bg: "#9945ff",
+      tone: "sky",
+      icon: Activity,
     },
   ];
   return (
-    <div className="absolute inset-0 flex flex-col justify-center gap-2.5 bg-muted p-8 md:p-10">
-      {paths.map((p) => (
-        <div
-          key={p.name}
-          className="flex items-center gap-3 rounded-xl bg-white/[0.03] p-3 ring-1 ring-inset ring-white/[0.05]"
-        >
-          <span
-            aria-hidden
-            className="size-9 shrink-0 rounded-lg"
-            style={{
-              background: `linear-gradient(135deg, ${p.bg}, color-mix(in oklch, ${p.bg} 40%, black))`,
-            }}
-          />
-          <div className="min-w-0 flex-1">
-            <div className="text-[13px] font-semibold">{p.name}</div>
-            <div className="font-mono text-[10px] text-muted-foreground">
-              {p.author} · ★ {p.stars} · {p.installs} installs
-            </div>
-          </div>
-          <span className="inline-flex shrink-0 items-center rounded-full bg-primary/15 px-3 py-1 text-[11px] font-semibold text-primary ring-1 ring-inset ring-primary/20">
-            Install
-          </span>
+    <div className="absolute inset-0 overflow-hidden bg-muted">
+      <Aurora tone="violet" />
+
+      <div
+        style={ISO_STAGE}
+        className="absolute inset-0 flex items-center justify-center"
+      >
+        <div style={ISO_PANE} className="flex flex-col gap-3">
+          {paths.map((p, i) => {
+            const Icon = p.icon;
+            return (
+              <div
+                key={p.name}
+                className="w-[300px] overflow-hidden rounded-2xl bg-background ring-1 ring-white/[0.08] shadow-[0_18px_36px_-20px_rgba(0,0,0,0.7)] animate-float-slow"
+                style={{
+                  animationDelay: `${i * 0.5}s`,
+                  transform: `translateZ(${(paths.length - i) * 8}px)`,
+                }}
+              >
+                {/* Procedural header — kind tint + glyph, mirrors PathCard */}
+                <div
+                  aria-hidden
+                  className={cn(
+                    "relative h-12 overflow-hidden border-b border-white/[0.04]",
+                    TONE_BG[p.tone],
+                  )}
+                >
+                  <Icon
+                    strokeWidth={1.25}
+                    className={cn(
+                      "absolute -bottom-2 -right-2 size-12 opacity-30",
+                      TONE_FG[p.tone],
+                    )}
+                  />
+                </div>
+                <div className="flex items-center gap-2.5 px-3 py-2">
+                  <div className="flex min-w-0 flex-1 flex-col">
+                    <span className="truncate text-[12px] font-semibold leading-tight">
+                      {p.name}
+                    </span>
+                    <span className="text-[9.5px] text-muted-foreground">
+                      {p.author} · ★ {p.stars} · {p.installs}
+                    </span>
+                  </div>
+                  <span className="inline-flex shrink-0 items-center rounded-md bg-primary/15 px-2.5 py-1 text-[10px] font-semibold text-primary ring-1 ring-inset ring-primary/20">
+                    Install
+                  </span>
+                </div>
+              </div>
+            );
+          })}
         </div>
-      ))}
+      </div>
     </div>
+  );
+}
+
+const TONE_BG: Record<"mint" | "violet" | "sky" | "amber", string> = {
+  mint: "bg-[var(--wf-accent-mint-soft)]",
+  violet: "bg-[var(--wf-accent-violet-soft)]",
+  sky: "bg-[var(--wf-accent-sky-soft)]",
+  amber: "bg-[var(--wf-accent-amber-soft)]",
+};
+const TONE_FG: Record<"mint" | "violet" | "sky" | "amber", string> = {
+  mint: "text-[var(--wf-accent-mint)]",
+  violet: "text-[var(--wf-accent-violet)]",
+  sky: "text-[var(--wf-accent-sky)]",
+  amber: "text-[var(--wf-accent-amber)]",
+};
+
+/* Shared aurora glow used behind every iso scene. */
+function Aurora({ tone }: { tone: "mint" | "amber" | "sky" | "violet" }) {
+  const color: Record<typeof tone, string> = {
+    mint: "var(--primary)",
+    amber: "var(--wf-accent-amber)",
+    sky: "var(--wf-accent-sky)",
+    violet: "var(--wf-accent-violet)",
+  };
+  return (
+    <div
+      aria-hidden
+      className="pointer-events-none absolute -inset-10"
+      style={{
+        background: `radial-gradient(55% 55% at 50% 50%, color-mix(in oklch, ${color[tone]} 28%, transparent) 0%, transparent 70%)`,
+        filter: "blur(50px)",
+      }}
+    />
   );
 }
 

@@ -297,6 +297,44 @@
   }
 }
 
+/* Feature-card art loops — used by the iso scenes in features.tsx */
+@keyframes wf-float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+@keyframes wf-pulse-soft {
+  0%, 100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+@keyframes wf-spark-trail {
+  0% {
+    stroke-dashoffset: 200;
+  }
+  60%, 100% {
+    stroke-dashoffset: 0;
+  }
+}
+@layer utilities {
+  .animate-float-slow {
+    animation: wf-float 4.2s ease-in-out infinite;
+  }
+  .animate-pulse-soft {
+    animation: wf-pulse-soft 2.6s ease-in-out infinite;
+  }
+  .animate-spark-trail {
+    stroke-dasharray: 200;
+    animation: wf-spark-trail 4s ease-out infinite;
+  }
+}
+
 /* Disable iOS Safari text autosizing. Without this, Safari boosts font-size
  * in long readable blocks (chat messages, paragraphs) but not in short UI
  * labels (tabs, buttons), which breaks our type scale on mobile. */
