@@ -219,12 +219,9 @@ export function ExplorePathsPanel() {
             label={isFiltering ? "Results" : "All paths"}
             count={filtered.length}
           />
-          {/* Search + sort + kind filters scoped to this section */}
-          <div className="mb-4 flex flex-col gap-3">
-            <div className="flex flex-wrap items-center gap-3">
-              <SearchInput value={query} onChange={setQuery} />
-              <SortDropdown value={sort} onChange={setSort} />
-            </div>
+          {/* Filter chips left; compact search + sort right. Scoped to this
+             section, wraps on narrow widths. */}
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <div
               role="tablist"
               aria-label="Filter by path kind"
@@ -251,6 +248,10 @@ export function ExplorePathsPanel() {
                   </KindChip>
                 );
               })}
+            </div>
+            <div className="ml-auto flex items-center gap-2">
+              <SearchInput value={query} onChange={setQuery} />
+              <SortDropdown value={sort} onChange={setSort} />
             </div>
           </div>
 
@@ -290,19 +291,19 @@ function SearchInput({
   onChange: (v: string) => void;
 }) {
   return (
-    <div className="relative min-w-0 flex-1">
+    <div className="relative w-44">
       <Search
         aria-hidden
         strokeWidth={1.75}
-        className="pointer-events-none absolute left-3 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground"
+        className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground"
       />
       <input
         type="search"
-        placeholder="Search paths, tags, authors…"
+        placeholder="Search…"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         aria-label="Search paths"
-        className="h-[var(--ui-h-input)] w-full rounded-lg bg-white/[0.06] pl-9 pr-3.5 text-body text-foreground outline-none ring-1 ring-inset ring-white/[0.08] transition-[background-color,box-shadow] duration-150 ease-out placeholder:text-muted-foreground hover:bg-white/[0.09] hover:ring-white/[0.12] focus-visible:bg-white/[0.09] focus-visible:ring-2 focus-visible:ring-primary/50"
+        className="h-[var(--ui-h-input)] w-full rounded-lg bg-white/[0.06] pl-8 pr-3 text-body text-foreground outline-none ring-1 ring-inset ring-white/[0.08] transition-[background-color,box-shadow] duration-150 ease-out placeholder:text-muted-foreground hover:bg-white/[0.09] hover:ring-white/[0.12] focus-visible:bg-white/[0.09] focus-visible:ring-2 focus-visible:ring-primary/50"
       />
     </div>
   );
