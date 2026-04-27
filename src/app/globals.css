@@ -285,6 +285,15 @@ html {
   select {
     font-size: 16px !important;
   }
+  /* iOS keys off the input's own font-size to decide whether to auto-zoom on
+   * focus — placeholder font-size doesn't factor in. Letting placeholders use
+   * the density-scaled text-body token keeps them visually matching the
+   * surrounding chrome (model selector, etc.) while typed input stays at 16px
+   * so focus doesn't trigger Safari's zoom. */
+  input::placeholder,
+  textarea::placeholder {
+    font-size: var(--text-body);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
