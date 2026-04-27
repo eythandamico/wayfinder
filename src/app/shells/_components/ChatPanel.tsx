@@ -106,8 +106,12 @@ export function ChatPanel() {
 
   return (
     <div className="flex h-full flex-col overflow-hidden rounded-lg bg-muted">
-      <div className="flex items-center gap-1 border-b border-white/5 px-3">
-        <div role="tablist" aria-label="Agent, paths, and jobs" className="flex items-center gap-0.5">
+      <div className="flex items-stretch border-b border-white/5">
+        <div
+          role="tablist"
+          aria-label="Agent, paths, and jobs"
+          className="flex flex-1"
+        >
           <TabButton
             active={tab === "agent"}
             onClick={() => setTab("agent")}
@@ -130,7 +134,7 @@ export function ChatPanel() {
             controls="shells-panel-jobs"
           />
         </div>
-        <div className="ml-auto flex shrink-0 items-center gap-0.5">
+        <div className="flex shrink-0 items-center gap-0.5 px-2">
           <HistoryDropdown
             active={activeSession}
             onSelect={setActiveSession}
@@ -226,18 +230,18 @@ function TabButton({
       aria-controls={controls}
       onClick={onClick}
       className={cn(
-        "relative inline-flex items-center gap-1.5 px-3 py-[var(--ui-y)] text-body font-medium transition-[color,scale] duration-150 ease-out active:scale-[0.96]",
+        "relative flex-1 py-[var(--ui-y)] text-center text-body font-medium transition-[color,scale] duration-150 ease-out active:scale-[0.96]",
         active
           ? "text-foreground"
           : "text-muted-foreground hover:text-foreground",
       )}
     >
       {label}
-      <span className="tabular-nums text-muted-foreground">{count}</span>
+      <span className="ml-1.5 tabular-nums text-muted-foreground">{count}</span>
       {active && (
         <span
           aria-hidden
-          className="pointer-events-none absolute inset-x-3 bottom-0 h-px bg-foreground"
+          className="pointer-events-none absolute inset-x-4 bottom-0 h-px bg-foreground"
         />
       )}
     </button>
