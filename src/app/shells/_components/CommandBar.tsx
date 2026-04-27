@@ -369,14 +369,6 @@ export function CommandBar() {
                     Select
                   </span>
                 </div>
-                <a
-                  href={PATHS_CATALOG_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-body text-primary transition-[filter] hover:brightness-110"
-                >
-                  View all on strategies.wayfinder.ai ↗
-                </a>
               </div>
             </div>
           </div>,
