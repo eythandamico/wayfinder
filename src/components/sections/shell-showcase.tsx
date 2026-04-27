@@ -527,112 +527,133 @@ function TradePane() {
   return (
     <div
       data-pane
-      className="flex flex-1 flex-col gap-2 overflow-hidden rounded-lg bg-muted p-2.5"
+      className="flex flex-1 flex-col overflow-hidden rounded-lg bg-muted"
     >
-      <div className="grid grid-cols-3 divide-x divide-white/5 rounded-md bg-background/40 ring-1 ring-inset ring-white/5">
-        {[
-          ["Margin", "Cross"],
-          ["Leverage", "40x"],
-          ["Type", "Market"],
-        ].map(([label, value], i) => (
-          <div key={label as string} className="flex flex-col gap-0.5 px-2 py-1.5">
-            <span className="font-mono text-[8.5px] uppercase tracking-wider text-muted-foreground">
-              {label}
-            </span>
-            <span
-              className={cn(
-                "text-[11px]",
-                i === 1 ? "font-mono tabular-nums text-primary" : "text-foreground",
-              )}
+      {/* Header — params strip + Long/Short, sticky at top */}
+      <div className="flex shrink-0 flex-col gap-2 px-2.5 pt-2.5">
+        <div className="grid grid-cols-3 divide-x divide-white/5 rounded-md bg-background/60">
+          {[
+            { value: "Cross", accent: false },
+            { value: "40x", accent: true },
+            { value: "Market", accent: false },
+          ].map(({ value, accent }) => (
+            <div
+              key={value}
+              className="flex items-center justify-center gap-1 px-2 py-1.5"
             >
-              {value}
+              <span
+                className={cn(
+                  "text-[11px]",
+                  accent
+                    ? "tabular-nums text-primary"
+                    : "text-foreground",
+                )}
+              >
+                {value}
+              </span>
+              <ChevronDownIcon className="size-2.5 text-muted-foreground" />
+            </div>
+          ))}
+        </div>
+        <div className="grid grid-cols-2 gap-1 rounded-md bg-background/60 p-0.5">
+          <button
+            type="button"
+            onClick={() => setSide("long")}
+            className={cn(
+              "rounded-sm py-1.5 text-[12px] font-semibold transition-colors",
+              side === "long"
+                ? "bg-primary text-primary-foreground shadow-[inset_0_-1.5px_0_rgba(0,0,0,0.12)]"
+                : "text-muted-foreground",
+            )}
+          >
+            Long ▲
+          </button>
+          <button
+            type="button"
+            onClick={() => setSide("short")}
+            className={cn(
+              "rounded-sm py-1.5 text-[12px] font-semibold transition-colors",
+              side === "short"
+                ? "bg-tone-down text-black shadow-[inset_0_-1.5px_0_rgba(0,0,0,0.12)]"
+                : "text-muted-foreground",
+            )}
+          >
+            Short ▼
+          </button>
+        </div>
+      </div>
+
+      {/* Body — stats inline + size + slider */}
+      <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto px-2.5 py-2.5">
+        <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 text-[10.5px]">
+          <span className="inline-flex items-baseline gap-1">
+            <span className="text-muted-foreground">Available</span>
+            <span className="tabular-nums text-foreground">$0.00</span>
+            <span className="text-muted-foreground">USDC</span>
+          </span>
+          <span className="inline-flex items-baseline gap-1">
+            <span className="text-muted-foreground">Position</span>
+            <span className="tabular-nums text-foreground">None</span>
+            <span className="text-muted-foreground">0 BTC</span>
+          </span>
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <div className="flex items-center justify-between text-[10.5px]">
+            <span className="text-muted-foreground">Size</span>
+            <span className="tabular-nums text-muted-foreground">≈ $0.00</span>
+          </div>
+          <div className="flex items-center gap-1.5 rounded-md bg-white/5 px-2 py-1.5">
+            <span
+              aria-hidden
+              className="flex size-3.5 items-center justify-center rounded-full text-[8px] font-bold text-black"
+              style={{ backgroundColor: "#f7931a" }}
+            >
+              ₿
+            </span>
+            <span className="min-w-0 flex-1 text-[12px] tabular-nums text-foreground">
+              0.00
+            </span>
+            <span className="rounded-sm bg-white/10 px-1.5 py-0.5 text-[9.5px] text-muted-foreground">
+              Max
+            </span>
+            <span className="text-[9.5px] text-muted-foreground">BTC</span>
+          </div>
+          <div className="relative flex h-7 items-center overflow-hidden rounded-md bg-white/5">
+            <div
+              className="absolute inset-y-1 left-1 rounded-sm bg-primary transition-[width] duration-150 ease-out"
+              style={{ width: `calc(${pct}% - 0.5rem)` }}
+            />
+            <input
+              type="range"
+              min={0}
+              max={100}
+              value={pct}
+              onChange={(e) => setPct(Number(e.target.value))}
+              aria-label="Size percentage"
+              className="absolute inset-0 cursor-pointer opacity-0"
+            />
+            <span className="relative z-10 ml-auto pr-3 text-[10px] tabular-nums text-muted-foreground">
+              {pct}%
             </span>
           </div>
-        ))}
+        </div>
       </div>
-      <div className="grid grid-cols-2 gap-1 rounded-md bg-background/40 p-0.5 ring-1 ring-inset ring-white/5">
+
+      {/* Footer — Place CTA, sticky at bottom */}
+      <div className="shrink-0 px-2.5 pb-2.5">
         <button
           type="button"
-          onClick={() => setSide("long")}
           className={cn(
-            "rounded-sm py-1.5 text-[12px] font-semibold transition-colors",
+            "w-full rounded-md py-2 text-[12px] font-semibold transition-[filter]",
             side === "long"
-              ? "bg-primary text-primary-foreground shadow-[inset_0_-1.5px_0_rgba(0,0,0,0.12)]"
-              : "text-muted-foreground",
+              ? "bg-primary text-primary-foreground hover:brightness-[1.04]"
+              : "bg-tone-down text-black hover:brightness-[1.04]",
           )}
         >
-          Long ▲
-        </button>
-        <button
-          type="button"
-          onClick={() => setSide("short")}
-          className={cn(
-            "rounded-sm py-1.5 text-[12px] font-semibold transition-colors",
-            side === "short"
-              ? "bg-tone-down text-black shadow-[inset_0_-1.5px_0_rgba(0,0,0,0.12)]"
-              : "text-muted-foreground",
-          )}
-        >
-          Short ▼
+          Place Market {side === "long" ? "Long" : "Short"} →
         </button>
       </div>
-      <div className="flex items-center justify-between">
-        <span className="font-mono text-[9.5px] uppercase tracking-wider text-muted-foreground">
-          Size
-        </span>
-        <span className="font-mono text-[10px] tabular-nums text-muted-foreground">
-          ≈ $0.00
-        </span>
-      </div>
-      <div className="flex items-center gap-1.5 rounded-md bg-white/5 px-2 py-1.5">
-        <span
-          aria-hidden
-          className="flex size-3.5 items-center justify-center rounded-full text-[8px] font-bold text-black"
-          style={{ backgroundColor: "#f7931a" }}
-        >
-          ₿
-        </span>
-        <span className="min-w-0 flex-1 font-mono text-[12px] text-foreground tabular-nums">
-          0.00
-        </span>
-        <span className="rounded-sm bg-white/10 px-1.5 py-0.5 font-mono text-[8.5px] uppercase tracking-wider text-muted-foreground">
-          Max
-        </span>
-        <span className="font-mono text-[9.5px] text-muted-foreground">BTC</span>
-      </div>
-      <div className="relative flex h-7 items-center overflow-hidden rounded-md bg-white/5">
-        <div
-          className="absolute inset-y-1 left-1 rounded-sm bg-primary transition-[width] duration-150 ease-out"
-          style={{ width: `calc(${pct}% - 0.5rem)` }}
-        />
-        <input
-          type="range"
-          min={0}
-          max={100}
-          value={pct}
-          onChange={(e) => setPct(Number(e.target.value))}
-          aria-label="Size percentage"
-          className="absolute inset-0 cursor-pointer opacity-0"
-        />
-        <span className="relative z-10 ml-auto pr-3 font-mono text-[10px] tabular-nums text-muted-foreground">
-          {pct}%
-        </span>
-      </div>
-      <div className="mt-auto flex items-center justify-between border-t border-white/5 pt-1.5 text-[10.5px]">
-        <span className="text-muted-foreground">Liquidation</span>
-        <span className="font-mono tabular-nums text-foreground/80">—</span>
-      </div>
-      <button
-        type="button"
-        className={cn(
-          "rounded-md py-2 text-[12px] font-semibold transition-[filter]",
-          side === "long"
-            ? "bg-primary text-primary-foreground hover:brightness-[1.04]"
-            : "bg-tone-down text-black hover:brightness-[1.04]",
-        )}
-      >
-        Place Market {side === "long" ? "Long" : "Short"} →
-      </button>
     </div>
   );
 }
@@ -661,12 +682,12 @@ function OrderBookPane() {
       data-pane
       className="flex h-[55%] shrink-0 flex-col overflow-hidden rounded-lg bg-muted"
     >
-      <div className="flex border-b border-white/5 px-1">
-        <span className="relative flex-1 py-1.5 text-center text-[11px] font-semibold text-foreground">
+      <div className="flex border-b border-white/5">
+        <span className="relative flex-1 py-2 text-center text-[12px] font-medium text-foreground">
           Order Book
-          <span className="absolute inset-x-3 bottom-0 h-px bg-foreground" />
+          <span className="absolute inset-x-4 bottom-0 h-px bg-foreground" />
         </span>
-        <span className="flex-1 py-1.5 text-center text-[11px] text-muted-foreground">
+        <span className="flex-1 py-2 text-center text-[12px] font-medium text-muted-foreground">
           Trades
         </span>
       </div>
@@ -732,22 +753,24 @@ function ChatPane() {
       data-pane
       className="flex flex-col overflow-hidden rounded-lg bg-muted"
     >
-      <div className="flex items-center justify-between px-4 pt-4 pb-3">
-        <span className="inline-flex items-center gap-1 text-[12.5px] font-semibold text-foreground">
-          Greeting
-          <ChevronDownIcon className="size-3 text-muted-foreground" />
-        </span>
-        <div className="flex items-center gap-0.5 text-muted-foreground">
-          <span className="flex size-6 items-center justify-center rounded hover:bg-white/[0.05]">
-            <PlusIcon />
+      {/* Tabs: Agent / Paths / Jobs (left) + history + new chat (right) */}
+      <div className="flex items-stretch border-b border-white/5">
+        <div className="flex px-2">
+          <ChatTab active label="Agent" count={3} />
+          <ChatTab label="Paths" count={10} />
+          <ChatTab label="Jobs" count={5} />
+        </div>
+        <div className="ml-auto flex shrink-0 items-center gap-0.5 px-1.5">
+          <span className="flex size-7 items-center justify-center rounded-md text-muted-foreground">
+            <Search strokeWidth={1.5} className="size-3.5" aria-hidden />
           </span>
-          <span className="flex size-6 items-center justify-center rounded hover:bg-white/[0.05]">
-            <MoreIcon />
+          <span className="flex size-7 items-center justify-center rounded-md text-muted-foreground">
+            <PlusIcon />
           </span>
         </div>
       </div>
 
-      <div className="scroll-thin flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto px-4 pb-3">
+      <div className="scroll-thin flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto px-3 pt-3 pb-3">
         <div className="flex justify-end">
           <div className="max-w-[80%] rounded-2xl bg-white/[0.06] px-3 py-2 text-[12px]">
             hey
@@ -779,7 +802,7 @@ function ChatPane() {
         )}
       </div>
 
-      <div className="px-4 pb-4">
+      <div className="px-3 pb-3">
         <div className="flex flex-col rounded-xl bg-background/40 ring-1 ring-inset ring-white/5 focus-within:ring-white/15">
           <textarea
             value={input}
@@ -812,6 +835,34 @@ function ChatPane() {
         </div>
       </div>
     </div>
+  );
+}
+
+function ChatTab({
+  active,
+  label,
+  count,
+}: {
+  active?: boolean;
+  label: string;
+  count: number;
+}) {
+  return (
+    <span
+      className={cn(
+        "relative inline-flex items-center gap-1.5 px-3 py-2.5 text-[12px] font-medium",
+        active ? "text-foreground" : "text-muted-foreground",
+      )}
+    >
+      {label}
+      <span className="tabular-nums text-muted-foreground">{count}</span>
+      {active && (
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-x-2 bottom-0 h-px bg-foreground"
+        />
+      )}
+    </span>
   );
 }
 
@@ -861,10 +912,6 @@ function LockIcon() {
 
 function PlusIcon() {
   return <Plus strokeWidth={1.5} className="size-3.5" aria-hidden />;
-}
-
-function MoreIcon() {
-  return <MoreVertical strokeWidth={1.5} className="size-3.5" aria-hidden />;
 }
 
 function ArrowUpIcon() {
