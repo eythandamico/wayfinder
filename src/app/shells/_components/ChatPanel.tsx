@@ -110,7 +110,7 @@ export function ChatPanel() {
         <div
           role="tablist"
           aria-label="Agent, paths, and jobs"
-          className="flex flex-1"
+          className="flex"
         >
           <TabButton
             active={tab === "agent"}
@@ -134,7 +134,7 @@ export function ChatPanel() {
             controls="shells-panel-jobs"
           />
         </div>
-        <div className="flex shrink-0 items-center gap-0.5 px-2">
+        <div className="ml-auto flex shrink-0 items-center gap-0.5 px-2">
           <HistoryDropdown
             active={activeSession}
             onSelect={setActiveSession}
@@ -230,7 +230,7 @@ function TabButton({
       aria-controls={controls}
       onClick={onClick}
       className={cn(
-        "relative flex-1 py-3 text-center text-body font-medium transition-[color,scale] duration-150 ease-out active:scale-[0.96]",
+        "relative px-3 py-3 text-body font-medium transition-[color,scale] duration-150 ease-out active:scale-[0.96]",
         active
           ? "text-foreground"
           : "text-muted-foreground hover:text-foreground",
@@ -241,7 +241,7 @@ function TabButton({
       {active && (
         <span
           aria-hidden
-          className="pointer-events-none absolute inset-x-4 bottom-0 h-px bg-foreground"
+          className="pointer-events-none absolute inset-x-3 bottom-0 h-px bg-foreground"
         />
       )}
     </button>
