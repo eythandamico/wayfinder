@@ -103,7 +103,10 @@ export function ShellsBoot({
           <span>{REGION}</span>
         </div>
 
-        <div className="flex w-[280px] flex-col gap-2 font-mono text-[12px]">
+        {/* Width is intrinsic — outer column sizes to the bar (the wider
+           child), so the percentage in the row above lands flush with the
+           bar's right bracket. */}
+        <div className="flex w-fit flex-col gap-2 font-mono text-[12px]">
           {/* Step label (left) + percentage (right) */}
           <div className="flex items-center justify-between gap-4 text-foreground">
             <span
