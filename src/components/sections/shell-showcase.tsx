@@ -680,7 +680,7 @@ function OrderBookPane() {
   return (
     <div
       data-pane
-      className="flex h-[55%] shrink-0 flex-col overflow-hidden rounded-lg bg-muted"
+      className="flex h-[42%] shrink-0 flex-col overflow-hidden rounded-lg bg-muted"
     >
       <div className="flex border-b border-white/5">
         <span className="relative flex-1 py-2 text-center text-[12px] font-medium text-foreground">
