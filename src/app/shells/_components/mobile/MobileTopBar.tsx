@@ -18,6 +18,7 @@ import {
   type Density,
   type ViewMode,
 } from "../../_state/shells-context";
+import Jazzicon, { jsNumberForAddress } from "react-jazzicon";
 import { CheckIcon, CopyIcon, SearchIcon } from "../icons";
 import { shortAddress } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -228,12 +229,14 @@ function WalletDropdown({ address }: { address: string }) {
         aria-label={`Wallet: ${short}. Open menu`}
         title={short}
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex h-9 items-center gap-1.5 rounded-full bg-white/[0.06] px-3 text-body tabular-nums text-foreground transition-[background-color,scale] duration-150 ease-out hover:bg-white/[0.10] active:scale-[0.96]"
+        className="inline-flex h-9 items-center gap-2 rounded-full bg-white/[0.06] pl-1 pr-3 text-body tabular-nums text-foreground transition-[background-color,scale] duration-150 ease-out hover:bg-white/[0.10] active:scale-[0.96]"
       >
         <span
           aria-hidden
-          className="size-1.5 rounded-full bg-primary shadow-[0_0_6px_var(--primary)]"
-        />
+          className="flex size-7 items-center justify-center overflow-hidden rounded-full"
+        >
+          <Jazzicon diameter={28} seed={jsNumberForAddress(address)} />
+        </span>
         <span className="hidden sm:inline">{short}</span>
       </button>
       <div
@@ -250,8 +253,14 @@ function WalletDropdown({ address }: { address: string }) {
           <span className="text-body text-muted-foreground">
             Connected wallet
           </span>
-          <div className="flex items-center justify-between gap-2 rounded-md bg-white/[0.04] px-2.5 py-2">
-            <span className="truncate text-body tabular-nums text-foreground">
+          <div className="flex items-center gap-2.5 rounded-md bg-white/[0.04] px-2.5 py-2">
+            <span
+              aria-hidden
+              className="flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-full"
+            >
+              <Jazzicon diameter={32} seed={jsNumberForAddress(address)} />
+            </span>
+            <span className="min-w-0 flex-1 truncate text-body tabular-nums text-foreground">
               {short}
             </span>
             <button
