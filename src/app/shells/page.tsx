@@ -74,12 +74,16 @@ export default function ShellsPage() {
 
       {bootMounted && <ShellsBoot dismissed={booted} />}
 
+      {/* Opacity-only fade — no transform here. The shell's <main> is
+         position: fixed, and a transform on this wrapper would re-anchor
+         the fixed child to the (zero-height) wrapper instead of the
+         viewport, hiding the app entirely. */}
       <div
         className={cn(
-          "h-full transition-[opacity,transform] duration-700 ease-out",
+          "contents transition-opacity duration-700 ease-out",
           booted
-            ? "translate-y-0 opacity-100"
-            : "pointer-events-none translate-y-2 opacity-0",
+            ? "opacity-100"
+            : "pointer-events-none opacity-0",
         )}
       >
         {isDesktop ? <DesktopShell /> : <MobileLayout />}
