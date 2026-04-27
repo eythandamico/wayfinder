@@ -906,7 +906,7 @@ function IconButton({
       type="button"
       {...rest}
       className={cn(
-        "relative flex size-8 items-center justify-center rounded-md text-muted-foreground transition-[background-color,color,scale] duration-150 ease-out hover:bg-white/[0.05] hover:text-foreground active:scale-[0.96]",
+        "relative flex items-center justify-center rounded-md p-[var(--ui-y)] text-muted-foreground transition-[background-color,color,scale] duration-150 ease-out hover:bg-white/[0.05] hover:text-foreground active:scale-[0.96]",
         "before:absolute before:-inset-1 before:content-['']",
         className,
       )}
