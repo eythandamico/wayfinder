@@ -7,7 +7,6 @@ import Image from "next/image";
 import {
   CandlestickChart,
   Compass,
-  MoreHorizontal,
   type LucideIcon,
 } from "lucide-react";
 import { WALLET_ADDRESS } from "../../_data/mocks";
@@ -19,7 +18,12 @@ import {
   type ViewMode,
 } from "../../_state/shells-context";
 import Jazzicon, { jsNumberForAddress } from "react-jazzicon";
-import { CheckIcon, CopyIcon, SearchIcon } from "../icons";
+import {
+  CheckIcon,
+  CopyIcon,
+  ExternalLinkIcon,
+  SearchIcon,
+} from "../icons";
 import { shortAddress } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
@@ -52,7 +56,6 @@ export function MobileTopBar() {
 
       <div className="flex items-center gap-1">
         <SearchButton />
-        <MoreMenu />
         <WalletDropdown address={WALLET_ADDRESS} />
       </div>
     </div>
@@ -131,75 +134,7 @@ function SearchButton() {
   );
 }
 
-/* ----- Density / overflow menu ----- */
-
-function MoreMenu() {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-  const { density, setDensity } = useDensity();
-
-  useClickOutside(ref, () => setOpen(false), open);
-
-  const options: { value: Density; size: string }[] = [
-    { value: "small", size: "text-[13px]" },
-    { value: "medium", size: "text-[14px]" },
-    { value: "large", size: "text-[16px]" },
-  ];
-
-  return (
-    <div ref={ref} className="relative">
-      <button
-        type="button"
-        aria-label="More options"
-        aria-haspopup="menu"
-        aria-expanded={open}
-        onClick={() => setOpen((v) => !v)}
-        className="flex size-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-white/[0.04] hover:text-foreground"
-      >
-        <MoreHorizontal strokeWidth={1.5} className="size-4" aria-hidden />
-      </button>
-      <div
-        role="menu"
-        aria-hidden={!open}
-        className={cn(
-          "absolute right-0 top-full z-30 mt-1 w-56 origin-top-right rounded-lg bg-background p-2 shadow-2xl transition-[opacity,transform] duration-150 ease-[var(--ease-strong)]",
-          open
-            ? "opacity-100 translate-y-0 scale-100"
-            : "pointer-events-none opacity-0 -translate-y-1 scale-[0.98]",
-        )}
-      >
-        <div className="px-1 pb-1.5 text-body text-muted-foreground">
-          Display density
-        </div>
-        <div className="flex items-center gap-1 rounded-md bg-white/[0.04] p-0.5">
-          {options.map((opt) => {
-            const active = density === opt.value;
-            return (
-              <button
-                key={opt.value}
-                type="button"
-                role="menuitemradio"
-                aria-checked={active}
-                onClick={() => setDensity(opt.value)}
-                className={cn(
-                  "flex h-8 flex-1 items-center justify-center rounded-sm font-semibold transition-[background-color,color,scale] duration-150 ease-out active:scale-[0.96]",
-                  opt.size,
-                  active
-                    ? "bg-white/[0.08] text-foreground"
-                    : "text-muted-foreground hover:text-foreground",
-                )}
-              >
-                Aa
-              </button>
-            );
-          })}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* ----- Wallet dropdown — far right ----- */
+/* ----- Wallet dropdown — far right. Mirrors desktop ConnectedPill menu. ----- */
 
 function WalletDropdown({ address }: { address: string }) {
   const [open, setOpen] = useState(false);
@@ -243,37 +178,95 @@ function WalletDropdown({ address }: { address: string }) {
             : "pointer-events-none opacity-0 -translate-y-1 scale-[0.98]",
         )}
       >
-        <div className="flex flex-col gap-2 px-2 pb-1.5 pt-2">
-          <span className="text-body text-muted-foreground">
-            Connected wallet
+        {/* Connected card — Jazzicon + label + truncated address */}
+        <div className="flex items-center gap-2.5 px-3 py-2.5">
+          <span
+            aria-hidden
+            className="flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-full"
+          >
+            <Jazzicon diameter={36} seed={jsNumberForAddress(address)} />
           </span>
-          <div className="flex items-center gap-2.5 rounded-md bg-white/[0.04] px-2.5 py-2">
-            <span
-              aria-hidden
-              className="flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-full"
-            >
-              <Jazzicon diameter={32} seed={jsNumberForAddress(address)} />
-            </span>
-            <span className="min-w-0 flex-1 truncate text-body tabular-nums text-foreground">
+          <div className="min-w-0 flex-1">
+            <div className="text-body text-muted-foreground">Connected</div>
+            <div className="truncate text-body tabular-nums text-foreground">
               {short}
-            </span>
-            <button
-              type="button"
-              aria-label={copied ? "Address copied" : "Copy address"}
-              onClick={copy}
-              className="flex size-7 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-white/[0.05] hover:text-foreground"
-            >
-              {copied ? <CheckIcon /> : <CopyIcon />}
-            </button>
+            </div>
           </div>
         </div>
+
+        <div className="h-px bg-white/5" />
+
+        <button
+          type="button"
+          role="menuitem"
+          onClick={copy}
+          className="flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-body text-foreground transition-colors hover:bg-white/[0.05]"
+        >
+          <span>{copied ? "Copied" : "Copy address"}</span>
+          {copied ? <CheckIcon /> : <CopyIcon />}
+        </button>
         <button
           type="button"
           role="menuitem"
           className="flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-body text-foreground transition-colors hover:bg-white/[0.05]"
         >
-          <span>Disconnect</span>
+          <span>View on Etherscan</span>
+          <ExternalLinkIcon />
         </button>
+
+        <div className="h-px bg-white/5" />
+
+        <DensityRow />
+
+        <div className="h-px bg-white/5" />
+
+        <button
+          type="button"
+          role="menuitem"
+          className="flex w-full items-center rounded-md px-3 py-2 text-left text-body text-tone-down transition-colors hover:bg-tone-down/10"
+        >
+          Disconnect
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* ----- Density picker — same Aa/Aa/Aa segmented row as desktop ----- */
+
+function DensityRow() {
+  const { density, setDensity } = useDensity();
+  const options: { value: Density; label: string; size: string }[] = [
+    { value: "small", label: "Small", size: "text-[13px]" },
+    { value: "medium", label: "Medium", size: "text-[14px]" },
+    { value: "large", label: "Large", size: "text-[16px]" },
+  ];
+  return (
+    <div className="flex flex-col gap-1.5 px-3 py-2">
+      <span className="text-body text-muted-foreground">Display density</span>
+      <div className="flex items-center gap-1 rounded-md bg-white/[0.04] p-0.5">
+        {options.map((opt) => {
+          const active = density === opt.value;
+          return (
+            <button
+              key={opt.value}
+              type="button"
+              role="menuitemradio"
+              aria-checked={active}
+              aria-label={`${opt.label} density`}
+              onClick={() => setDensity(opt.value)}
+              className={cn(
+                "flex h-8 flex-1 items-center justify-center rounded-sm font-semibold transition-[background-color,color,scale] duration-150 ease-out active:scale-[0.96]",
+                opt.size,
+                active
+                  ? "bg-white/[0.08] text-foreground"
+                  : "text-muted-foreground hover:text-foreground",
+              )}
+            >
+              Aa
+            </button>
+          );
+        })}
       </div>
     </div>
   );
