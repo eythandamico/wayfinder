@@ -255,19 +255,18 @@ function ViewModeButton({
   return (
     <button
       type="button"
-      aria-label={label}
       aria-pressed={active}
-      title={label}
       data-target={target}
       onClick={onClick}
       className={cn(
-        "flex h-[var(--ui-h-input)] w-[var(--ui-h-input)] items-center justify-center rounded-lg transition-[background-color,color,box-shadow,scale] duration-150 ease-out active:scale-[0.96]",
+        "inline-flex h-[var(--ui-h-input)] items-center gap-2 rounded-lg px-3 text-body font-medium transition-[background-color,color,box-shadow,scale] duration-150 ease-out active:scale-[0.96]",
         active
           ? "bg-white/[0.08] text-foreground ring-1 ring-inset ring-white/[0.10]"
           : "text-muted-foreground hover:bg-white/[0.04] hover:text-foreground",
       )}
     >
       <Icon strokeWidth={1.75} className="size-4" aria-hidden />
+      {label}
     </button>
   );
 }
