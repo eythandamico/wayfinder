@@ -10,6 +10,7 @@ import {
   CandlestickChart as LucideCandlestick,
   ChevronDown,
   Compass,
+  Eye,
   Infinity,
   Loader2,
   Lock,
@@ -413,50 +414,105 @@ function PortfolioPane() {
   return (
     <div
       data-pane
-      className="flex h-[36%] shrink-0 flex-col overflow-hidden rounded-lg bg-muted px-4 py-3"
+      className="flex h-[36%] shrink-0 flex-col overflow-hidden rounded-lg bg-muted"
     >
-      <div className="flex items-start justify-between">
-        <div className="flex flex-col gap-1">
-          <span className="font-mono text-[9px] uppercase tracking-wider text-muted-foreground">
-            Portfolio
+      {/* Account header — Jazzicon wallet pill + view toggle + ⋯ */}
+      <div className="flex shrink-0 items-center justify-between gap-2 border-b border-white/5 px-3 py-2">
+        <span className="inline-flex items-center gap-1.5">
+          <span
+            aria-hidden
+            className="flex size-5 items-center justify-center overflow-hidden rounded-full"
+          >
+            <Jazzicon diameter={20} seed={jsNumberForAddress(PREVIEW_WALLET)} />
           </span>
-          <span className="font-heading text-[22px] font-semibold leading-none tabular-nums">
-            $0.00
+          <span className="text-[11px] font-medium text-foreground">
+            warm-seeking-fox
           </span>
-          <span className="font-mono text-[10px] tabular-nums text-muted-foreground">
-            — $0.00 · 0.00% · 24H
+          <ChevronDownIcon className="size-3 text-muted-foreground" />
+        </span>
+        <div className="flex items-center gap-1">
+          <Eye
+            strokeWidth={1.5}
+            className="size-3.5 text-muted-foreground"
+            aria-hidden
+          />
+          <MoreVertical
+            strokeWidth={1.5}
+            className="size-3.5 text-muted-foreground"
+            aria-hidden
+          />
+        </div>
+      </div>
+
+      {/* Hero: balance + change + Deposit */}
+      <div className="flex shrink-0 items-start justify-between gap-3 px-3 pt-3">
+        <div className="flex min-w-0 flex-col gap-1">
+          <span className="text-[22px] font-semibold leading-none tabular-nums text-foreground">
+            $26,523.12
+          </span>
+          <span className="inline-flex items-baseline gap-1.5 text-[10.5px] tabular-nums text-primary">
+            <span aria-hidden>▲</span>+$201.82 (0.14%)
+            <span className="text-muted-foreground">today</span>
           </span>
         </div>
-        <span className="inline-flex items-center gap-2 font-mono text-[10px] tabular-nums text-muted-foreground">
-          <span className="size-1.5 rounded-full bg-primary shadow-[0_0_6px_var(--primary)]" />
-          0xa153…Eb3C2
+        <span className="rounded-md bg-white/[0.08] px-2.5 py-1 text-[10.5px] font-medium text-foreground">
+          Deposit
         </span>
       </div>
-      <div className="mt-3 flex flex-col">
-        {[
-          ["H", "Hyperliquid", 0],
-          ["T", "Tokens", 0],
-          ["P", "Polymarket", 0],
-        ].map(([glyph, name, count]) => (
-          <div
-            key={name as string}
-            className="flex items-center gap-2 border-t border-white/5 py-1.5 first:border-t-0"
-          >
-            <span className="flex size-5 items-center justify-center rounded-md bg-white/[0.06] font-mono text-[9.5px] font-semibold">
-              {glyph}
-            </span>
-            <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-              <span className="font-mono text-[9.5px] uppercase tracking-wider">
-                {name}
-              </span>
-              <span className="font-mono text-[9px] text-muted-foreground">
-                {count} positions
-              </span>
-            </div>
-            <span className="font-mono text-[11px] tabular-nums">$0.00</span>
-          </div>
-        ))}
+
+      {/* Sparkline */}
+      <div className="flex-1 px-3 pb-3 pt-2">
+        <MiniSparkline />
       </div>
+    </div>
+  );
+}
+
+function MiniSparkline() {
+  const data = [
+    9.1, 9.5, 9.2, 8.9, 9.6, 10.3, 10.0, 10.8, 11.1, 11.6, 11.3, 12.1, 12.8,
+    12.5, 13.2, 14.1, 14.6, 14.0, 15.0, 15.9, 16.3, 16.0, 17.2, 18.2, 18.9,
+    18.5, 19.7, 20.6, 21.5, 21.1, 22.1, 22.9, 23.8, 23.4, 24.7, 25.9, 26.4,
+    26.5,
+  ];
+  const max = Math.max(...data);
+  const min = Math.min(...data);
+  const range = max - min || 1;
+  const W = 100;
+  const H = 32;
+  const points = data
+    .map((v, i) => {
+      const x = (i / (data.length - 1)) * W;
+      const y = H - ((v - min) / range) * H;
+      return `${x.toFixed(2)},${y.toFixed(2)}`;
+    })
+    .join(" ");
+  const last = data[data.length - 1];
+  const lastYPct = (1 - (last - min) / range) * 100;
+
+  return (
+    <div className="relative h-full w-full text-primary">
+      <svg
+        viewBox={`0 0 ${W} ${H}`}
+        preserveAspectRatio="none"
+        aria-hidden
+        className="h-full w-full"
+      >
+        <polyline
+          points={points}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={1.75}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          vectorEffect="non-scaling-stroke"
+        />
+      </svg>
+      <span
+        aria-hidden
+        className="pointer-events-none absolute size-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-current shadow-[0_0_0_4px_color-mix(in_oklch,currentColor_25%,transparent)]"
+        style={{ left: "100%", top: `${lastYPct}%` }}
+      />
     </div>
   );
 }
