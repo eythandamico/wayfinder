@@ -8,9 +8,8 @@ import { OrderBookPanel } from "../OrderBook";
 import { PortfolioPanel } from "../PortfolioPanel";
 import { TradePanel } from "../TradePanel";
 import { useViewMode } from "../../_state/shells-context";
-import { ActionStrip } from "./ActionStrip";
+import { BottomBar } from "./BottomBar";
 import { BottomSheet } from "./BottomSheet";
-import { CompactComposer } from "./CompactComposer";
 import { MobileTopBar } from "./MobileTopBar";
 
 type Sheet = "chat" | "trade" | "portfolio" | "orderbook" | null;
@@ -30,8 +29,10 @@ export function MobileLayout() {
             <ChartPanel tfPosition="below" />
           </div>
 
-          <ActionStrip onOpen={(s) => setSheet(s)} />
-          <CompactComposer onActivate={() => setSheet("chat")} />
+          <BottomBar
+            onOpenSheet={(s) => setSheet(s)}
+            onOpenChat={() => setSheet("chat")}
+          />
 
           <BottomSheet
             open={sheet === "chat"}
