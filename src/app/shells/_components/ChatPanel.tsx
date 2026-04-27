@@ -230,7 +230,7 @@ function TabButton({
       aria-controls={controls}
       onClick={onClick}
       className={cn(
-        "relative px-3 py-3 text-body font-medium transition-[color,scale] duration-150 ease-out active:scale-[0.96]",
+        "relative px-4 py-3 text-body font-medium transition-[color,scale] duration-150 ease-out active:scale-[0.96]",
         active
           ? "text-foreground"
           : "text-muted-foreground hover:text-foreground",
@@ -241,7 +241,7 @@ function TabButton({
       {active && (
         <span
           aria-hidden
-          className="pointer-events-none absolute inset-x-3 bottom-0 h-px bg-foreground"
+          className="pointer-events-none absolute inset-x-4 bottom-0 h-px bg-foreground"
         />
       )}
     </button>
