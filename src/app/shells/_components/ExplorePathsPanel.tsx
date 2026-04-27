@@ -2,7 +2,7 @@
 
 import { useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { Search } from "lucide-react";
+import { Download, Search, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useClickOutside } from "@/lib/hooks/useClickOutside";
 import { CREATE_PATH_URL } from "@/lib/links";
@@ -42,14 +42,39 @@ const STATUS_ORDER: Record<PathStatus, number> = {
   unbonded: 3,
 };
 
-const STATUS_TONES: Record<PathStatus, string> = {
-  bonded: "bg-primary/15 text-primary",
-  "pending-update": "bg-white/[0.06] text-muted-foreground",
-  probation: "bg-amber-300/15 text-amber-200",
-  unbonded: "bg-tone-down/15 text-tone-down",
+const STATUS_STYLES: Record<
+  PathStatus,
+  { bg: string; text: string; dot: string }
+> = {
+  bonded: {
+    bg: "bg-white/[0.06]",
+    text: "text-muted-foreground",
+    dot: "bg-primary shadow-[0_0_6px_var(--primary)]",
+  },
+  "pending-update": {
+    bg: "bg-white/[0.06]",
+    text: "text-muted-foreground",
+    dot: "bg-amber-300",
+  },
+  unbonded: {
+    bg: "bg-white/[0.06]",
+    text: "text-muted-foreground/70",
+    dot: "bg-muted-foreground/50",
+  },
+  probation: {
+    bg: "bg-white/[0.06]",
+    text: "text-muted-foreground",
+    dot: "bg-tone-down",
+  },
 };
 
-const PAGE_SIZE = 9;
+const PAGE_SIZE = 15; // 5 cols × 3 rows on a wide display
+
+const GRID_COLS =
+  "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3";
+
+const TRENDING_COLS =
+  "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3";
 
 export function ExplorePathsPanel() {
   const [query, setQuery] = useState("");
@@ -69,6 +94,14 @@ export function ExplorePathsPanel() {
     for (const p of PATHS) acc[p.kind] += 1;
     return acc;
   }, []);
+
+  const trending = useMemo(
+    () =>
+      [...PATHS]
+        .sort((a, b) => b.weeklyInstalls - a.weeklyInstalls)
+        .slice(0, 3),
+    [],
+  );
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -101,8 +134,8 @@ export function ExplorePathsPanel() {
     return items;
   }, [query, kind, sort]);
 
-  // Reset pagination whenever filters change. Derived-state idiom (React docs)
-  // — set state during render, guarded by a previous-value check, instead of
+  // Reset pagination when filters change. Derived-state idiom (React docs):
+  // set state during render, guarded by a previous-value check, instead of
   // useEffect which would lag a paint behind.
   const filterKey = `${query}|${kind}|${sort}`;
   const [prevFilterKey, setPrevFilterKey] = useState(filterKey);
@@ -113,6 +146,7 @@ export function ExplorePathsPanel() {
 
   const visible = filtered.slice(0, visibleCount);
   const canShowMore = visibleCount < filtered.length;
+  const isFiltering = kind !== "all" || query.trim() !== "";
 
   return (
     <div
@@ -156,32 +190,51 @@ export function ExplorePathsPanel() {
         </div>
       </div>
 
-      {/* Body — grid of cards */}
-      <div className="scroll-thin flex-1 overflow-y-auto px-5 py-4">
-        {visible.length === 0 ? (
-          <EmptyState />
-        ) : (
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
-            {visible.map((p) => (
-              <PathCard key={p.id} path={p} />
-            ))}
-          </div>
+      {/* Body — trending (when not filtering) + full grid */}
+      <div className="scroll-thin flex-1 overflow-y-auto px-5 py-5">
+        {!isFiltering && (
+          <section className="mb-7">
+            <SectionLabel label="Trending now" />
+            <div className={TRENDING_COLS}>
+              {trending.map((p) => (
+                <PathCard key={p.id} path={p} />
+              ))}
+            </div>
+          </section>
         )}
-        {canShowMore && (
-          <div className="mt-5 flex justify-center">
-            <button
-              type="button"
-              onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}
-              className="rounded-lg bg-white/[0.06] px-4 py-2 text-body text-muted-foreground ring-1 ring-inset ring-white/[0.08] transition-[background-color,color,box-shadow] duration-150 ease-out hover:bg-white/[0.09] hover:text-foreground hover:ring-white/[0.12]"
-            >
-              Show {Math.min(PAGE_SIZE, filtered.length - visibleCount)} more
-            </button>
-          </div>
-        )}
+
+        <section>
+          <SectionLabel
+            label={isFiltering ? "Results" : "All paths"}
+            count={filtered.length}
+          />
+          {visible.length === 0 ? (
+            <EmptyState query={query} />
+          ) : (
+            <div className={GRID_COLS}>
+              {visible.map((p) => (
+                <PathCard key={p.id} path={p} />
+              ))}
+            </div>
+          )}
+          {canShowMore && (
+            <div className="mt-5 flex justify-center">
+              <button
+                type="button"
+                onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}
+                className="rounded-lg bg-white/[0.06] px-4 py-2 text-sm text-muted-foreground ring-1 ring-inset ring-white/[0.08] transition-[background-color,color,box-shadow] duration-150 ease-out hover:bg-white/[0.09] hover:text-foreground hover:ring-white/[0.12]"
+              >
+                Show {Math.min(PAGE_SIZE, filtered.length - visibleCount)} more
+              </button>
+            </div>
+          )}
+        </section>
       </div>
     </div>
   );
 }
+
+/* ----- Header controls ----- */
 
 function SearchInput({
   value,
@@ -318,95 +371,136 @@ function KindChip({
   );
 }
 
-function PathCard({ path }: { path: Path }) {
+/* ----- Section header (matches marketing /paths styling) ----- */
+
+function SectionLabel({ label, count }: { label: string; count?: number }) {
   return (
-    <article className="flex h-full flex-col gap-3 rounded-lg bg-background/40 p-4 ring-1 ring-inset ring-white/[0.06] transition-[background-color,box-shadow] duration-150 ease-out hover:bg-background/60 hover:ring-white/[0.10]">
-      <div className="flex items-center justify-between gap-2 text-body">
-        <span className="text-muted-foreground">
+    <div className="mb-3 flex items-center gap-3">
+      <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+        {label}
+        {count !== undefined && (
+          <span className="ml-2 tabular-nums text-foreground">{count}</span>
+        )}
+      </span>
+      <span aria-hidden className="h-px flex-1 bg-white/[0.05]" />
+    </div>
+  );
+}
+
+/* ----- Card (mirrors marketing /paths card) ----- */
+
+function PathCard({ path }: { path: Path }) {
+  const costLabel =
+    path.cost === "0 PROMPT" ? "Install" : `Install · ${path.cost}`;
+
+  return (
+    <article className="group/card flex h-full flex-col gap-4 rounded-2xl bg-card/60 p-5 ring-1 ring-inset ring-white/[0.06] transition-[transform,box-shadow,background-color] duration-200 ease-out hover:-translate-y-px hover:bg-card/80 hover:ring-white/[0.12]">
+      {/* Meta — kind + status */}
+      <div className="flex items-center justify-between gap-3">
+        <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
           {PATH_KIND_LABELS[path.kind]}
         </span>
         <StatusBadge status={path.status} />
       </div>
 
-      <div className="flex flex-col gap-0.5">
-        <h3 className="text-body font-semibold text-foreground">{path.name}</h3>
-        <span className="text-body text-muted-foreground">{path.author}</span>
+      {/* Title + author */}
+      <div className="flex flex-col gap-1">
+        <h3 className="font-heading text-lg font-semibold leading-tight text-foreground">
+          {path.name}
+        </h3>
+        <span className="font-mono text-[11px] text-muted-foreground">
+          {path.author}
+        </span>
       </div>
 
-      <p className="line-clamp-2 text-body text-muted-foreground">
+      {/* Description */}
+      <p className="line-clamp-2 text-pretty text-sm leading-relaxed text-muted-foreground">
         {path.description}
       </p>
 
-      <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-body">
-        <Stat label="Installs" value={path.installs.toLocaleString()} />
-        {path.yieldPct && <Stat label="APY" value={path.yieldPct} />}
-        <Stat label="Reward" value={path.ownerReward} />
-      </div>
-
-      {path.tags.length > 0 && (
-        <div className="flex flex-wrap gap-1">
-          {path.tags.slice(0, 4).map((tag) => (
-            <span
-              key={tag}
-              className="rounded-md bg-white/[0.04] px-1.5 py-0.5 text-body text-muted-foreground"
-            >
-              {tag}
+      {/* Stats + CTA */}
+      <div className="mt-auto flex items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-muted-foreground">
+          {path.yieldPct && (
+            <span className="font-mono text-[11px] uppercase tracking-wider tabular-nums text-primary">
+              {path.yieldPct}
             </span>
-          ))}
+          )}
+          <span
+            aria-label={`${path.stars} stars`}
+            className="inline-flex items-center gap-1 font-mono text-[11.5px] tabular-nums"
+          >
+            <Star
+              strokeWidth={0}
+              fill="currentColor"
+              className="size-3"
+              aria-hidden
+            />
+            {path.stars.toLocaleString()}
+          </span>
+          <span
+            aria-label={`${path.installs} installs`}
+            className="inline-flex items-center gap-1 font-mono text-[11.5px] tabular-nums"
+          >
+            <Download strokeWidth={1.6} className="size-3" aria-hidden />
+            {path.installs.toLocaleString()}
+          </span>
         </div>
-      )}
-
-      <button
-        type="button"
-        aria-label={`Install ${path.name}`}
-        className="group/install relative mt-auto inline-flex items-center justify-center gap-1.5 overflow-hidden rounded-lg bg-primary py-2 text-body font-semibold text-primary-foreground transition-[filter,scale] duration-150 ease-out hover:brightness-[1.04] active:scale-[0.96]"
-      >
-        <span
-          aria-hidden
-          className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-b from-white/40 to-transparent"
-        />
-        <span className="relative">
-          {path.cost === "0 PROMPT" ? "Install" : `Install · ${path.cost}`}
-        </span>
-      </button>
+        <button
+          type="button"
+          aria-label={`Install ${path.name}`}
+          className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-md bg-primary/15 px-3 text-sm font-medium text-primary transition-colors duration-150 ease-out hover:bg-primary/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+        >
+          <Download
+            strokeWidth={1.75}
+            className="size-3.5 transition-transform duration-150 ease-out group-hover/card:translate-y-0.5"
+            aria-hidden
+          />
+          {costLabel}
+        </button>
+      </div>
     </article>
   );
 }
 
 function StatusBadge({ status }: { status: PathStatus }) {
+  const s = STATUS_STYLES[status];
   return (
     <span
       className={cn(
-        "rounded-md px-1.5 py-0.5 text-body",
-        STATUS_TONES[status],
+        "inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider",
+        s.bg,
+        s.text,
       )}
     >
+      <span aria-hidden className={cn("size-1.5 rounded-full", s.dot)} />
       {PATH_STATUS_LABELS[status]}
     </span>
   );
 }
 
-function Stat({ label, value }: { label: string; value: string }) {
+function EmptyState({ query }: { query: string }) {
   return (
-    <span className="inline-flex items-baseline gap-1">
-      <span className="text-muted-foreground">{label}</span>
-      <span className="tabular-nums text-foreground">{value}</span>
-    </span>
-  );
-}
-
-function EmptyState() {
-  return (
-    <div className="flex flex-col items-center gap-2 py-16 text-center">
-      <p className="text-body text-foreground">No paths match.</p>
-      <p className="max-w-xs text-body text-muted-foreground">
-        Try clearing the filters or submit a new path to the catalog.
+    <div className="flex flex-col items-center gap-3 rounded-2xl bg-card/40 px-6 py-16 text-center ring-1 ring-inset ring-white/[0.06]">
+      <span className="font-heading text-xl font-semibold text-foreground">
+        No paths match
+      </span>
+      <p className="max-w-md text-sm text-muted-foreground">
+        {query ? (
+          <>
+            Nothing matched{" "}
+            <span className="text-foreground">&ldquo;{query}&rdquo;</span>. Try a
+            different keyword or clear the filters.
+          </>
+        ) : (
+          <>Try a different filter combination.</>
+        )}
       </p>
       <Link
         href={CREATE_PATH_URL}
         target="_blank"
         rel="noopener noreferrer"
-        className="mt-2 rounded-md bg-primary/15 px-3 py-1.5 text-body font-semibold text-primary ring-1 ring-inset ring-primary/20 transition-colors hover:bg-primary/20"
+        className="mt-2 inline-flex items-center gap-1 rounded-md bg-primary/15 px-3 py-1.5 text-sm font-semibold text-primary ring-1 ring-inset ring-primary/20 transition-colors hover:bg-primary/20"
       >
         Submit a path ↗
       </Link>
