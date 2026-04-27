@@ -236,7 +236,7 @@ const FADE_MASK =
 function ChatArt() {
   // Real ChatPanel slice — tab strip + one message exchange + composer.
   return (
-    <div className="absolute inset-0 overflow-hidden bg-muted">
+    <div className="absolute inset-0 overflow-hidden">
       <div className="absolute inset-0 flex items-center justify-center">
         <div
           className="w-[min(86%,440px)] overflow-hidden rounded-2xl bg-background ring-1 ring-white/[0.08] shadow-[0_30px_70px_-25px_rgba(0,0,0,0.7)]"
@@ -325,7 +325,7 @@ function VenueArt() {
   ];
 
   return (
-    <div className="absolute inset-0 overflow-hidden bg-muted">
+    <div className="absolute inset-0 overflow-hidden">
       <div className="absolute inset-0 flex items-center justify-center">
         <div
           className="w-[min(86%,460px)] overflow-hidden rounded-2xl bg-background ring-1 ring-white/[0.08] shadow-[0_30px_70px_-25px_rgba(0,0,0,0.7)]"
@@ -414,7 +414,7 @@ function PortfolioArt() {
   ];
 
   return (
-    <div className="absolute inset-0 overflow-hidden bg-muted">
+    <div className="absolute inset-0 overflow-hidden">
       <div className="absolute inset-0 flex items-center justify-center">
         <div
           className="w-[min(86%,440px)] overflow-hidden rounded-2xl bg-background ring-1 ring-white/[0.08] shadow-[0_30px_70px_-25px_rgba(0,0,0,0.7)]"
@@ -562,7 +562,7 @@ function PathsArt() {
   const Icon = path.icon;
 
   return (
-    <div className="absolute inset-0 overflow-hidden bg-muted">
+    <div className="absolute inset-0 overflow-hidden">
       <div className="absolute inset-0 flex items-center justify-center">
         <article className="flex w-[min(76%,360px)] flex-col overflow-hidden rounded-2xl bg-card/60 ring-1 ring-inset ring-white/[0.08] shadow-[0_30px_70px_-25px_rgba(0,0,0,0.7)]">
           {/* Procedural header — kind tint + glyph */}

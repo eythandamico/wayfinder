@@ -93,7 +93,7 @@ export function StackCard({
         </>
       ) : (
         <>
-          <div className="relative aspect-[5/3] overflow-hidden border-b border-white/[0.06]">
+          <div className="relative aspect-[4/3] overflow-hidden">
             {visual}
           </div>
           <div className="relative flex flex-col gap-3 p-7">{copy}</div>
