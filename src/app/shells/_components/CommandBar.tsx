@@ -52,14 +52,14 @@ type ResultItem =
 const kbdClass =
   "inline-flex items-center justify-center rounded bg-white/[0.08] min-w-[1.25rem] px-1.5 py-0.5 text-body uppercase tracking-wider text-muted-foreground";
 
-type VenueFilter = Venue | "all";
+type Filter = Venue | "all" | "paths";
 
 export function CommandBar() {
   const { open, closeCommand, toggleCommand } = useCommandBar();
   const [rendered, setRendered] = useState(false);
   const [visible, setVisible] = useState(false);
   const [query, setQuery] = useState("");
-  const [venue, setVenue] = useState<VenueFilter>("all");
+  const [filter, setFilter] = useState<Filter>("all");
   const [selected, setSelected] = useState(0);
   const searchRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
@@ -72,7 +72,7 @@ export function CommandBar() {
   useEffect(() => {
     if (open) {
       setQuery("");
-      setVenue("all");
+      setFilter("all");
       setSelected(0);
     }
   }, [open]);
@@ -118,21 +118,33 @@ export function CommandBar() {
 
   const { tokens, paths } = useMemo(() => {
     const q = query.toLowerCase().trim();
-    const byVenue = (m: Market) => venue === "all" || m.venue === venue;
     const matchesQuery = (m: Market) =>
       !q || (m.symbol + " " + m.venue).toLowerCase().includes(q);
-    const tokenList = MARKETS.filter(byVenue).filter(matchesQuery);
-    return {
-      tokens: q ? tokenList : tokenList.slice(0, 8),
-      paths: q
+
+    // Tokens hide when the user is explicitly filtering to Paths.
+    const tokenList =
+      filter === "paths"
+        ? []
+        : MARKETS.filter(
+            (m) => filter === "all" || m.venue === filter,
+          ).filter(matchesQuery);
+
+    // Paths only show under "All" or the explicit "Paths" filter.
+    const pathList =
+      filter === "all" || filter === "paths"
         ? PATHS.filter((p) =>
+            !q ||
             (p.name + " " + p.description + " " + p.tags.join(" "))
               .toLowerCase()
               .includes(q),
           )
-        : PATHS,
+        : [];
+
+    return {
+      tokens: q ? tokenList : tokenList.slice(0, 8),
+      paths: pathList,
     };
-  }, [query, venue]);
+  }, [query, filter]);
 
   const items: ResultItem[] = useMemo(
     () => [
@@ -146,7 +158,7 @@ export function CommandBar() {
   useEffect(() => {
     if (!open) return;
     setSelected(0);
-  }, [query, venue, open]);
+  }, [query, filter, open]);
 
   const activate = (item: ResultItem) => {
     if (item.kind === "token") setActiveMarket(item.value);
@@ -242,25 +254,30 @@ export function CommandBar() {
                 </kbd>
               </div>
 
-              {/* Venue filters — narrow the token list to a specific surface */}
+              {/* Section filters — narrow results by venue or to paths only */}
               <div
                 role="tablist"
-                aria-label="Filter by venue"
+                aria-label="Filter results"
                 className="scroll-thin flex shrink-0 items-center gap-1.5 overflow-x-auto border-b border-white/5 px-4 py-2"
               >
                 <VenueChip
-                  active={venue === "all"}
-                  onClick={() => setVenue("all")}
+                  active={filter === "all"}
+                  onClick={() => setFilter("all")}
                   label="All"
                 />
                 {VENUES.map((v) => (
                   <VenueChip
                     key={v.id}
-                    active={venue === v.id}
-                    onClick={() => setVenue(v.id)}
+                    active={filter === v.id}
+                    onClick={() => setFilter(v.id)}
                     label={v.label}
                   />
                 ))}
+                <VenueChip
+                  active={filter === "paths"}
+                  onClick={() => setFilter("paths")}
+                  label="Paths"
+                />
               </div>
 
               {/* Results */}
