@@ -7,15 +7,22 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import {
   ArrowUp,
+  CandlestickChart as LucideCandlestick,
   ChevronDown,
+  Compass,
   Infinity,
   Loader2,
   Lock,
   MoreVertical,
   Plus,
   Search,
+  Sparkles,
+  type LucideIcon,
 } from "lucide-react";
+import Jazzicon, { jsNumberForAddress } from "react-jazzicon";
 import { cn } from "@/lib/utils";
+
+const PREVIEW_WALLET = "0xa1536Cf17e2bFE9B4C0b0C34dC8D4D8a58e8Eb3C2";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -143,7 +150,7 @@ function AppTopBar() {
   const [q, setQ] = useState("");
   return (
     <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 border-b border-white/5 px-3 py-2">
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2">
         <Image
           src="/brand/wayfinder-logomark.svg"
           alt="Wayfinder"
@@ -151,10 +158,8 @@ function AppTopBar() {
           height={22}
           className="h-5 w-auto opacity-95"
         />
-        <span className="rounded-md px-2 py-1 text-[13px] font-medium text-foreground transition-colors hover:bg-white/[0.04]">
-          Shells
-          <ChevronDownIcon className="ml-1 inline-block size-3 align-middle text-muted-foreground" />
-        </span>
+        <ViewToggle active label="Trade" Icon={LucideCandlestick} />
+        <ViewToggle label="Paths" Icon={Compass} />
       </div>
       <div className="relative w-[420px] max-w-full">
         <SearchIcon className="pointer-events-none absolute left-3 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
@@ -163,30 +168,66 @@ function AppTopBar() {
           value={q}
           onChange={(e) => setQ(e.target.value)}
           placeholder="Search tokens or paths…"
-          className="h-8 w-full rounded-full bg-white/5 pl-8 pr-10 text-[12.5px] text-foreground outline-none transition-colors duration-150 ease-out placeholder:text-muted-foreground/70 hover:bg-white/10 focus-visible:bg-white/10 focus-visible:ring-2 focus-visible:ring-primary/40"
+          className="h-9 w-full rounded-lg bg-white/[0.08] pl-9 pr-12 text-[12.5px] text-foreground outline-none transition-colors duration-150 ease-out placeholder:text-muted-foreground/70 hover:bg-white/[0.12] focus-visible:bg-white/[0.12]"
         />
         <kbd className="absolute right-2 top-1/2 inline-flex -translate-y-1/2 items-center rounded bg-white/[0.08] px-1.5 py-0.5 font-mono text-[9.5px] uppercase tracking-wider text-muted-foreground">
           ⌘K
         </kbd>
       </div>
       <div className="flex items-center justify-end gap-2">
-        <span className="inline-flex h-7 items-center gap-1.5 rounded-full bg-white/5 px-2.5 text-muted-foreground">
+        <span className="inline-flex h-9 items-center gap-2 rounded-lg bg-white/[0.08] px-3 text-muted-foreground">
           <InfinityIcon />
-          <span className="font-mono text-[11px] tabular-nums text-foreground">
+          <span className="text-[11.5px] tabular-nums text-foreground">
             12.4K<span className="text-muted-foreground"> / 100K</span>
           </span>
           <ChevronDownIcon className="size-3 text-muted-foreground" />
         </span>
+        <span
+          className="inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-[11.5px] font-semibold"
+          style={{
+            background: "var(--wf-pro-gold)",
+            color: "var(--wf-pro-indigo)",
+          }}
+        >
+          <Sparkles strokeWidth={1.75} className="size-3" />
+          Go Pro
+        </span>
         <span className="h-5 w-px bg-white/10" aria-hidden />
-        <span className="inline-flex h-7 items-center gap-1.5 rounded-full bg-white/5 px-2.5 text-muted-foreground">
-          <span className="size-1.5 rounded-full bg-primary shadow-[0_0_6px_var(--primary)]" />
-          <span className="font-mono text-[11px] tabular-nums text-foreground">
-            0xa153…Eb3C2
+        <span className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-white/[0.08] pl-1 pr-2">
+          <span
+            aria-hidden
+            className="flex size-7 items-center justify-center overflow-hidden rounded-full"
+          >
+            <Jazzicon diameter={28} seed={jsNumberForAddress(PREVIEW_WALLET)} />
           </span>
           <ChevronDownIcon className="size-3 text-muted-foreground" />
         </span>
       </div>
     </div>
+  );
+}
+
+function ViewToggle({
+  active,
+  label,
+  Icon,
+}: {
+  active?: boolean;
+  label: string;
+  Icon: LucideIcon;
+}) {
+  return (
+    <span
+      className={cn(
+        "inline-flex h-8 items-center gap-1.5 rounded-md px-2.5 text-[12.5px] font-medium transition-colors",
+        active
+          ? "bg-white/[0.10] text-foreground"
+          : "text-muted-foreground",
+      )}
+    >
+      <Icon strokeWidth={1.75} className="size-3.5" aria-hidden />
+      {label}
+    </span>
   );
 }
 
