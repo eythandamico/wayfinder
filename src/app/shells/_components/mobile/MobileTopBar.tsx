@@ -4,9 +4,19 @@ import { useRef, useState } from "react";
 import { useClickOutside } from "@/lib/hooks/useClickOutside";
 import Link from "next/link";
 import Image from "next/image";
-import { MoreHorizontal } from "lucide-react";
+import {
+  CandlestickChart,
+  Compass,
+  MoreHorizontal,
+  type LucideIcon,
+} from "lucide-react";
 import { WALLET_ADDRESS } from "../../_data/mocks";
-import { useDensity, type Density } from "../../_state/shells-context";
+import {
+  useDensity,
+  useViewMode,
+  type Density,
+  type ViewMode,
+} from "../../_state/shells-context";
 import { CommandSearchIconButton } from "../CommandBar";
 import { cn } from "@/lib/utils";
 
@@ -20,20 +30,23 @@ export function MobileTopBar() {
         paddingBottom: "0.5rem",
       }}
     >
-      <Link
-        href="/"
-        aria-label="Wayfinder home"
-        className="flex items-center rounded-md px-1 transition-opacity hover:opacity-80"
-      >
-        <Image
-          src="/brand/wayfinder-logomark.svg"
-          alt="Wayfinder"
-          width={120}
-          height={28}
-          className="h-6 w-auto"
-          priority
-        />
-      </Link>
+      <div className="flex items-center gap-2">
+        <Link
+          href="/"
+          aria-label="Wayfinder home"
+          className="flex items-center rounded-md px-1 transition-opacity hover:opacity-80"
+        >
+          <Image
+            src="/brand/wayfinder-logomark.svg"
+            alt="Wayfinder"
+            width={120}
+            height={28}
+            className="h-6 w-auto"
+            priority
+          />
+        </Link>
+        <MobileViewModeToggle />
+      </div>
 
       <div className="flex items-center gap-1.5">
         <span
@@ -50,6 +63,61 @@ export function MobileTopBar() {
         <MoreMenu />
       </div>
     </div>
+  );
+}
+
+function MobileViewModeToggle() {
+  const { viewMode, setViewMode } = useViewMode();
+  return (
+    <div className="flex items-center gap-0.5">
+      <ToggleButton
+        active={viewMode === "trading"}
+        onClick={() => setViewMode("trading")}
+        Icon={CandlestickChart}
+        target="trading"
+        label="Trade"
+      />
+      <ToggleButton
+        active={viewMode === "explore"}
+        onClick={() => setViewMode("explore")}
+        Icon={Compass}
+        target="explore"
+        label="Paths"
+      />
+    </div>
+  );
+}
+
+function ToggleButton({
+  active,
+  onClick,
+  Icon,
+  target,
+  label,
+}: {
+  active: boolean;
+  onClick: () => void;
+  Icon: LucideIcon;
+  target: ViewMode;
+  label: string;
+}) {
+  return (
+    <button
+      type="button"
+      aria-pressed={active}
+      aria-label={`${label} view`}
+      title={label}
+      data-target={target}
+      onClick={onClick}
+      className={cn(
+        "flex size-8 items-center justify-center rounded-md transition-[background-color,color,scale] duration-150 ease-out active:scale-[0.96]",
+        active
+          ? "bg-white/[0.08] text-foreground"
+          : "text-muted-foreground hover:bg-white/[0.04] hover:text-foreground",
+      )}
+    >
+      <Icon strokeWidth={1.75} className="size-4" aria-hidden />
+    </button>
   );
 }
 
