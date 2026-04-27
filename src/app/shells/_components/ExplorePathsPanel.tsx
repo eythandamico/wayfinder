@@ -208,7 +208,7 @@ export function ExplorePathsPanel() {
       aria-label="Paths catalog"
       className="flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-lg bg-muted"
     >
-      <div className="scroll-thin flex-1 overflow-y-auto px-5 py-5">
+      <div className="scroll-thin flex-1 overflow-y-auto px-3 py-3">
         <section className="mb-7">
           <SectionLabel label="Trending now" />
           <TrendingCarousel paths={trending} />

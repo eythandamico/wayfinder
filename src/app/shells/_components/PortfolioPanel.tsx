@@ -38,7 +38,7 @@ export function PortfolioPanel() {
   return (
     <div className="flex h-full flex-col overflow-hidden rounded-lg bg-muted">
       {/* Account header */}
-      <div className="flex shrink-0 items-center justify-between gap-2 border-b border-white/5 px-4 py-3">
+      <div className="flex shrink-0 items-center justify-between gap-2 border-b border-white/5 px-3 py-3">
         <WalletDropdown active={activeWallet} onSelect={setActiveWallet} />
         <div className="flex shrink-0 items-center gap-0.5">
           <SmallIconButton
@@ -54,7 +54,7 @@ export function PortfolioPanel() {
         </div>
       </div>
 
-      <div className="scroll-thin flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto px-4 py-4">
+      <div className="scroll-thin flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto px-3 py-3">
         {/* Hero: balance + change + Deposit */}
         <div className="flex items-start justify-between gap-3">
           <div className="flex min-w-0 flex-col gap-1">

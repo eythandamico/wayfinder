@@ -27,7 +27,7 @@ export function OrderBookPanel() {
       </div>
 
       {tab === "book" ? (
-        <div id="orderbook-panel-book" role="tabpanel" className="flex min-h-0 flex-1 flex-col px-3 py-2">
+        <div id="orderbook-panel-book" role="tabpanel" className="flex min-h-0 flex-1 flex-col px-3 py-3">
           <div className="grid grid-cols-[1fr_1fr_1fr] gap-2 px-2 py-1.5 text-body text-muted-foreground">
             <span>Price</span>
             <span className="text-right">Size</span>
@@ -52,7 +52,7 @@ export function OrderBookPanel() {
           </div>
         </div>
       ) : (
-        <div id="orderbook-panel-trades" role="tabpanel" className="flex h-full items-center justify-center p-6 text-body text-muted-foreground">
+        <div id="orderbook-panel-trades" role="tabpanel" className="flex h-full items-center justify-center p-3 text-body text-muted-foreground">
           No recent trades
         </div>
       )}

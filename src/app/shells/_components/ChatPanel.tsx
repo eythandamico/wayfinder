@@ -147,7 +147,7 @@ export function ChatPanel() {
           role="tabpanel"
           className="flex min-h-0 flex-1 flex-col"
         >
-          <div className="px-4 pt-4">
+          <div className="px-3 pt-3">
             <div className="mb-3 flex items-center justify-between gap-2">
               <span className="truncate px-2 py-1 text-body font-semibold text-foreground">
                 {activeSession.name}
@@ -159,13 +159,13 @@ export function ChatPanel() {
               </div>
             </div>
           </div>
-          <div className="scroll-thin min-h-0 flex-1 space-y-4 overflow-y-auto px-4">
+          <div className="scroll-thin min-h-0 flex-1 space-y-4 overflow-y-auto px-3">
             {SAMPLE_MESSAGES.map((m, i) => (
               <Message key={i} message={m} />
             ))}
             {thinking && <ThinkingIndicator />}
           </div>
-          <div className="px-4 pb-4">
+          <div className="px-3 pb-3">
             {showUpgrade && <UpgradeBanner onDismiss={dismissUpgrade} />}
             <ChatComposer
               value={input}
@@ -375,7 +375,7 @@ function PathsPanel({
     );
   }
   return (
-    <div className="scroll-thin flex min-h-0 flex-1 flex-col overflow-y-auto p-2">
+    <div className="scroll-thin flex min-h-0 flex-1 flex-col overflow-y-auto p-3">
       {paths.map((p) => (
         <PathRow
           key={p.id}
@@ -457,7 +457,7 @@ function JobsPanel({
     );
   }
   return (
-    <div className="scroll-thin flex min-h-0 flex-1 flex-col overflow-y-auto p-2">
+    <div className="scroll-thin flex min-h-0 flex-1 flex-col overflow-y-auto p-3">
       {jobs.map((j) => (
         <JobRow
           key={j.id}
