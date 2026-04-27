@@ -2,24 +2,32 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { Check, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+/**
+ * Each stage's `end` is the cumulative ms at which it transitions to done.
+ * Stage durations therefore = end[i] - end[i-1] (or end[0] for the first).
+ */
 const STAGES = [
-  { label: "allocating runtime", duration: 320 },
-  { label: "connecting hyperliquid", duration: 380 },
-  { label: "connecting onchain rpc", duration: 300 },
-  { label: "syncing paths registry", duration: 360 },
+  { label: "allocating runtime", end: 340 },
+  { label: "connecting hyperliquid", end: 720 },
+  { label: "connecting onchain rpc", end: 1020 },
+  { label: "syncing paths registry", end: 1380 },
 ] as const;
+
+const TOTAL_MS = STAGES[STAGES.length - 1].end + 120;
+const BAR_WIDTH = 24;
+
+const SPINNER = "⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏";
 
 const INSTANCE_ID = "wf-a8f3-7c2d";
 const REGION = "us-east-1";
 
 /**
- * Bootup screen for /shells styled like a server spin-up. Fakes the cycle
- * of allocating compute + connecting venues + syncing data, with a small
- * boot-log block under the brand mark. Calls onComplete once all stages
- * finish so the parent can flip booted and start the app fade-in.
+ * Bootup screen for /shells styled like a server cold-start. A monospace
+ * boot log with an ASCII progress bar that fills smoothly via rAF, a CLI-style
+ * braille spinner on the in-flight stage, and per-stage timings shown after
+ * each step completes. Calls onComplete once 100% lands.
  */
 export function ShellsBoot({
   dismissed,
@@ -28,20 +36,39 @@ export function ShellsBoot({
   dismissed: boolean;
   onComplete?: () => void;
 }) {
-  const [done, setDone] = useState(0);
+  const [elapsed, setElapsed] = useState(0);
+  const [spin, setSpin] = useState(0);
 
   useEffect(() => {
-    let cumulative = 0;
-    const ids: number[] = [];
-    STAGES.forEach((stage, i) => {
-      cumulative += stage.duration;
-      ids.push(window.setTimeout(() => setDone(i + 1), cumulative));
-    });
-    // Hold on the completed state for a beat before signaling complete,
-    // so the user sees every line check off rather than instantly fading.
-    ids.push(window.setTimeout(() => onComplete?.(), cumulative + 250));
-    return () => ids.forEach((id) => window.clearTimeout(id));
+    const start = performance.now();
+    let raf = 0;
+    let done = false;
+    const tick = () => {
+      const t = performance.now() - start;
+      setElapsed(Math.min(t, TOTAL_MS));
+      if (t < TOTAL_MS) {
+        raf = requestAnimationFrame(tick);
+      } else if (!done) {
+        done = true;
+        onComplete?.();
+      }
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
   }, [onComplete]);
+
+  // CLI braille spinner — independent ticker so it spins regardless of rAF.
+  useEffect(() => {
+    const id = window.setInterval(
+      () => setSpin((f) => (f + 1) % SPINNER.length),
+      80,
+    );
+    return () => window.clearInterval(id);
+  }, []);
+
+  const progress = Math.min(elapsed / TOTAL_MS, 1);
+  const filled = Math.floor(progress * BAR_WIDTH);
+  const pct = Math.floor(progress * 100);
 
   return (
     <div
@@ -53,7 +80,6 @@ export function ShellsBoot({
         dismissed ? "pointer-events-none opacity-0" : "opacity-100",
       )}
     >
-      {/* Aurora — primary-tinted radial behind the icon */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0"
@@ -64,34 +90,63 @@ export function ShellsBoot({
         }}
       />
 
-      <div className="relative flex flex-col items-center gap-8">
+      <div className="relative flex flex-col items-center gap-7">
         <Image
           src="/brand/wayfinder-icon-white.png"
           alt="Wayfinder"
           width={96}
           height={96}
-          className="size-14 animate-breathe"
+          className="size-12 animate-breathe"
           priority
         />
 
-        {/* Instance metadata */}
         <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
           <span>{INSTANCE_ID}</span>
           <span aria-hidden className="size-1 rounded-full bg-muted-foreground/40" />
           <span>{REGION}</span>
         </div>
 
-        {/* Boot log */}
-        <div className="flex w-[280px] flex-col gap-1.5 font-mono text-[12px]">
-          {STAGES.map((stage, i) => (
-            <BootLine
-              key={stage.label}
-              label={stage.label}
-              status={
-                done > i ? "done" : done === i ? "running" : "pending"
-              }
-            />
-          ))}
+        {/* ASCII progress bar */}
+        <div
+          aria-label={`${pct} percent loaded`}
+          className="flex items-center gap-3 font-mono text-[12px]"
+        >
+          <span className="text-muted-foreground/50">[</span>
+          <span className="tabular-nums">
+            <span className="text-primary">
+              {"█".repeat(filled)}
+            </span>
+            <span className="text-muted-foreground/25">
+              {"░".repeat(BAR_WIDTH - filled)}
+            </span>
+          </span>
+          <span className="text-muted-foreground/50">]</span>
+          <span className="tabular-nums text-foreground">
+            {String(pct).padStart(3, "\u00a0")}%
+          </span>
+        </div>
+
+        {/* Boot log — one row per stage, status derived from elapsed */}
+        <div className="flex w-[300px] flex-col gap-1.5 font-mono text-[12px]">
+          {STAGES.map((stage, i) => {
+            const startMs = i === 0 ? 0 : STAGES[i - 1].end;
+            const status =
+              elapsed >= stage.end
+                ? "done"
+                : elapsed >= startMs
+                  ? "running"
+                  : "pending";
+            const stageMs = stage.end - startMs;
+            return (
+              <BootLine
+                key={stage.label}
+                label={stage.label}
+                status={status}
+                stageMs={stageMs}
+                spinFrame={SPINNER[spin]}
+              />
+            );
+          })}
         </div>
       </div>
     </div>
@@ -101,15 +156,19 @@ export function ShellsBoot({
 function BootLine({
   label,
   status,
+  stageMs,
+  spinFrame,
 }: {
   label: string;
   status: "pending" | "running" | "done";
+  stageMs: number;
+  spinFrame: string;
 }) {
   return (
     <div
       className={cn(
         "flex items-center justify-between gap-4 transition-[color,opacity] duration-300 ease-out",
-        status === "pending" && "text-muted-foreground/40",
+        status === "pending" && "text-muted-foreground/35",
         status === "running" && "text-foreground",
         status === "done" && "text-muted-foreground",
       )}
@@ -118,15 +177,23 @@ function BootLine({
         <span aria-hidden className="text-muted-foreground/50">
           ›
         </span>
-        <span className="tabular-nums">{label}</span>
+        <span>{label}</span>
       </span>
-      <span aria-hidden className="flex size-3 items-center justify-center">
+      <span
+        aria-hidden
+        className="inline-flex min-w-[3.5rem] items-center justify-end gap-1.5 tabular-nums"
+      >
         {status === "done" ? (
-          <Check strokeWidth={2.5} className="size-3 text-primary" />
+          <>
+            <span className="text-primary">✓</span>
+            <span className="text-muted-foreground/70">
+              {stageMs}ms
+            </span>
+          </>
         ) : status === "running" ? (
-          <Loader2 strokeWidth={2} className="size-3 animate-spin text-primary" />
+          <span className="text-primary">{spinFrame}</span>
         ) : (
-          <span className="size-1 rounded-full bg-muted-foreground/30" />
+          <span className="text-muted-foreground/30">·</span>
         )}
       </span>
     </div>
