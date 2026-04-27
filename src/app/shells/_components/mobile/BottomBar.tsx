@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { BookOpen, Briefcase, Mic, Plus, TrendingUp } from "lucide-react";
+import { BookOpen, Briefcase, Plus, TrendingUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useClickOutside } from "@/lib/hooks/useClickOutside";
 
@@ -84,11 +84,17 @@ export function BottomBar({
           className="flex h-[var(--ui-h-input)] flex-1 items-center gap-2 rounded-full bg-white/5 px-4 text-left text-body text-muted-foreground transition-[background-color,color,scale] duration-150 ease-out hover:bg-white/10 active:scale-[0.96]"
         >
           <span className="flex-1 truncate">Ask your agent…</span>
+          {/* Agent status — primary = ready. The shape of this slot is where
+             'Thinking…' or an error pill will live once chat is wired. */}
           <span
-            aria-hidden
-            className="flex size-7 shrink-0 items-center justify-center rounded-full bg-white/10 text-muted-foreground"
+            aria-label="Agent active"
+            className="flex shrink-0 items-center gap-1.5 text-body"
           >
-            <Mic strokeWidth={1.5} className="size-3.5" />
+            <span
+              aria-hidden
+              className="size-1.5 rounded-full bg-primary shadow-[0_0_6px_var(--primary)]"
+            />
+            Active
           </span>
         </button>
       </div>
