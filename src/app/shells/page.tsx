@@ -167,12 +167,12 @@ function DesktopShell() {
   const { viewMode } = useViewMode();
 
   return (
-    <main className="fixed inset-0 flex flex-col overflow-hidden bg-background p-2 text-foreground">
+    <main className="fixed inset-0 flex flex-col overflow-hidden bg-background p-3 text-foreground">
       <MarketHeader />
       {viewMode === "trading" ? (
         <div
           ref={containerRef}
-          className="mt-2 flex min-h-0 min-w-0 flex-1"
+          className="mt-3 flex min-h-0 min-w-0 flex-1"
         >
           {/* Left column: Chart / Portfolio */}
           <div
@@ -229,7 +229,7 @@ function DesktopShell() {
           </div>
         </div>
       ) : (
-        <div className="mt-2 flex min-h-0 min-w-0 flex-1">
+        <div className="mt-3 flex min-h-0 min-w-0 flex-1">
           <ExplorePathsPanel />
         </div>
       )}
