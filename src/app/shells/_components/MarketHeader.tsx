@@ -28,7 +28,7 @@ import { CommandSearchBar } from "./CommandBar";
 
 export function MarketHeader() {
   return (
-    <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 px-3 py-4">
+    <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 px-3 py-2">
       <div className="flex items-center gap-3">
         <Link
           href="/"
