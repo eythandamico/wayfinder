@@ -178,18 +178,18 @@ function DesktopShell() {
           <div
             ref={leftColRef}
             className="flex min-h-0 min-w-0 flex-col"
-            style={{ flexBasis: `${cols[0]}%`, flexShrink: 0, flexGrow: 0 }}
+            style={{ flexBasis: `${cols[0]}%`, flexShrink: 1, flexGrow: 0 }}
           >
             <div
               className="min-h-0 min-w-0"
-              style={{ flexBasis: `${leftRows[0]}%`, flexShrink: 0, flexGrow: 0 }}
+              style={{ flexBasis: `${leftRows[0]}%`, flexShrink: 1, flexGrow: 0 }}
             >
               <ChartPanel />
             </div>
             <ResizeHandle orientation="vertical" onDrag={onDragLeftRows} />
             <div
               className="min-h-0 min-w-0"
-              style={{ flexBasis: `${leftRows[1]}%`, flexShrink: 0, flexGrow: 0 }}
+              style={{ flexBasis: `${leftRows[1]}%`, flexShrink: 1, flexGrow: 0 }}
             >
               <PortfolioPanel />
             </div>
@@ -201,18 +201,18 @@ function DesktopShell() {
           <div
             ref={midColRef}
             className="flex min-h-0 min-w-0 flex-col"
-            style={{ flexBasis: `${cols[1]}%`, flexShrink: 0, flexGrow: 0 }}
+            style={{ flexBasis: `${cols[1]}%`, flexShrink: 1, flexGrow: 0 }}
           >
             <div
               className="min-h-0 min-w-0"
-              style={{ flexBasis: `${midRows[0]}%`, flexShrink: 0, flexGrow: 0 }}
+              style={{ flexBasis: `${midRows[0]}%`, flexShrink: 1, flexGrow: 0 }}
             >
               <TradePanel />
             </div>
             <ResizeHandle orientation="vertical" onDrag={onDragMidRows} />
             <div
               className="min-h-0 min-w-0"
-              style={{ flexBasis: `${midRows[1]}%`, flexShrink: 0, flexGrow: 0 }}
+              style={{ flexBasis: `${midRows[1]}%`, flexShrink: 1, flexGrow: 0 }}
             >
               <OrderBookPanel />
             </div>
@@ -223,7 +223,7 @@ function DesktopShell() {
           {/* Right column: Chat */}
           <div
             className="flex min-h-0 min-w-0 flex-col"
-            style={{ flexBasis: `${cols[2]}%`, flexShrink: 0, flexGrow: 0 }}
+            style={{ flexBasis: `${cols[2]}%`, flexShrink: 1, flexGrow: 0 }}
           >
             <ChatPanel />
           </div>
