@@ -6,7 +6,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
-import { ArrowUpRight, Home } from "lucide-react";
+import { ArrowUpRight, Home, Menu, X } from "lucide-react";
 import { Button } from "@/components/ds";
 import { cn } from "@/lib/utils";
 import { DOCS_URL } from "@/lib/links";
@@ -39,6 +39,17 @@ export function SiteHeader() {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [scrolled, setScrolled] = useState(false);
   const [indicatorMounted, setIndicatorMounted] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  // Lock background scroll while menu is open.
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [mobileOpen]);
   const [indicator, setIndicator] = useState({
     left: 0,
     top: 0,
@@ -130,7 +141,7 @@ export function SiteHeader() {
   return (
     <header
       ref={headerRef}
-      className="sticky top-0 z-30 isolate pt-[env(safe-area-inset-top)]"
+      className="sticky top-0 z-50 isolate pt-[env(safe-area-inset-top)]"
     >
       <div
         aria-hidden
@@ -150,14 +161,14 @@ export function SiteHeader() {
 
       <div
         className={cn(
-          "grid w-full grid-cols-[1fr_auto_1fr] items-center gap-6 px-6 transition-[padding] duration-300 motion-reduce:transition-none",
+          "flex w-full items-center gap-3 px-4 transition-[padding] duration-300 motion-reduce:transition-none md:grid md:grid-cols-[1fr_auto_1fr] md:gap-6 md:px-6",
           scrolled ? "py-3" : "py-5",
         )}
       >
         <Link
           ref={logoRef}
           href="/"
-          className="group/mark flex items-center justify-self-start"
+          className="group/mark flex items-center md:justify-self-start"
           aria-label="Wayfinder home"
         >
           <Image
@@ -234,13 +245,95 @@ export function SiteHeader() {
           })}
         </nav>
 
-        <div ref={ctasRef} className="flex items-center gap-2 justify-self-end">
+        <div
+          ref={ctasRef}
+          className="ml-auto flex items-center gap-2 md:justify-self-end"
+        >
           <Button size="sm" render={<Link href="/shells" />}>
             Launch app
           </Button>
+          <button
+            type="button"
+            aria-label={mobileOpen ? "Close menu" : "Open menu"}
+            aria-expanded={mobileOpen}
+            aria-controls="mobile-nav"
+            onClick={() => setMobileOpen((v) => !v)}
+            className="inline-flex size-9 items-center justify-center rounded-full bg-card/70 text-foreground ring-1 ring-inset ring-white/10 transition-colors hover:bg-card md:hidden"
+          >
+            {mobileOpen ? (
+              <X strokeWidth={1.75} className="size-4" aria-hidden />
+            ) : (
+              <Menu strokeWidth={1.75} className="size-4" aria-hidden />
+            )}
+          </button>
         </div>
       </div>
+
+      <MobileNav
+        open={mobileOpen}
+        onClose={() => setMobileOpen(false)}
+        activeHref={pathname ?? "/"}
+      />
     </header>
+  );
+}
+
+function MobileNav({
+  open,
+  onClose,
+  activeHref,
+}: {
+  open: boolean;
+  onClose: () => void;
+  activeHref: string;
+}) {
+  if (!open) return null;
+  return (
+    <div
+      id="mobile-nav"
+      className="fixed inset-0 z-40 flex flex-col bg-background pt-[calc(env(safe-area-inset-top)+4.5rem)] animate-in fade-in duration-200 md:hidden"
+    >
+      <nav className="flex-1 overflow-y-auto">
+        <ul className="flex flex-col">
+          {navItems
+            .filter((i) => i.type === "link")
+            .map((item) => {
+              const link = item as Extract<NavItem, { type: "link" }>;
+              const isActive =
+                activeHref === link.href ||
+                activeHref.startsWith(link.href + "/");
+              return (
+                <li
+                  key={link.href}
+                  className="border-b border-white/[0.06] last:border-b-0"
+                >
+                  <Link
+                    href={link.href}
+                    target={link.external ? "_blank" : undefined}
+                    rel={link.external ? "noopener noreferrer" : undefined}
+                    onClick={onClose}
+                    className={cn(
+                      "flex w-full items-center justify-between px-6 py-5 text-xl transition-colors",
+                      isActive
+                        ? "bg-white/[0.04] text-foreground"
+                        : "text-foreground/85 hover:bg-white/[0.03]",
+                    )}
+                  >
+                    <span>{link.label}</span>
+                    {link.external && (
+                      <ArrowUpRight
+                        strokeWidth={1.5}
+                        className="size-5 text-muted-foreground"
+                        aria-hidden
+                      />
+                    )}
+                  </Link>
+                </li>
+              );
+            })}
+        </ul>
+      </nav>
+    </div>
   );
 }
 

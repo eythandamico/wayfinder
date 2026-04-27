@@ -1,35 +1,20 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import {
-  Activity,
+  Download,
   Eye,
-  Loader2,
   MoreVertical,
   Route,
-  TrendingUp,
+  Star,
   Wallet,
   Zap,
-  type LucideIcon,
 } from "lucide-react";
 import { PageSection, SectionHeader, StackCard } from "@/components/ds";
 import { cn } from "@/lib/utils";
-
-/* Shared iso treatment — perspective on the stage, rotateX/Z on the pane.
- * Animations on pane children compose cleanly (iso rotation lives on the
- * pane only). overflow-hidden on the art container clips edges. */
-const ISO_STAGE: React.CSSProperties = {
-  perspective: "1400px",
-  perspectiveOrigin: "50% 30%",
-  transformStyle: "preserve-3d",
-};
-const ISO_PANE: React.CSSProperties = {
-  transform: "rotateX(22deg) rotateZ(-14deg)",
-  transformStyle: "preserve-3d",
-};
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
@@ -244,79 +229,62 @@ export function Features() {
 /*  Card artwork — co-located with the section that owns them          */
 /* ------------------------------------------------------------------ */
 
-function ChatArt() {
-  // Looping ellipsis on the agent's "thinking" line — feels alive without
-  // animating layout properties.
-  const [dots, setDots] = useState(0);
-  useEffect(() => {
-    const id = window.setInterval(() => setDots((d) => (d + 1) % 4), 380);
-    return () => window.clearInterval(id);
-  }, []);
+/* Edge-fade mask — crops the panel so it reads as a slice of a real screen. */
+const FADE_MASK =
+  "linear-gradient(180deg, transparent 0%, #000 16%, #000 84%, transparent 100%)";
 
+function ChatArt() {
+  // Real ChatPanel slice — tab strip + one message exchange + composer.
   return (
     <div className="absolute inset-0 overflow-hidden bg-muted">
-      <Aurora tone="mint" />
-
-      <div
-        style={ISO_STAGE}
-        className="absolute inset-0 flex items-center justify-center"
-      >
+      <div className="absolute inset-0 flex items-center justify-center">
         <div
-          style={ISO_PANE}
-          className="w-[78%] max-w-[420px] overflow-hidden rounded-2xl bg-background ring-1 ring-white/[0.08] shadow-[0_30px_60px_-20px_rgba(0,0,0,0.6)]"
+          className="w-[min(86%,440px)] overflow-hidden rounded-2xl bg-background ring-1 ring-white/[0.08] shadow-[0_30px_70px_-25px_rgba(0,0,0,0.7)]"
+          style={{ maskImage: FADE_MASK, WebkitMaskImage: FADE_MASK }}
         >
-          {/* Tabs strip */}
-          <div className="flex items-stretch border-b border-white/5">
-            <span className="relative px-3 py-2 text-[11px] font-medium text-foreground">
+          {/* Tab strip — mirrors ChatPanel */}
+          <div className="flex items-center gap-1 px-2 pt-1">
+            <span className="relative px-3 py-3 text-[12px] font-medium text-foreground">
               Agent <span className="ml-1 text-muted-foreground">3</span>
               <span
                 aria-hidden
                 className="absolute inset-x-2 bottom-0 h-px bg-foreground"
               />
             </span>
-            <span className="px-3 py-2 text-[11px] font-medium text-muted-foreground">
+            <span className="px-3 py-3 text-[12px] font-medium text-muted-foreground">
               Paths <span className="ml-1">10</span>
             </span>
-            <span className="px-3 py-2 text-[11px] font-medium text-muted-foreground">
+            <span className="px-3 py-3 text-[12px] font-medium text-muted-foreground">
               Jobs <span className="ml-1">5</span>
             </span>
           </div>
 
-          {/* Body */}
-          <div className="space-y-3 px-3.5 py-3.5">
-            <div className="ml-auto max-w-[78%] rounded-2xl bg-white/[0.06] px-3 py-1.5 text-[11.5px]">
-              Hedge my BTC longs with funding capture
-            </div>
-            <div className="space-y-1">
-              <div className="text-[11.5px] leading-relaxed text-foreground/90">
-                Short 0.4 BTC on HL Perps (funding +0.008%/h) against your
-                spot. Net exposure flat, ~$19/day in funding{".".repeat(dots)}
+          {/* Messages */}
+          <div className="flex flex-col gap-4 px-4 py-4">
+            <div className="flex justify-end">
+              <div className="max-w-[70%] rounded-2xl bg-white/[0.06] px-4 py-2 text-[12.5px] text-foreground">
+                Hedge my BTC longs with funding capture
               </div>
-              <span className="text-[9.5px] text-muted-foreground">
+            </div>
+            <div className="flex flex-col gap-1">
+              <div className="text-[12.5px] leading-relaxed text-foreground">
+                Short 0.4 BTC on HL Perps (funding +0.008%/h) against your
+                spot. Net exposure flat, ~$19/day in funding.
+              </div>
+              <span className="text-[10.5px] text-muted-foreground">
                 kimi-k2.5 · 3.2s · 284 tokens
               </span>
             </div>
-            <div className="inline-flex items-center gap-1.5 text-[10.5px] text-muted-foreground">
-              <Loader2
-                aria-hidden
-                strokeWidth={1.75}
-                className="size-3 animate-spin text-primary"
-                style={{ animationDuration: "900ms" }}
-              />
-              thinking
-            </div>
           </div>
 
-          {/* Composer preview */}
-          <div className="border-t border-white/5 p-2.5">
-            <div className="flex items-center gap-2 rounded-xl bg-white/[0.04] px-3 py-1.5 text-[10.5px] text-muted-foreground">
-              <span className="flex-1 truncate">
-                Plan, Build, / for commands…
-              </span>
-              <span className="inline-flex items-center gap-1 text-foreground/80">
+          {/* Composer */}
+          <div className="border-t border-white/5 px-3 py-2.5">
+            <div className="flex items-center gap-2 rounded-xl bg-white/[0.04] px-3 py-2 text-[11.5px] text-muted-foreground">
+              <span className="flex-1">Plan, build, / for commands…</span>
+              <span className="inline-flex items-center gap-1.5 text-foreground/80">
                 <span
                   aria-hidden
-                  className="size-1.5 rounded-full bg-primary shadow-[0_0_6px_var(--primary)] animate-pulse-soft"
+                  className="size-1.5 rounded-full bg-primary shadow-[0_0_6px_var(--primary)]"
                 />
                 Active
               </span>
@@ -329,110 +297,102 @@ function ChatArt() {
 }
 
 function VenueArt() {
-  const rows = [
-    {
-      sym: "BTC-USDC",
-      venue: "HL Perps",
-      basePrice: 75739.5,
-      icon: "₿",
-      bg: "#f7931a",
-      fg: "#000",
-    },
-    {
-      sym: "ETH-USDC",
-      venue: "HL Spot",
-      basePrice: 2310.9,
-      icon: "Ξ",
-      bg: "#627eea",
-      fg: "#fff",
-    },
-    {
-      sym: "SOL/USDC",
-      venue: "Onchain",
-      basePrice: 85.36,
-      icon: "S",
-      bg: "#9945ff",
-      fg: "#fff",
-    },
-    {
-      sym: "Trump 2028",
-      venue: "Polymarket",
-      basePrice: 0.52,
-      icon: "◆",
-      bg: "#2f78c4",
-      fg: "#fff",
-    },
+  // Real CommandBar slice — filter chips row + token rows.
+  const chips = [
+    { label: "All", active: false },
+    { label: "HL Perps", active: true },
+    { label: "HL Spot", active: false },
+    { label: "Onchain", active: false },
+    { label: "Polymarket", active: false },
+    { label: "Paths", active: false },
   ];
-
-  // Pseudo-live prices: each row drifts on its own clock so the cards aren't
-  // all flickering in sync.
-  const [tick, setTick] = useState(0);
-  useEffect(() => {
-    const id = window.setInterval(() => setTick((t) => t + 1), 1500);
-    return () => window.clearInterval(id);
-  }, []);
+  const rows: Array<{
+    sym: string;
+    venue: string;
+    lev?: string;
+    price: string;
+    change: string;
+    up: boolean;
+    icon: string;
+    iconBg: string;
+    iconFg?: string;
+    selected?: boolean;
+  }> = [
+    { sym: "BTC-USDC", venue: "HL Perps", lev: "100x", price: "$75,739.50", change: "+1.42%", up: true, icon: "₿", iconBg: "#f7931a", iconFg: "#000", selected: true },
+    { sym: "ETH-USDC", venue: "HL Perps", lev: "50x", price: "$2,310.90", change: "+0.18%", up: true, icon: "Ξ", iconBg: "#627eea" },
+    { sym: "SOL-USDC", venue: "HL Perps", lev: "20x", price: "$85.36", change: "−0.65%", up: false, icon: "S", iconBg: "#9945ff" },
+    { sym: "HYPE-USD", venue: "HL Perps", lev: "10x", price: "$24.18", change: "+2.04%", up: true, icon: "H", iconBg: "var(--primary)", iconFg: "#000" },
+  ];
 
   return (
     <div className="absolute inset-0 overflow-hidden bg-muted">
-      <Aurora tone="amber" />
+      <div className="absolute inset-0 flex items-center justify-center">
+        <div
+          className="w-[min(86%,460px)] overflow-hidden rounded-2xl bg-background ring-1 ring-white/[0.08] shadow-[0_30px_70px_-25px_rgba(0,0,0,0.7)]"
+          style={{ maskImage: FADE_MASK, WebkitMaskImage: FADE_MASK }}
+        >
+          {/* Filter chips — mirrors CommandBar VenueChip */}
+          <div className="flex items-center gap-1.5 border-b border-white/5 px-3 py-2">
+            {chips.map((c) => (
+              <span
+                key={c.label}
+                className={cn(
+                  "shrink-0 rounded-full px-3 py-1 text-[10.5px]",
+                  c.active
+                    ? "bg-primary/15 text-primary"
+                    : "bg-white/[0.04] text-muted-foreground",
+                )}
+              >
+                {c.label}
+              </span>
+            ))}
+          </div>
 
-      <div
-        style={ISO_STAGE}
-        className="absolute inset-0 flex items-center justify-center"
-      >
-        <div style={ISO_PANE} className="flex flex-col gap-2.5">
-          {rows.map((r, i) => {
-            // simple deterministic-ish price wobble
-            const seed = (tick + i * 7) * 0.31;
-            const drift = Math.sin(seed) * 0.018; // ±1.8%
-            const price = r.basePrice * (1 + drift);
-            const up = drift >= 0;
-            return (
+          {/* Token rows — mirrors CommandBar TokenRow */}
+          <div>
+            {rows.map((r) => (
               <div
                 key={r.sym}
-                className="flex w-[300px] items-center gap-2.5 rounded-xl bg-background px-3 py-2.5 ring-1 ring-white/[0.08] shadow-[0_14px_28px_-16px_rgba(0,0,0,0.7)] animate-float-slow"
-                style={{
-                  animationDelay: `${i * 0.4}s`,
-                  transform: `translateZ(${(rows.length - i) * 6}px)`,
-                }}
+                className={cn(
+                  "flex items-center gap-3 px-4 py-2.5",
+                  r.selected ? "bg-white/[0.06]" : undefined,
+                )}
               >
                 <span
                   aria-hidden
                   className="flex size-7 shrink-0 items-center justify-center rounded-full text-[11px] font-bold"
-                  style={{ backgroundColor: r.bg, color: r.fg }}
+                  style={{ background: r.iconBg, color: r.iconFg ?? "#fff" }}
                 >
                   {r.icon}
                 </span>
-                <div className="min-w-0 flex-1">
-                  <div className="text-[12px] font-semibold leading-tight">
-                    {r.sym}
+                <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[12px] font-medium">{r.sym}</span>
+                    {r.lev && (
+                      <span className="rounded-full bg-white/[0.06] px-2 py-0.5 text-[9.5px] text-muted-foreground">
+                        {r.lev}
+                      </span>
+                    )}
                   </div>
-                  <div className="text-[9.5px] uppercase tracking-wider text-muted-foreground">
+                  <span className="text-[10.5px] text-muted-foreground">
                     {r.venue}
-                  </div>
+                  </span>
                 </div>
-                <div className="text-right">
-                  <div className="text-[11.5px] tabular-nums">
-                    {r.basePrice >= 100
-                      ? `$${price.toLocaleString("en-US", {
-                          minimumFractionDigits: 1,
-                          maximumFractionDigits: 1,
-                        })}`
-                      : `$${price.toFixed(2)}`}
-                  </div>
-                  <div
+                <div className="flex shrink-0 flex-col items-end gap-0.5">
+                  <span className="text-[11.5px] tabular-nums">{r.price}</span>
+                  <span
                     className={cn(
-                      "text-[9.5px] tabular-nums",
-                      up ? "text-primary" : "text-tone-down",
+                      "inline-flex items-center gap-0.5 text-[10px] tabular-nums",
+                      r.up ? "text-primary" : "text-tone-down",
                     )}
                   >
-                    {up ? "+" : ""}
-                    {(drift * 100).toFixed(2)}%
-                  </div>
+                    <span aria-hidden>{r.up ? "▲" : "▼"}</span>
+                    {r.change}
+                  </span>
                 </div>
               </div>
-            );
-          })}
+            ))}
+          </div>
         </div>
       </div>
     </div>
@@ -440,56 +400,95 @@ function VenueArt() {
 }
 
 function PortfolioArt() {
+  // Real PortfolioPanel slice — Connected pill + Eye/More + hero + sparkline +
+  // grouped venue rows.
+  const venues: Array<{
+    glyph: string;
+    name: string;
+    count: number;
+    value: string;
+  }> = [
+    { glyph: "HL", name: "Hyperliquid", count: 3, value: "$28,420.10" },
+    { glyph: "Ξ", name: "Onchain · Base", count: 2, value: "$8,894.40" },
+    { glyph: "◆", name: "Polymarket", count: 1, value: "$5,004.02" },
+  ];
+
   return (
     <div className="absolute inset-0 overflow-hidden bg-muted">
-      <Aurora tone="sky" />
-
-      <div
-        style={ISO_STAGE}
-        className="absolute inset-0 flex items-center justify-center"
-      >
+      <div className="absolute inset-0 flex items-center justify-center">
         <div
-          style={ISO_PANE}
-          className="w-[80%] max-w-[440px] overflow-hidden rounded-2xl bg-background ring-1 ring-white/[0.08] shadow-[0_30px_60px_-20px_rgba(0,0,0,0.6)]"
+          className="w-[min(86%,440px)] overflow-hidden rounded-2xl bg-background ring-1 ring-white/[0.08] shadow-[0_30px_70px_-25px_rgba(0,0,0,0.7)]"
+          style={{ maskImage: FADE_MASK, WebkitMaskImage: FADE_MASK }}
         >
-          {/* Account header */}
-          <div className="flex items-center justify-between gap-2 border-b border-white/5 px-3 py-2">
-            <span className="inline-flex items-center gap-1.5">
+          {/* Account header — Connected pill (Jazzicon swap) + actions */}
+          <div className="flex items-center justify-between gap-2 border-b border-white/5 px-3 py-3">
+            <span className="inline-flex items-center gap-2">
               <span
                 aria-hidden
-                className="size-5 rounded-full"
+                className="size-6 rounded-full"
                 style={{
                   background:
                     "conic-gradient(from 140deg at 50% 50%, #6ed7c8, #5a8de0, #c47fdb, #6ed7c8)",
                 }}
               />
-              <span className="text-[11px] font-medium">warm-seeking-fox</span>
+              <span className="text-[12px] font-medium">warm-seeking-fox</span>
+              <span aria-hidden className="text-muted-foreground">▾</span>
             </span>
             <div className="flex items-center gap-1 text-muted-foreground">
-              <Eye strokeWidth={1.5} className="size-3.5" aria-hidden />
-              <MoreVertical strokeWidth={1.5} className="size-3.5" aria-hidden />
+              <Eye strokeWidth={1.5} className="size-4" aria-hidden />
+              <MoreVertical strokeWidth={1.5} className="size-4" aria-hidden />
             </div>
           </div>
 
           {/* Hero */}
-          <div className="flex items-start justify-between gap-3 px-3 pt-3">
-            <div className="flex min-w-0 flex-col gap-1">
-              <span className="text-[24px] font-semibold leading-none tabular-nums">
+          <div className="flex items-start justify-between gap-3 px-3 pb-2 pt-3">
+            <div className="flex flex-col gap-1">
+              <span className="text-[26px] font-semibold leading-none tabular-nums">
                 $42,318.52
               </span>
-              <span className="inline-flex items-baseline gap-1.5 text-[10.5px] tabular-nums text-primary">
-                <span aria-hidden>▲</span>+$1,204.88 (2.93%)
+              <span className="inline-flex items-center gap-1.5 text-[11px] tabular-nums text-primary">
+                <span aria-hidden>▲</span>
+                +$1,204.88 (2.93%)
                 <span className="text-muted-foreground">today</span>
               </span>
             </div>
-            <span className="rounded-md bg-white/[0.08] px-2.5 py-1 text-[10.5px] font-medium">
+            <span className="rounded-md bg-white/[0.08] px-3 py-1.5 text-[11px] font-medium">
               Deposit
             </span>
           </div>
 
           {/* Sparkline */}
-          <div className="px-3 pb-3 pt-3">
+          <div className="px-3 pb-2 pt-2">
             <PortfolioArtSparkline />
+          </div>
+
+          {/* Venue rows — mirrors VenueRow accordion (collapsed) */}
+          <div className="border-t border-white/5">
+            {venues.map((v, i) => (
+              <div
+                key={v.name}
+                className={cn(
+                  "flex items-center gap-3 px-3 py-3",
+                  i > 0 && "border-t border-white/5",
+                )}
+              >
+                <span
+                  aria-hidden
+                  className="flex size-7 shrink-0 items-center justify-center rounded-md bg-white/[0.06] text-[11px] font-semibold"
+                >
+                  {v.glyph}
+                </span>
+                <div className="flex flex-1 flex-col gap-0.5">
+                  <span className="text-[11.5px] text-foreground">
+                    {v.name}
+                  </span>
+                  <span className="text-[10px] tabular-nums text-muted-foreground">
+                    {v.count} {v.count === 1 ? "position" : "positions"}
+                  </span>
+                </div>
+                <span className="text-[11.5px] tabular-nums">{v.value}</span>
+              </div>
+            ))}
           </div>
         </div>
       </div>
@@ -519,7 +518,7 @@ function PortfolioArtSparkline() {
   const lastYPct = (1 - (last - min) / range) * 100;
 
   return (
-    <div className="relative h-12 w-full text-primary">
+    <div className="relative h-10 w-full text-primary">
       <svg
         viewBox={`0 0 ${W} ${H}`}
         preserveAspectRatio="none"
@@ -534,12 +533,11 @@ function PortfolioArtSparkline() {
           strokeLinecap="round"
           strokeLinejoin="round"
           vectorEffect="non-scaling-stroke"
-          className="animate-spark-trail"
         />
       </svg>
       <span
         aria-hidden
-        className="pointer-events-none absolute size-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-current animate-pulse-soft shadow-[0_0_0_4px_color-mix(in_oklch,currentColor_25%,transparent)]"
+        className="pointer-events-none absolute size-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-current shadow-[0_0_0_4px_color-mix(in_oklch,currentColor_25%,transparent)]"
         style={{ left: "100%", top: `${lastYPct}%` }}
       />
     </div>
@@ -547,92 +545,105 @@ function PortfolioArtSparkline() {
 }
 
 function PathsArt() {
-  const paths: Array<{
-    name: string;
-    author: string;
-    stars: string;
-    installs: string;
-    tone: "mint" | "violet" | "sky" | "amber";
-    icon: LucideIcon;
-  }> = [
-    {
-      name: "Delta-Neutral LP",
-      author: "@lunar",
-      stars: "4.8",
-      installs: "3.2K",
-      tone: "mint",
-      icon: TrendingUp,
-    },
-    {
-      name: "BTC Funding Capture",
-      author: "@mercury",
-      stars: "4.6",
-      installs: "2.1K",
-      tone: "violet",
-      icon: Zap,
-    },
-    {
-      name: "SOL Momentum Rotation",
-      author: "@orbit",
-      stars: "4.4",
-      installs: "1.8K",
-      tone: "sky",
-      icon: Activity,
-    },
-  ];
+  // Real path card — mirrors ExplorePathsPanel article structure.
+  const path = {
+    name: "BTC Funding Capture",
+    author: "@mercury",
+    kind: "Funding capture",
+    description:
+      "Capture HL Perps funding while staying delta-neutral against spot. Auto-rolls every 8h.",
+    yieldPct: "12.4% APY",
+    stars: 4623,
+    installs: 2118,
+    cost: "Install · 0.05 ETH",
+    tone: "violet" as const,
+    icon: Zap,
+  };
+  const Icon = path.icon;
+
   return (
     <div className="absolute inset-0 overflow-hidden bg-muted">
-      <Aurora tone="violet" />
+      <div className="absolute inset-0 flex items-center justify-center">
+        <article className="flex w-[min(76%,360px)] flex-col overflow-hidden rounded-2xl bg-card/60 ring-1 ring-inset ring-white/[0.08] shadow-[0_30px_70px_-25px_rgba(0,0,0,0.7)]">
+          {/* Procedural header — kind tint + glyph */}
+          <div
+            aria-hidden
+            className={cn(
+              "relative h-24 overflow-hidden border-b border-white/[0.04]",
+              TONE_BG[path.tone],
+            )}
+          >
+            <Icon
+              strokeWidth={1.25}
+              className={cn(
+                "absolute -bottom-3 -right-2 size-24 opacity-30",
+                TONE_FG[path.tone],
+              )}
+            />
+          </div>
 
-      <div
-        style={ISO_STAGE}
-        className="absolute inset-0 flex items-center justify-center"
-      >
-        <div style={ISO_PANE} className="flex flex-col gap-3">
-          {paths.map((p, i) => {
-            const Icon = p.icon;
-            return (
-              <div
-                key={p.name}
-                className="w-[300px] overflow-hidden rounded-2xl bg-background ring-1 ring-white/[0.08] shadow-[0_18px_36px_-20px_rgba(0,0,0,0.7)] animate-float-slow"
-                style={{
-                  animationDelay: `${i * 0.5}s`,
-                  transform: `translateZ(${(paths.length - i) * 8}px)`,
-                }}
-              >
-                {/* Procedural header — kind tint + glyph, mirrors PathCard */}
-                <div
-                  aria-hidden
-                  className={cn(
-                    "relative h-12 overflow-hidden border-b border-white/[0.04]",
-                    TONE_BG[p.tone],
-                  )}
-                >
-                  <Icon
-                    strokeWidth={1.25}
-                    className={cn(
-                      "absolute -bottom-2 -right-2 size-12 opacity-30",
-                      TONE_FG[p.tone],
-                    )}
+          <div className="flex flex-col gap-3 p-4">
+            {/* Meta — kind + status */}
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-[10.5px] text-muted-foreground">
+                {path.kind}
+              </span>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/15 px-2 py-0.5 text-[10px] text-primary">
+                <span aria-hidden className="size-1.5 rounded-full bg-primary" />
+                Live
+              </span>
+            </div>
+
+            {/* Title + author */}
+            <div className="flex flex-col gap-0.5">
+              <h3 className="text-[14px] font-semibold text-foreground">
+                {path.name}
+              </h3>
+              <span className="text-[10.5px] text-muted-foreground">
+                {path.author}
+              </span>
+            </div>
+
+            {/* Description */}
+            <p className="line-clamp-2 text-pretty text-[11px] leading-relaxed text-muted-foreground">
+              {path.description}
+            </p>
+
+            {/* Stats + Install */}
+            <div className="mt-1 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-x-3 text-muted-foreground">
+                <span className="text-[10.5px] tabular-nums text-primary">
+                  {path.yieldPct}
+                </span>
+                <span className="inline-flex items-center gap-1 text-[10.5px] tabular-nums">
+                  <Star
+                    strokeWidth={0}
+                    fill="currentColor"
+                    className="size-2.5"
+                    aria-hidden
                   />
-                </div>
-                <div className="flex items-center gap-2.5 px-3 py-2">
-                  <div className="flex min-w-0 flex-1 flex-col">
-                    <span className="truncate text-[12px] font-semibold leading-tight">
-                      {p.name}
-                    </span>
-                    <span className="text-[9.5px] text-muted-foreground">
-                      {p.author} · ★ {p.stars} · {p.installs}
-                    </span>
-                  </div>
-                  <span className="inline-flex shrink-0 items-center rounded-md bg-primary/15 px-2.5 py-1 text-[10px] font-semibold text-primary ring-1 ring-inset ring-primary/20">
-                    Install
-                  </span>
-                </div>
+                  {path.stars.toLocaleString()}
+                </span>
+                <span className="inline-flex items-center gap-1 text-[10.5px] tabular-nums">
+                  <Download
+                    strokeWidth={1.6}
+                    className="size-2.5"
+                    aria-hidden
+                  />
+                  {path.installs.toLocaleString()}
+                </span>
               </div>
-            );
-          })}
-        </div>
+              <span className="inline-flex h-7 shrink-0 items-center gap-1.5 rounded-md bg-primary/15 px-3 text-[11px] font-medium text-primary">
+                <Download
+                  strokeWidth={1.75}
+                  className="size-3"
+                  aria-hidden
+                />
+                {path.cost}
+              </span>
+            </div>
+          </div>
+        </article>
       </div>
     </div>
   );
@@ -650,26 +661,6 @@ const TONE_FG: Record<"mint" | "violet" | "sky" | "amber", string> = {
   sky: "text-[var(--wf-accent-sky)]",
   amber: "text-[var(--wf-accent-amber)]",
 };
-
-/* Shared aurora glow used behind every iso scene. */
-function Aurora({ tone }: { tone: "mint" | "amber" | "sky" | "violet" }) {
-  const color: Record<typeof tone, string> = {
-    mint: "var(--primary)",
-    amber: "var(--wf-accent-amber)",
-    sky: "var(--wf-accent-sky)",
-    violet: "var(--wf-accent-violet)",
-  };
-  return (
-    <div
-      aria-hidden
-      className="pointer-events-none absolute -inset-10"
-      style={{
-        background: `radial-gradient(55% 55% at 50% 50%, color-mix(in oklch, ${color[tone]} 28%, transparent) 0%, transparent 70%)`,
-        filter: "blur(50px)",
-      }}
-    />
-  );
-}
 
 /* ------------------------------------------------------------------ */
 /*  Footer glyphs                                                       */
