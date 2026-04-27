@@ -12,10 +12,47 @@ import { useActiveMarket } from "../_state/shells-context";
 import { BarDivider, ChevronDownIcon, ExternalLinkIcon } from "./icons";
 import { MarketPicker } from "./MarketPicker";
 
-export function ChartPanel() {
+export function ChartPanel({
+  tfPosition = "header",
+}: {
+  /**
+   * Where the timeframe pills render. "header" puts them in the top strip
+   * (desktop default). "below" hides them from the header and renders a
+   * dedicated row beneath the chart — useful on mobile where horizontal
+   * room in the header is tight.
+   */
+  tfPosition?: "header" | "below";
+} = {}) {
   const [tf, setTf] = useState<Timeframe>("1m");
   const [pickerOpen, setPickerOpen] = useState(false);
   const { activeMarket: market, setActiveMarket: setMarket } = useActiveMarket();
+
+  const timeframePills = (
+    <div
+      role="tablist"
+      aria-label="Chart timeframe"
+      className="flex shrink-0 items-center gap-0.5 rounded-lg bg-background/40 p-1"
+    >
+      {TIMEFRAMES.map((t) => (
+        <button
+          key={t}
+          type="button"
+          role="tab"
+          aria-selected={tf === t}
+          aria-label={`Timeframe ${t}`}
+          onClick={() => setTf(t)}
+          className={cn(
+            "rounded-md px-[var(--ui-x-tight)] py-[var(--ui-y-tight)] text-body transition-[background-color,color,scale] duration-150 ease-out active:scale-[0.96]",
+            tf === t
+              ? "bg-white/10 text-foreground"
+              : "text-muted-foreground hover:text-foreground",
+          )}
+        >
+          {t}
+        </button>
+      ))}
+    </div>
+  );
 
   return (
     <div className="flex h-full flex-col overflow-hidden rounded-lg bg-muted">
@@ -86,36 +123,29 @@ export function ChartPanel() {
           ))}
         </div>
 
-        <BarDivider />
-
-        {/* Timeframe pills */}
-        <div role="tablist" aria-label="Chart timeframe" className="flex shrink-0 items-center gap-0.5 rounded-lg bg-background/40 p-1">
-          {TIMEFRAMES.map((t) => (
-            <button
-              key={t}
-              type="button"
-              role="tab"
-              aria-selected={tf === t}
-              aria-label={`Timeframe ${t}`}
-              onClick={() => setTf(t)}
-              className={cn(
-                "rounded-md px-[var(--ui-x-tight)] py-[var(--ui-y-tight)] text-body transition-[background-color,color,scale] duration-150 ease-out active:scale-[0.96]",
-                tf === t
-                  ? "bg-white/10 text-foreground"
-                  : "text-muted-foreground hover:text-foreground",
-              )}
-            >
-              {t}
-            </button>
-          ))}
-        </div>
+        {tfPosition === "header" && (
+          <>
+            <BarDivider />
+            {timeframePills}
+          </>
+        )}
       </div>
-      <div className="min-h-0 flex-1 overflow-hidden px-3 pb-3">
+      <div
+        className={cn(
+          "min-h-0 flex-1 overflow-hidden px-3",
+          tfPosition === "header" ? "pb-3" : "pb-2",
+        )}
+      >
         <TradingViewChart
           interval={TV_INTERVAL[tf]}
           symbol={market.tvSymbol}
         />
       </div>
+      {tfPosition === "below" && (
+        <div className="flex shrink-0 justify-center px-3 pb-3">
+          {timeframePills}
+        </div>
+      )}
 
       <MarketPicker
         open={pickerOpen}

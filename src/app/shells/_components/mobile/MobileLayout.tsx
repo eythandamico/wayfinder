@@ -27,7 +27,7 @@ export function MobileLayout() {
       {viewMode === "trading" ? (
         <>
           <div className="min-h-0 flex-1 overflow-hidden p-1">
-            <ChartPanel />
+            <ChartPanel tfPosition="below" />
           </div>
 
           <ActionStrip onOpen={(s) => setSheet(s)} />
