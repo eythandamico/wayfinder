@@ -2,95 +2,133 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import { Check, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const STAGES = [
-  "Spinning up your instance",
-  "Connecting to markets",
-  "Loading paths",
+  { label: "allocating runtime", duration: 320 },
+  { label: "connecting hyperliquid", duration: 380 },
+  { label: "connecting onchain rpc", duration: 300 },
+  { label: "syncing paths registry", duration: 360 },
 ] as const;
 
-const STAGE_MS = 500;
+const INSTANCE_ID = "wf-a8f3-7c2d";
+const REGION = "us-east-1";
 
 /**
- * Bootup screen for /shells — sits above the app and fades out once
- * `dismissed` is true. Sequence: ~1.5s of cycling status messages with the
- * brand icon breathing, then the parent flips dismissed and the screen
- * fades out while the app fades in underneath.
+ * Bootup screen for /shells styled like a server spin-up. Fakes the cycle
+ * of allocating compute + connecting venues + syncing data, with a small
+ * boot-log block under the brand mark. Calls onComplete once all stages
+ * finish so the parent can flip booted and start the app fade-in.
  */
-export function ShellsBoot({ dismissed }: { dismissed: boolean }) {
-  const [stage, setStage] = useState(0);
+export function ShellsBoot({
+  dismissed,
+  onComplete,
+}: {
+  dismissed: boolean;
+  onComplete?: () => void;
+}) {
+  const [done, setDone] = useState(0);
 
   useEffect(() => {
-    const ids = STAGES.map((_, i) =>
-      i === 0 ? null : window.setTimeout(() => setStage(i), STAGE_MS * i),
-    ).filter((x): x is number => x !== null);
+    let cumulative = 0;
+    const ids: number[] = [];
+    STAGES.forEach((stage, i) => {
+      cumulative += stage.duration;
+      ids.push(window.setTimeout(() => setDone(i + 1), cumulative));
+    });
+    // Hold on the completed state for a beat before signaling complete,
+    // so the user sees every line check off rather than instantly fading.
+    ids.push(window.setTimeout(() => onComplete?.(), cumulative + 250));
     return () => ids.forEach((id) => window.clearTimeout(id));
-  }, []);
+  }, [onComplete]);
 
   return (
     <div
-      aria-hidden={dismissed}
       role="status"
       aria-live="polite"
+      aria-hidden={dismissed}
       className={cn(
         "fixed inset-0 z-[100] flex flex-col items-center justify-center bg-background transition-opacity duration-500 ease-out",
         dismissed ? "pointer-events-none opacity-0" : "opacity-100",
       )}
     >
-      {/* Aurora glow — primary-tinted radial behind the icon */}
+      {/* Aurora — primary-tinted radial behind the icon */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            "radial-gradient(35% 40% at 50% 45%, color-mix(in oklch, var(--primary) 22%, transparent) 0%, transparent 70%)",
+            "radial-gradient(35% 40% at 50% 35%, color-mix(in oklch, var(--primary) 20%, transparent) 0%, transparent 70%)",
           filter: "blur(60px)",
         }}
       />
 
-      <div className="relative flex flex-col items-center gap-7">
+      <div className="relative flex flex-col items-center gap-8">
         <Image
           src="/brand/wayfinder-icon-white.png"
           alt="Wayfinder"
-          width={120}
-          height={120}
-          className="size-20 animate-breathe"
+          width={96}
+          height={96}
+          className="size-14 animate-breathe"
           priority
         />
 
-        {/* Status row — fixed-height container so the swap doesn't shift
-            anything underneath, and keyed span so each stage gets its own
-            mount + enter animation. */}
-        <div className="relative flex h-5 items-center justify-center">
-          <span
-            key={stage}
-            className="inline-flex items-center gap-2 text-body text-muted-foreground animate-in fade-in slide-in-from-bottom-0.5 duration-400 ease-out"
-          >
-            {STAGES[stage]}
-            <DotsLoader />
-          </span>
+        {/* Instance metadata */}
+        <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+          <span>{INSTANCE_ID}</span>
+          <span aria-hidden className="size-1 rounded-full bg-muted-foreground/40" />
+          <span>{REGION}</span>
+        </div>
+
+        {/* Boot log */}
+        <div className="flex w-[280px] flex-col gap-1.5 font-mono text-[12px]">
+          {STAGES.map((stage, i) => (
+            <BootLine
+              key={stage.label}
+              label={stage.label}
+              status={
+                done > i ? "done" : done === i ? "running" : "pending"
+              }
+            />
+          ))}
         </div>
       </div>
     </div>
   );
 }
 
-function DotsLoader() {
+function BootLine({
+  label,
+  status,
+}: {
+  label: string;
+  status: "pending" | "running" | "done";
+}) {
   return (
-    <span aria-hidden className="inline-flex items-center gap-1">
-      <span
-        className="size-1 animate-boot-dot rounded-full bg-current"
-        style={{ animationDelay: "0ms" }}
-      />
-      <span
-        className="size-1 animate-boot-dot rounded-full bg-current"
-        style={{ animationDelay: "180ms" }}
-      />
-      <span
-        className="size-1 animate-boot-dot rounded-full bg-current"
-        style={{ animationDelay: "360ms" }}
-      />
-    </span>
+    <div
+      className={cn(
+        "flex items-center justify-between gap-4 transition-[color,opacity] duration-300 ease-out",
+        status === "pending" && "text-muted-foreground/40",
+        status === "running" && "text-foreground",
+        status === "done" && "text-muted-foreground",
+      )}
+    >
+      <span className="inline-flex items-baseline gap-2">
+        <span aria-hidden className="text-muted-foreground/50">
+          ›
+        </span>
+        <span className="tabular-nums">{label}</span>
+      </span>
+      <span aria-hidden className="flex size-3 items-center justify-center">
+        {status === "done" ? (
+          <Check strokeWidth={2.5} className="size-3 text-primary" />
+        ) : status === "running" ? (
+          <Loader2 strokeWidth={2} className="size-3 animate-spin text-primary" />
+        ) : (
+          <span className="size-1 rounded-full bg-muted-foreground/30" />
+        )}
+      </span>
+    </div>
   );
 }

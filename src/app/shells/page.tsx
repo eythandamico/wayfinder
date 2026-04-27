@@ -21,7 +21,6 @@ import { TradePanel } from "./_components/TradePanel";
 import { MobileLayout } from "./_components/mobile/MobileLayout";
 import { ShellsProvider, useViewMode } from "./_state/shells-context";
 
-const BOOT_DURATION_MS = 1700;
 const BOOT_FADE_OUT_MS = 500;
 
 /* ------------------------------------------------------------------ */
@@ -51,13 +50,8 @@ export default function ShellsPage() {
   const [booted, setBooted] = useState(false);
   const [bootMounted, setBootMounted] = useState(true);
 
-  // Boot timeline: cycle through stages, then flip booted -> app fades in,
-  // boot screen fades out. Once the fade-out duration elapses, unmount the
-  // boot screen entirely so it can't intercept clicks.
-  useEffect(() => {
-    const flip = window.setTimeout(() => setBooted(true), BOOT_DURATION_MS);
-    return () => window.clearTimeout(flip);
-  }, []);
+  // ShellsBoot drives its own timeline and calls onComplete when every stage
+  // has finished. Then we fade out the boot screen and reveal the app.
   useEffect(() => {
     if (!booted) return;
     const id = window.setTimeout(
@@ -72,7 +66,9 @@ export default function ShellsPage() {
       <h1 className="sr-only">Wayfinder Trading Terminal</h1>
       <CommandBar />
 
-      {bootMounted && <ShellsBoot dismissed={booted} />}
+      {bootMounted && (
+        <ShellsBoot dismissed={booted} onComplete={() => setBooted(true)} />
+      )}
 
       {/* Opacity-only fade — no transform here. The shell's <main> is
          position: fixed, and a transform on this wrapper would re-anchor
