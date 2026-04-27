@@ -105,7 +105,7 @@ export function ShellShowcase() {
 
       <div
         ref={frameRef}
-        className="relative overflow-hidden rounded-2xl bg-muted/90 ring-1 ring-white/[0.08] shadow-[0_40px_80px_-20px_rgba(0,0,0,0.7)] backdrop-blur-sm"
+        className="relative overflow-hidden rounded-2xl bg-background ring-1 ring-white/[0.08] shadow-[0_40px_80px_-20px_rgba(0,0,0,0.7)]"
         style={{ willChange: "transform" }}
       >
         <BrowserChrome />
