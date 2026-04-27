@@ -161,7 +161,7 @@ export function SiteHeader() {
 
       <div
         className={cn(
-          "flex w-full items-center gap-3 px-4 transition-[padding] duration-300 motion-reduce:transition-none md:grid md:grid-cols-[1fr_auto_1fr] md:gap-6 md:px-6",
+          "relative z-50 flex w-full items-center gap-3 px-4 transition-[padding] duration-300 motion-reduce:transition-none md:grid md:grid-cols-[1fr_auto_1fr] md:gap-6 md:px-6",
           scrolled ? "py-3" : "py-5",
         )}
       >
@@ -289,12 +289,17 @@ function MobileNav({
 }) {
   if (!open) return null;
   return (
-    <div
-      id="mobile-nav"
-      className="fixed inset-0 z-40 flex flex-col bg-background pt-[calc(env(safe-area-inset-top)+4.5rem)] animate-in fade-in duration-200 md:hidden"
-    >
-      <nav className="flex-1 overflow-y-auto">
-        <ul className="flex flex-col">
+    <div className="fixed inset-0 z-40 md:hidden" id="mobile-nav">
+      {/* Backdrop — tap-to-close */}
+      <button
+        type="button"
+        aria-label="Close menu"
+        onClick={onClose}
+        className="absolute inset-0 bg-background/60 backdrop-blur-sm animate-in fade-in duration-200"
+      />
+      {/* Dropdown card */}
+      <nav className="absolute inset-x-3 top-[calc(env(safe-area-inset-top)+4.5rem)] overflow-hidden rounded-2xl bg-card ring-1 ring-white/10 shadow-2xl animate-in fade-in slide-in-from-top-2 duration-200">
+        <ul className="flex flex-col p-1.5">
           {navItems
             .filter((i) => i.type === "link")
             .map((item) => {
@@ -303,27 +308,24 @@ function MobileNav({
                 activeHref === link.href ||
                 activeHref.startsWith(link.href + "/");
               return (
-                <li
-                  key={link.href}
-                  className="border-b border-white/[0.06] last:border-b-0"
-                >
+                <li key={link.href}>
                   <Link
                     href={link.href}
                     target={link.external ? "_blank" : undefined}
                     rel={link.external ? "noopener noreferrer" : undefined}
                     onClick={onClose}
                     className={cn(
-                      "flex w-full items-center justify-between px-6 py-5 text-xl transition-colors",
+                      "flex items-center justify-between rounded-xl px-4 py-3 text-base transition-colors",
                       isActive
-                        ? "bg-white/[0.04] text-foreground"
-                        : "text-foreground/85 hover:bg-white/[0.03]",
+                        ? "bg-white/[0.06] text-foreground"
+                        : "text-muted-foreground hover:bg-white/[0.04] hover:text-foreground",
                     )}
                   >
                     <span>{link.label}</span>
                     {link.external && (
                       <ArrowUpRight
                         strokeWidth={1.5}
-                        className="size-5 text-muted-foreground"
+                        className="size-4 opacity-60"
                         aria-hidden
                       />
                     )}
