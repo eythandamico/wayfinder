@@ -569,7 +569,7 @@ function PathCard({ path }: { path: Path }) {
 
         {/* Title + author */}
         <div className="flex flex-col gap-0.5">
-          <h3 className="text-body font-semibold leading-tight text-foreground">
+          <h3 className="text-title font-semibold text-foreground">
             {path.name}
           </h3>
           <span className="text-body text-muted-foreground">{path.author}</span>

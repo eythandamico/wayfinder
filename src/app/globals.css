@@ -170,15 +170,22 @@
   }
 }
 
-/* Shells type scale — 2 semantic tiers, density-controlled.
- * Hierarchy comes from color (text-foreground vs text-muted-foreground) and
- * weight (font-medium / font-semibold), NOT size. Robinhood Legend pattern.
+/* Shells type scale — 3 semantic tiers, density-controlled.
+ * Hierarchy comes mostly from color (text-foreground vs text-muted-foreground)
+ * and weight (font-medium / font-semibold). Size hierarchy is reserved for
+ * places where browsable card titles or hero numbers genuinely need to lift
+ * out of a dense list. Robinhood Legend pattern, with one exception.
  *   text-body    — default for ~95% of UI: nav, sections, tables, buttons, inputs
+ *   text-title   — card / item titles in browsable content (paths catalog, etc.)
  *   text-display — hero numbers only (account balance, etc.)
+ *
+ * If you add a new size utility, register it in the font-size class group in
+ * src/lib/utils.ts so tailwind-merge doesn't strip it on cn() calls.
  */
 :root {
   /* Text */
   --text-body: 14px;
+  --text-title: 17px;
   --text-display: 28px;
   /* Interactive chrome — scales with density alongside text */
   --ui-y: 0.625rem;       /* py-2.5 — tabs */
@@ -189,6 +196,7 @@
 }
 [data-density="small"] {
   --text-body: 13px;
+  --text-title: 15px;
   --text-display: 24px;
   --ui-y: 0.4375rem;
   --ui-y-tight: 0.1875rem;
@@ -198,6 +206,7 @@
 }
 [data-density="large"] {
   --text-body: 16px;
+  --text-title: 20px;
   --text-display: 32px;
   --ui-y: 0.8125rem;
   --ui-y-tight: 0.3125rem;
@@ -208,6 +217,7 @@
 
 @layer utilities {
   .text-body { font-size: var(--text-body); }
+  .text-title { font-size: var(--text-title); line-height: 1.25; }
   .text-display { font-size: var(--text-display); }
 
   .text-balance { text-wrap: balance; }
