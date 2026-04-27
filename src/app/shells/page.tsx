@@ -222,7 +222,7 @@ function DesktopShell() {
 
           {/* Right column: Chat */}
           <div
-            className="min-h-0 min-w-0"
+            className="flex min-h-0 min-w-0 flex-col"
             style={{ flexBasis: `${cols[2]}%`, flexShrink: 0, flexGrow: 0 }}
           >
             <ChatPanel />
