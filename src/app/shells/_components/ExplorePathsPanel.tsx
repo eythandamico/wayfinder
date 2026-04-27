@@ -269,7 +269,7 @@ export function ExplorePathsPanel() {
               <button
                 type="button"
                 onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}
-                className="rounded-lg bg-white/[0.06] px-4 py-2 text-sm text-muted-foreground ring-1 ring-inset ring-white/[0.08] transition-[background-color,color,box-shadow] duration-150 ease-out hover:bg-white/[0.09] hover:text-foreground hover:ring-white/[0.12]"
+                className="rounded-lg bg-white/[0.06] px-4 py-2 text-body text-muted-foreground ring-1 ring-inset ring-white/[0.08] transition-[background-color,color,box-shadow] duration-150 ease-out hover:bg-white/[0.09] hover:text-foreground hover:ring-white/[0.12]"
               >
                 Show {Math.min(PAGE_SIZE, filtered.length - visibleCount)} more
               </button>
@@ -538,7 +538,7 @@ function CarouselButton({
 function SectionLabel({ label, count }: { label: string; count?: number }) {
   return (
     <div className="mb-3 flex items-center gap-3">
-      <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+      <span className="text-body text-muted-foreground">
         {label}
         {count !== undefined && (
           <span className="ml-2 tabular-nums text-foreground">{count}</span>
@@ -561,24 +561,22 @@ function PathCard({ path }: { path: Path }) {
       <div className="flex flex-1 flex-col gap-4 p-5">
         {/* Meta — kind + status */}
         <div className="flex items-center justify-between gap-3">
-          <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+          <span className="text-body text-muted-foreground">
             {PATH_KIND_LABELS[path.kind]}
           </span>
           <StatusBadge status={path.status} />
         </div>
 
         {/* Title + author */}
-        <div className="flex flex-col gap-1">
-          <h3 className="font-heading text-lg font-semibold leading-tight text-foreground">
+        <div className="flex flex-col gap-0.5">
+          <h3 className="text-body font-semibold leading-tight text-foreground">
             {path.name}
           </h3>
-          <span className="font-mono text-[11px] text-muted-foreground">
-            {path.author}
-          </span>
+          <span className="text-body text-muted-foreground">{path.author}</span>
         </div>
 
         {/* Description */}
-        <p className="line-clamp-2 text-pretty text-sm leading-relaxed text-muted-foreground">
+        <p className="line-clamp-2 text-pretty text-body leading-relaxed text-muted-foreground">
           {path.description}
         </p>
 
@@ -586,13 +584,13 @@ function PathCard({ path }: { path: Path }) {
         <div className="mt-auto flex items-center justify-between gap-3">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-muted-foreground">
             {path.yieldPct && (
-              <span className="font-mono text-[11px] uppercase tracking-wider tabular-nums text-primary">
+              <span className="text-body tabular-nums text-primary">
                 {path.yieldPct}
               </span>
             )}
             <span
               aria-label={`${path.stars} stars`}
-              className="inline-flex items-center gap-1 font-mono text-[11.5px] tabular-nums"
+              className="inline-flex items-center gap-1 text-body tabular-nums"
             >
               <Star
                 strokeWidth={0}
@@ -604,7 +602,7 @@ function PathCard({ path }: { path: Path }) {
             </span>
             <span
               aria-label={`${path.installs} installs`}
-              className="inline-flex items-center gap-1 font-mono text-[11.5px] tabular-nums"
+              className="inline-flex items-center gap-1 text-body tabular-nums"
             >
               <Download strokeWidth={1.6} className="size-3" aria-hidden />
               {path.installs.toLocaleString()}
@@ -613,7 +611,7 @@ function PathCard({ path }: { path: Path }) {
           <button
             type="button"
             aria-label={`Install ${path.name}`}
-            className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-md bg-primary/15 px-3 text-sm font-medium text-primary transition-colors duration-150 ease-out hover:bg-primary/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+            className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-md bg-primary/15 px-3 text-body font-medium text-primary transition-colors duration-150 ease-out hover:bg-primary/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
           >
             <Download
               strokeWidth={1.75}
@@ -663,7 +661,7 @@ function StatusBadge({ status }: { status: PathStatus }) {
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider",
+        "inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-body",
         s.bg,
         s.text,
       )}
@@ -677,10 +675,10 @@ function StatusBadge({ status }: { status: PathStatus }) {
 function EmptyState({ query }: { query: string }) {
   return (
     <div className="flex flex-col items-center gap-3 rounded-2xl bg-card/40 px-6 py-16 text-center ring-1 ring-inset ring-white/[0.06]">
-      <span className="font-heading text-xl font-semibold text-foreground">
+      <span className="text-body font-semibold text-foreground">
         No paths match
       </span>
-      <p className="max-w-md text-sm text-muted-foreground">
+      <p className="max-w-md text-body text-muted-foreground">
         {query ? (
           <>
             Nothing matched{" "}
@@ -695,7 +693,7 @@ function EmptyState({ query }: { query: string }) {
         href={CREATE_PATH_URL}
         target="_blank"
         rel="noopener noreferrer"
-        className="mt-2 inline-flex items-center gap-1 rounded-md bg-primary/15 px-3 py-1.5 text-sm font-semibold text-primary ring-1 ring-inset ring-primary/20 transition-colors hover:bg-primary/20"
+        className="mt-2 inline-flex items-center gap-1 rounded-md bg-primary/15 px-3 py-1.5 text-body font-semibold text-primary ring-1 ring-inset ring-primary/20 transition-colors hover:bg-primary/20"
       >
         Submit a path ↗
       </Link>
