@@ -8,9 +8,8 @@ import {
   TIMEFRAMES,
   TV_INTERVAL,
 } from "../_data/mocks";
-import { useActiveMarket } from "../_state/shells-context";
+import { useActiveMarket, useCommandBar } from "../_state/shells-context";
 import { BarDivider, ChevronDownIcon, ExternalLinkIcon } from "./icons";
-import { MarketPicker } from "./MarketPicker";
 
 export function ChartPanel({
   tfPosition = "header",
@@ -24,8 +23,8 @@ export function ChartPanel({
   tfPosition?: "header" | "below";
 } = {}) {
   const [tf, setTf] = useState<Timeframe>("1m");
-  const [pickerOpen, setPickerOpen] = useState(false);
-  const { activeMarket: market, setActiveMarket: setMarket } = useActiveMarket();
+  const { activeMarket: market } = useActiveMarket();
+  const { openCommand } = useCommandBar();
 
   const timeframePills = (
     <div
@@ -65,9 +64,8 @@ export function ChartPanel({
         <button
           type="button"
           aria-haspopup="dialog"
-          aria-expanded={pickerOpen}
           aria-label={`Change market. Current: ${market.symbol} ${market.leverage}`}
-          onClick={() => setPickerOpen(true)}
+          onClick={openCommand}
           className="flex shrink-0 items-center gap-2 rounded-md px-1.5 py-1 transition-colors hover:bg-white/[0.04]"
         >
           <span
@@ -148,16 +146,6 @@ export function ChartPanel({
       {tfPosition === "below" && (
         <div className="shrink-0 px-3 pb-3">{timeframePills}</div>
       )}
-
-      <MarketPicker
-        open={pickerOpen}
-        onClose={() => setPickerOpen(false)}
-        activeMarketId={market.id}
-        onSelect={(m) => {
-          setMarket(m);
-          setPickerOpen(false);
-        }}
-      />
     </div>
   );
 }

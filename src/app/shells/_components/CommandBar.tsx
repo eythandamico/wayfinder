@@ -3,8 +3,8 @@
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { cn } from "@/lib/utils";
-import type { Market, Path } from "../_types";
-import { MARKETS, PATHS, PATHS_CATALOG_URL } from "../_data/mocks";
+import type { Market, Path, Venue } from "../_types";
+import { MARKETS, PATHS, PATHS_CATALOG_URL, VENUES } from "../_data/mocks";
 import { useActiveMarket, useCommandBar } from "../_state/shells-context";
 import { SearchIcon } from "./icons";
 
@@ -52,11 +52,14 @@ type ResultItem =
 const kbdClass =
   "inline-flex items-center justify-center rounded bg-white/[0.08] min-w-[1.25rem] px-1.5 py-0.5 text-body uppercase tracking-wider text-muted-foreground";
 
+type VenueFilter = Venue | "all";
+
 export function CommandBar() {
   const { open, closeCommand, toggleCommand } = useCommandBar();
   const [rendered, setRendered] = useState(false);
   const [visible, setVisible] = useState(false);
   const [query, setQuery] = useState("");
+  const [venue, setVenue] = useState<VenueFilter>("all");
   const [selected, setSelected] = useState(0);
   const searchRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
@@ -69,6 +72,7 @@ export function CommandBar() {
   useEffect(() => {
     if (open) {
       setQuery("");
+      setVenue("all");
       setSelected(0);
     }
   }, [open]);
@@ -114,18 +118,21 @@ export function CommandBar() {
 
   const { tokens, paths } = useMemo(() => {
     const q = query.toLowerCase().trim();
-    if (!q) return { tokens: MARKETS.slice(0, 6), paths: PATHS };
+    const byVenue = (m: Market) => venue === "all" || m.venue === venue;
+    const matchesQuery = (m: Market) =>
+      !q || (m.symbol + " " + m.venue).toLowerCase().includes(q);
+    const tokenList = MARKETS.filter(byVenue).filter(matchesQuery);
     return {
-      tokens: MARKETS.filter((m) =>
-        (m.symbol + " " + m.venue).toLowerCase().includes(q),
-      ),
-      paths: PATHS.filter((p) =>
-        (p.name + " " + p.description + " " + p.tags.join(" "))
-          .toLowerCase()
-          .includes(q),
-      ),
+      tokens: q ? tokenList : tokenList.slice(0, 8),
+      paths: q
+        ? PATHS.filter((p) =>
+            (p.name + " " + p.description + " " + p.tags.join(" "))
+              .toLowerCase()
+              .includes(q),
+          )
+        : PATHS,
     };
-  }, [query]);
+  }, [query, venue]);
 
   const items: ResultItem[] = useMemo(
     () => [
@@ -139,7 +146,7 @@ export function CommandBar() {
   useEffect(() => {
     if (!open) return;
     setSelected(0);
-  }, [query, open]);
+  }, [query, venue, open]);
 
   const activate = (item: ResultItem) => {
     if (item.kind === "token") setActiveMarket(item.value);
@@ -233,6 +240,27 @@ export function CommandBar() {
                 <kbd aria-hidden className={kbdClass}>
                   esc
                 </kbd>
+              </div>
+
+              {/* Venue filters — narrow the token list to a specific surface */}
+              <div
+                role="tablist"
+                aria-label="Filter by venue"
+                className="scroll-thin flex shrink-0 items-center gap-1.5 overflow-x-auto border-b border-white/5 px-4 py-2"
+              >
+                <VenueChip
+                  active={venue === "all"}
+                  onClick={() => setVenue("all")}
+                  label="All"
+                />
+                {VENUES.map((v) => (
+                  <VenueChip
+                    key={v.id}
+                    active={venue === v.id}
+                    onClick={() => setVenue(v.id)}
+                    label={v.label}
+                  />
+                ))}
               </div>
 
               {/* Results */}
@@ -338,6 +366,33 @@ export function CommandBar() {
           document.body,
         )}
     </>
+  );
+}
+
+function VenueChip({
+  active,
+  onClick,
+  label,
+}: {
+  active: boolean;
+  onClick: () => void;
+  label: string;
+}) {
+  return (
+    <button
+      type="button"
+      role="tab"
+      aria-selected={active}
+      onClick={onClick}
+      className={cn(
+        "shrink-0 rounded-full px-3 py-1 text-body transition-colors duration-150 ease-out",
+        active
+          ? "bg-primary/15 text-primary"
+          : "bg-white/[0.04] text-muted-foreground hover:bg-white/[0.08] hover:text-foreground",
+      )}
+    >
+      {label}
+    </button>
   );
 }
 
