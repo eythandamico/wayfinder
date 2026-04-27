@@ -70,9 +70,7 @@ export function StackCard({
       href={href}
       className={cn(
         "group/stack relative isolate overflow-hidden rounded-3xl bg-card ring-1 ring-inset ring-white/[0.06] transition-colors hover:ring-white/[0.1]",
-        wide
-          ? "grid aspect-[2/1] grid-cols-2"
-          : "flex aspect-square flex-col p-10 md:p-14",
+        wide ? "grid aspect-[2/1] grid-cols-2" : "flex flex-col",
         className,
       )}
     >
@@ -95,10 +93,10 @@ export function StackCard({
         </>
       ) : (
         <>
-          <div className="pointer-events-none opacity-30 transition-opacity group-hover/stack:opacity-50">
+          <div className="relative aspect-[5/3] overflow-hidden border-b border-white/[0.06]">
             {visual}
           </div>
-          <div className="relative mt-auto flex flex-col gap-4">{copy}</div>
+          <div className="relative flex flex-col gap-3 p-7">{copy}</div>
         </>
       )}
     </Link>
