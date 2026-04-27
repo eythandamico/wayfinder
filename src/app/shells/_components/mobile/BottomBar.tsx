@@ -32,17 +32,17 @@ export function BottomBar({
 
   return (
     <>
-      {/* Backdrop — covers the rest of the screen when the actions drawer is
-          open. Blurs + dims the chart underneath so the menu reads as the
-          focused element. Tap anywhere on the backdrop to dismiss. */}
-      <div
-        aria-hidden
-        onClick={() => setActionsOpen(false)}
-        className={cn(
-          "fixed inset-0 z-40 bg-background/60 backdrop-blur-sm transition-opacity duration-200 ease-out",
-          actionsOpen ? "opacity-100" : "pointer-events-none opacity-0",
-        )}
-      />
+      {/* Backdrop + drawer only mount when open, so they can't flash visible
+          on first paint while the closed-state classes settle. animate-in
+          handles the enter; exit is instant which is fine for a tap-to-open
+          mobile menu. */}
+      {actionsOpen && (
+        <div
+          aria-hidden
+          onClick={() => setActionsOpen(false)}
+          className="fixed inset-0 z-40 bg-background/60 backdrop-blur-sm animate-in fade-in duration-200"
+        />
+      )}
 
       <div
         ref={wrapperRef}
@@ -51,33 +51,28 @@ export function BottomBar({
           paddingBottom: "calc(env(safe-area-inset-bottom) + 0.75rem)",
         }}
       >
-        {/* Action drawer — floats above the main row when open. Vertical list. */}
-        <div
-          role="menu"
-          aria-hidden={!actionsOpen}
-          className={cn(
-            "absolute inset-x-3 bottom-full mb-2 flex flex-col gap-1 rounded-2xl bg-background p-1.5 shadow-2xl transition-[opacity,transform] duration-200 ease-[var(--ease-strong)]",
-            actionsOpen
-              ? "translate-y-0 opacity-100"
-              : "pointer-events-none translate-y-2 opacity-0",
-          )}
-        >
-          <ActionRow
-            label="Trade"
-            icon={<TrendingUp strokeWidth={1.5} className="size-5" />}
-            onClick={() => choose("trade")}
-          />
-          <ActionRow
-            label="Order book"
-            icon={<BookOpen strokeWidth={1.5} className="size-5" />}
-            onClick={() => choose("orderbook")}
-          />
-          <ActionRow
-            label="Portfolio"
-            icon={<Briefcase strokeWidth={1.5} className="size-5" />}
-            onClick={() => choose("portfolio")}
-          />
-        </div>
+        {actionsOpen && (
+          <div
+            role="menu"
+            className="absolute inset-x-3 bottom-full mb-2 flex flex-col gap-1 rounded-2xl bg-background p-1.5 shadow-2xl animate-in fade-in slide-in-from-bottom-2 duration-200 ease-[var(--ease-strong)]"
+          >
+            <ActionRow
+              label="Trade"
+              icon={<TrendingUp strokeWidth={1.5} className="size-5" />}
+              onClick={() => choose("trade")}
+            />
+            <ActionRow
+              label="Order book"
+              icon={<BookOpen strokeWidth={1.5} className="size-5" />}
+              onClick={() => choose("orderbook")}
+            />
+            <ActionRow
+              label="Portfolio"
+              icon={<Briefcase strokeWidth={1.5} className="size-5" />}
+              onClick={() => choose("portfolio")}
+            />
+          </div>
+        )}
 
         {/* Main row: leading actions trigger, full-width composer */}
         <div className="flex items-center gap-2">
