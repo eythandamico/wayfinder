@@ -8,17 +8,14 @@ import {
   ArrowUp,
   Check,
   ChevronDown,
-  Clock,
   Copy,
   Cpu,
   ExternalLink,
   HardDrive,
   Image as LucideImage,
   Infinity as LucideInfinity,
-  Key,
   Lock,
   Mic,
-  MoreVertical,
   Plus,
   Search,
 } from "lucide-react";
@@ -73,10 +70,6 @@ export function MicRecordingIcon() {
   );
 }
 
-export function MoreIcon() {
-  return <MoreVertical strokeWidth={STROKE} className="size-4" />;
-}
-
 export function CheckIcon() {
   return (
     <Check strokeWidth={2} className="size-4 text-primary" />
@@ -102,18 +95,6 @@ export function SearchIcon() {
 
 export function ExternalLinkIcon() {
   return <ExternalLink strokeWidth={STROKE} className="size-3.5" />;
-}
-
-export function KeyIcon() {
-  return (
-    <Key strokeWidth={STROKE} className="size-3.5" aria-hidden />
-  );
-}
-
-export function ClockIcon() {
-  return (
-    <Clock strokeWidth={STROKE} className="size-3" aria-hidden />
-  );
 }
 
 export function BarDivider() {
