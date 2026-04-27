@@ -388,7 +388,10 @@ function TrendingCarousel({ paths }: { paths: Path[] }) {
           <div
             key={p.id}
             role="listitem"
-            className="w-[280px] shrink-0 snap-start"
+            // Width matches the grid below at every breakpoint:
+            //   1 col → full, 2 col → ~½, 3 col → ~⅓, 4 col → ~¼, 5 col → ~⅕
+            // Math accounts for the 12px (gap-3) between cards.
+            className="shrink-0 snap-start w-full sm:w-[calc((100%-12px)/2)] lg:w-[calc((100%-24px)/3)] xl:w-[calc((100%-36px)/4)] 2xl:w-[calc((100%-48px)/5)]"
           >
             <PathCard path={p} />
           </div>
