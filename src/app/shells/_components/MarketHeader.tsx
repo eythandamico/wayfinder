@@ -81,7 +81,7 @@ function UsagePill({ usage }: { usage: UsageData }) {
         aria-controls="usage-menu"
         aria-label={`Session usage: ${formatTokens(usage.tokens.used)} of ${formatTokens(usage.tokens.total)} tokens used`}
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex h-[var(--ui-h-input)] items-center gap-2.5 rounded-lg bg-white/[0.06] px-3.5 text-muted-foreground ring-1 ring-inset ring-white/[0.08] transition-[background-color,color,box-shadow,scale] duration-150 ease-out hover:bg-white/[0.09] hover:text-foreground hover:ring-white/[0.12] active:scale-[0.96]"
+        className="inline-flex h-[var(--ui-h-input)] items-center gap-2.5 rounded-lg bg-white/[0.08] px-3.5 text-muted-foreground transition-[background-color,color,scale] duration-150 ease-out hover:bg-white/[0.12] hover:text-foreground active:scale-[0.96]"
       >
         <InfinityIcon />
         <span aria-hidden className="text-body tabular-nums text-foreground">
@@ -105,7 +105,7 @@ function UsagePill({ usage }: { usage: UsageData }) {
         role="menu"
         aria-hidden={!open}
         className={cn(
-          "absolute right-0 top-full z-30 mt-1 w-80 origin-top-right rounded-lg bg-background p-3 shadow-xl ring-1 ring-white/5 transition-[opacity,transform] duration-150 ease-out",
+          "absolute right-0 top-full z-30 mt-1 w-80 origin-top-right rounded-lg bg-background p-3 shadow-2xl transition-[opacity,transform] duration-150 ease-out",
           open
             ? "opacity-100 translate-y-0 scale-100"
             : "pointer-events-none opacity-0 -translate-y-1 scale-[0.98]",
@@ -261,8 +261,8 @@ function ViewModeButton({
       className={cn(
         "inline-flex h-[var(--ui-h-input)] items-center gap-2 rounded-lg px-3 text-body font-medium transition-[background-color,color,box-shadow,scale] duration-150 ease-out active:scale-[0.96]",
         active
-          ? "bg-white/[0.08] text-foreground ring-1 ring-inset ring-white/[0.10]"
-          : "text-muted-foreground hover:bg-white/[0.04] hover:text-foreground",
+          ? "bg-white/[0.12] text-foreground"
+          : "text-muted-foreground hover:bg-white/[0.06] hover:text-foreground",
       )}
     >
       <Icon strokeWidth={1.75} className="size-4" aria-hidden />
@@ -299,7 +299,7 @@ function ConnectedPill({ address }: { address: string }) {
         aria-controls="wallet-menu"
         aria-label={`Wallet connected: ${short}`}
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex h-[var(--ui-h-input)] items-center gap-2.5 rounded-lg bg-white/[0.06] px-3.5 text-muted-foreground ring-1 ring-inset ring-white/[0.08] transition-[background-color,color,box-shadow,scale] duration-150 ease-out hover:bg-white/[0.09] hover:text-foreground hover:ring-white/[0.12] active:scale-[0.96]"
+        className="inline-flex h-[var(--ui-h-input)] items-center gap-2.5 rounded-lg bg-white/[0.08] px-3.5 text-muted-foreground transition-[background-color,color,scale] duration-150 ease-out hover:bg-white/[0.12] hover:text-foreground active:scale-[0.96]"
       >
         <span aria-hidden className="size-1.5 rounded-full bg-primary shadow-[0_0_6px_var(--primary)]" />
         <span aria-hidden className="text-body tabular-nums text-foreground">
@@ -318,7 +318,7 @@ function ConnectedPill({ address }: { address: string }) {
         role="menu"
         aria-hidden={!open}
         className={cn(
-          "absolute right-0 top-full z-30 mt-1 w-64 origin-top-right rounded-lg bg-background p-1 shadow-xl ring-1 ring-white/5 transition-[opacity,transform] duration-150 ease-out",
+          "absolute right-0 top-full z-30 mt-1 w-64 origin-top-right rounded-lg bg-background p-1 shadow-2xl transition-[opacity,transform] duration-150 ease-out",
           open
             ? "opacity-100 translate-y-0 scale-100"
             : "pointer-events-none opacity-0 -translate-y-1 scale-[0.98]",
