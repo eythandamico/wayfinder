@@ -38,7 +38,7 @@ export function TradePanel() {
     <div className="flex h-full flex-col overflow-hidden rounded-lg bg-muted">
       {/* Header — params + side toggle pinned at top */}
       <div className="flex shrink-0 flex-col gap-3 px-3 pt-3">
-        <div className="grid grid-cols-3 divide-x divide-white/5 rounded-lg bg-background/40 ring-1 ring-inset ring-white/5">
+        <div className="grid grid-cols-3 divide-x divide-white/5 rounded-lg bg-background/60">
           <ParamDropdown
             label="Margin"
             value={margin}
@@ -66,7 +66,7 @@ export function TradePanel() {
         <div
           role="group"
           aria-label="Trade side"
-          className="grid grid-cols-2 gap-1 rounded-lg bg-background/40 p-1 ring-1 ring-inset ring-white/5"
+          className="grid grid-cols-2 gap-1 rounded-lg bg-background/60 p-1"
         >
           <SideButton
             active={side === "long"}
