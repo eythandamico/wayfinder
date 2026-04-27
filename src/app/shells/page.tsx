@@ -16,9 +16,13 @@ import { ExplorePathsPanel } from "./_components/ExplorePathsPanel";
 import { MarketHeader } from "./_components/MarketHeader";
 import { OrderBookPanel } from "./_components/OrderBook";
 import { PortfolioPanel } from "./_components/PortfolioPanel";
+import { ShellsBoot } from "./_components/ShellsBoot";
 import { TradePanel } from "./_components/TradePanel";
 import { MobileLayout } from "./_components/mobile/MobileLayout";
 import { ShellsProvider, useViewMode } from "./_state/shells-context";
+
+const BOOT_DURATION_MS = 1700;
+const BOOT_FADE_OUT_MS = 500;
 
 /* ------------------------------------------------------------------ */
 /*  Media query — render desktop or mobile shell                       */
@@ -44,11 +48,42 @@ function useIsDesktop() {
 
 export default function ShellsPage() {
   const isDesktop = useIsDesktop();
+  const [booted, setBooted] = useState(false);
+  const [bootMounted, setBootMounted] = useState(true);
+
+  // Boot timeline: cycle through stages, then flip booted -> app fades in,
+  // boot screen fades out. Once the fade-out duration elapses, unmount the
+  // boot screen entirely so it can't intercept clicks.
+  useEffect(() => {
+    const flip = window.setTimeout(() => setBooted(true), BOOT_DURATION_MS);
+    return () => window.clearTimeout(flip);
+  }, []);
+  useEffect(() => {
+    if (!booted) return;
+    const id = window.setTimeout(
+      () => setBootMounted(false),
+      BOOT_FADE_OUT_MS,
+    );
+    return () => window.clearTimeout(id);
+  }, [booted]);
+
   return (
     <ShellsProvider>
       <h1 className="sr-only">Wayfinder Trading Terminal</h1>
       <CommandBar />
-      {isDesktop ? <DesktopShell /> : <MobileLayout />}
+
+      {bootMounted && <ShellsBoot dismissed={booted} />}
+
+      <div
+        className={cn(
+          "h-full transition-[opacity,transform] duration-700 ease-out",
+          booted
+            ? "translate-y-0 opacity-100"
+            : "pointer-events-none translate-y-2 opacity-0",
+        )}
+      >
+        {isDesktop ? <DesktopShell /> : <MobileLayout />}
+      </div>
     </ShellsProvider>
   );
 }
