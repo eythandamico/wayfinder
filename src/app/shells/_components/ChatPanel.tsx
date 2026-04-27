@@ -33,7 +33,6 @@ import {
   LockIcon,
   MicIcon,
   MicRecordingIcon,
-  MoreIcon,
   PlusIcon,
 } from "./icons";
 
@@ -151,19 +150,7 @@ export function ChatPanel() {
           role="tabpanel"
           className="flex min-h-0 flex-1 flex-col"
         >
-          <div className="px-3 pt-3">
-            <div className="mb-3 flex items-center justify-between gap-2">
-              <span className="truncate px-2 py-1 text-body font-semibold text-foreground">
-                {activeSession.name}
-              </span>
-              <div className="flex shrink-0 items-center gap-0.5">
-                <IconButton aria-label="More options">
-                  <MoreIcon />
-                </IconButton>
-              </div>
-            </div>
-          </div>
-          <div className="scroll-thin min-h-0 flex-1 space-y-4 overflow-y-auto px-3">
+          <div className="scroll-thin min-h-0 flex-1 space-y-4 overflow-y-auto px-3 pt-3">
             {SAMPLE_MESSAGES.map((m, i) => (
               <Message key={i} message={m} />
             ))}
