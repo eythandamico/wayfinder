@@ -38,7 +38,7 @@ export function BottomBar({
         role="menu"
         aria-hidden={!actionsOpen}
         className={cn(
-          "absolute inset-x-3 bottom-full mb-2 grid grid-cols-3 gap-2 rounded-2xl bg-background p-2 shadow-2xl ring-1 ring-white/[0.06] transition-[opacity,transform] duration-200 ease-[var(--ease-strong)]",
+          "absolute inset-x-3 bottom-full mb-2 grid grid-cols-3 gap-2 rounded-2xl bg-background p-2 shadow-2xl transition-[opacity,transform] duration-200 ease-[var(--ease-strong)]",
           actionsOpen
             ? "translate-y-0 opacity-100"
             : "pointer-events-none translate-y-2 opacity-0",

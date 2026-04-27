@@ -278,7 +278,7 @@ function ParamDropdown({
         role="menu"
         aria-hidden={!open}
         className={cn(
-          "absolute top-full z-20 mt-1 min-w-full origin-top rounded-lg bg-background p-1 shadow-xl ring-1 ring-white/5 transition-[opacity,transform] duration-150 ease-out",
+          "absolute top-full z-20 mt-1 min-w-full origin-top rounded-lg bg-background p-1 shadow-2xl transition-[opacity,transform] duration-150 ease-out",
           align === "end" ? "right-0" : "left-0",
           open
             ? "opacity-100 translate-y-0 scale-100"

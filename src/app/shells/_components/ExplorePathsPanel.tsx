@@ -346,7 +346,7 @@ function SortDropdown({
         role="menu"
         aria-hidden={!open}
         className={cn(
-          "absolute right-0 top-full z-20 mt-1 min-w-[200px] origin-top-right rounded-lg bg-background p-1 shadow-xl ring-1 ring-white/5 transition-[opacity,transform] duration-150 ease-[var(--ease-strong)]",
+          "absolute right-0 top-full z-20 mt-1 min-w-[200px] origin-top-right rounded-lg bg-background p-1 shadow-2xl transition-[opacity,transform] duration-150 ease-[var(--ease-strong)]",
           open
             ? "opacity-100 translate-y-0 scale-100"
             : "pointer-events-none opacity-0 -translate-y-1 scale-[0.98]",
