@@ -110,7 +110,7 @@ export function ChatPanel() {
         <div
           role="tablist"
           aria-label="Agent, paths, and jobs"
-          className="flex"
+          className="flex px-2"
         >
           <TabButton
             active={tab === "agent"}
