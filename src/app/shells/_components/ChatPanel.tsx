@@ -241,7 +241,7 @@ function TabButton({
       {active && (
         <span
           aria-hidden
-          className="pointer-events-none absolute inset-x-4 bottom-0 h-px bg-foreground"
+          className="pointer-events-none absolute inset-x-2 bottom-0 h-px bg-foreground"
         />
       )}
     </button>
