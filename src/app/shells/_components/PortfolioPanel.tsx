@@ -255,15 +255,16 @@ function Sparkline({ data, up }: { data: number[]; up: boolean }) {
     })
     .join(" ");
 
-  // Last point for the trailing dot
+  // Last point as a percentage so the trailing dot can be positioned via CSS,
+  // outside the SVG. Drawing it inside the stretched (preserveAspectRatio:
+  // none) SVG turns circles into wide ovals.
   const last = data[data.length - 1];
-  const lastX = W;
-  const lastY = H - ((last - min) / range) * H;
+  const lastYPct = (1 - (last - min) / range) * 100;
 
   return (
     <div
       className={cn(
-        "h-16 w-full",
+        "relative h-16 w-full",
         up ? "text-primary" : "text-tone-down",
       )}
     >
@@ -271,32 +272,25 @@ function Sparkline({ data, up }: { data: number[]; up: boolean }) {
         viewBox={`0 0 ${W} ${H}`}
         preserveAspectRatio="none"
         aria-hidden
-        className="h-full w-full overflow-visible"
+        className="h-full w-full"
       >
         <polyline
           points={points}
           fill="none"
           stroke="currentColor"
-          strokeWidth={1.25}
+          strokeWidth={1.75}
           strokeLinecap="round"
           strokeLinejoin="round"
           vectorEffect="non-scaling-stroke"
         />
-        <circle
-          cx={lastX}
-          cy={lastY}
-          r={2.5}
-          fill="currentColor"
-          opacity={0.9}
-        />
-        <circle
-          cx={lastX}
-          cy={lastY}
-          r={6}
-          fill="currentColor"
-          opacity={0.18}
-        />
       </svg>
+      {/* Trailing dot — DOM-positioned so it stays a true circle regardless
+          of the SVG's stretched aspect ratio. */}
+      <span
+        aria-hidden
+        className="pointer-events-none absolute size-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-current shadow-[0_0_0_4px_currentColor] [box-shadow:0_0_0_4px_color-mix(in_oklch,currentColor_25%,transparent)]"
+        style={{ left: "100%", top: `${lastYPct}%` }}
+      />
     </div>
   );
 }
