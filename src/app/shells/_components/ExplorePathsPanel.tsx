@@ -69,12 +69,10 @@ const STATUS_STYLES: Record<
 };
 
 const PAGE_SIZE = 15; // 5 cols × 3 rows on a wide display
+const TRENDING_COUNT = 8;
 
 const GRID_COLS =
   "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3";
-
-const TRENDING_COLS =
-  "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3";
 
 export function ExplorePathsPanel() {
   const [query, setQuery] = useState("");
@@ -99,7 +97,7 @@ export function ExplorePathsPanel() {
     () =>
       [...PATHS]
         .sort((a, b) => b.weeklyInstalls - a.weeklyInstalls)
-        .slice(0, 3),
+        .slice(0, TRENDING_COUNT),
     [],
   );
 
@@ -195,11 +193,7 @@ export function ExplorePathsPanel() {
         {!isFiltering && (
           <section className="mb-7">
             <SectionLabel label="Trending now" />
-            <div className={TRENDING_COLS}>
-              {trending.map((p) => (
-                <PathCard key={p.id} path={p} />
-              ))}
-            </div>
+            <TrendingCarousel paths={trending} />
           </section>
         )}
 
@@ -368,6 +362,39 @@ function KindChip({
         {count}
       </span>
     </button>
+  );
+}
+
+/* ----- Trending carousel — same card width as grid, scrolls horizontally ----- */
+
+function TrendingCarousel({ paths }: { paths: Path[] }) {
+  return (
+    <div className="relative">
+      {/* Edge fades so users see there's more content beyond the viewport */}
+      <span
+        aria-hidden
+        className="pointer-events-none absolute inset-y-0 left-0 z-10 w-6 bg-gradient-to-r from-muted to-transparent"
+      />
+      <span
+        aria-hidden
+        className="pointer-events-none absolute inset-y-0 right-0 z-10 w-6 bg-gradient-to-l from-muted to-transparent"
+      />
+      <div
+        role="list"
+        aria-label="Trending paths"
+        className="scroll-thin -mx-1 flex snap-x gap-3 overflow-x-auto px-1 pb-2"
+      >
+        {paths.map((p) => (
+          <div
+            key={p.id}
+            role="listitem"
+            className="w-[280px] shrink-0 snap-start"
+          >
+            <PathCard path={p} />
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
 
