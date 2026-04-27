@@ -34,14 +34,14 @@ export function MobileTopBar() {
         <Link
           href="/"
           aria-label="Wayfinder home"
-          className="flex items-center rounded-md px-1 transition-opacity hover:opacity-80"
+          className="flex shrink-0 items-center rounded-md px-1 transition-opacity hover:opacity-80"
         >
           <Image
-            src="/brand/wayfinder-logomark.svg"
+            src="/brand/wayfinder-icon-white.png"
             alt="Wayfinder"
-            width={120}
-            height={28}
-            className="h-6 w-auto"
+            width={56}
+            height={56}
+            className="size-7"
             priority
           />
         </Link>
