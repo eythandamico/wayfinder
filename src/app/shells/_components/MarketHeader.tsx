@@ -7,12 +7,7 @@ import { cn } from "@/lib/utils";
 import { useClickOutside } from "@/lib/hooks/useClickOutside";
 import { formatTokens, shortAddress } from "@/lib/format";
 import type { UsageData } from "../_types";
-import {
-  CURRENT_SECTION,
-  MOCK_USAGE,
-  NAV_SECTIONS,
-  WALLET_ADDRESS,
-} from "../_data/mocks";
+import { MOCK_USAGE, WALLET_ADDRESS } from "../_data/mocks";
 import {
   BarDivider,
   ChevronDownIcon,
@@ -23,7 +18,12 @@ import {
   InfinityIcon,
 } from "./icons";
 import { Sparkles } from "lucide-react";
-import { useDensity, type Density } from "../_state/shells-context";
+import {
+  useDensity,
+  useViewMode,
+  type Density,
+  type ViewMode,
+} from "../_state/shells-context";
 import { CommandSearchBar } from "./CommandBar";
 
 export function MarketHeader() {
@@ -45,7 +45,7 @@ export function MarketHeader() {
           />
         </Link>
 
-        <AppMenu current={CURRENT_SECTION} />
+        <ViewModeToggle />
       </div>
 
       <div className="w-[560px] max-w-full justify-self-center">
@@ -217,67 +217,59 @@ function UsageMetricRow({
   );
 }
 
-function AppMenu({ current }: { current: string }) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  useClickOutside(ref, () => setOpen(false), open);
-
+function ViewModeToggle() {
+  const { viewMode, setViewMode } = useViewMode();
   return (
-    <div ref={ref} className="relative">
-      <button
-        type="button"
-        aria-haspopup="menu"
-        aria-expanded={open}
-        aria-controls="app-menu"
-        aria-label={`Navigate sections (current: ${current})`}
-        onClick={() => setOpen((v) => !v)}
-        className="inline-flex h-[var(--ui-h-input)] items-center gap-2 rounded-lg bg-white/[0.06] px-3.5 text-body font-medium text-foreground ring-1 ring-inset ring-white/[0.08] transition-[background-color,color,box-shadow,scale] duration-150 ease-out hover:bg-white/[0.09] hover:ring-white/[0.12] active:scale-[0.96]"
-      >
-        {current}
-        <ChevronDownIcon
-          aria-hidden
-          className={cn(
-            "size-3 text-muted-foreground transition-transform",
-            open && "rotate-180",
-          )}
-        />
-      </button>
-      <div
-        id="app-menu"
-        role="menu"
-        aria-hidden={!open}
-        className={cn(
-          "absolute left-0 top-full z-30 mt-1 w-52 origin-top-left rounded-lg bg-background p-1 shadow-xl ring-1 ring-white/5 transition-[opacity,transform] duration-150 ease-[var(--ease-strong)]",
-          open
-            ? "opacity-100 translate-y-0 scale-100"
-            : "pointer-events-none opacity-0 -translate-y-1 scale-[0.98]",
-        )}
-      >
-        {NAV_SECTIONS.map((s) => {
-          const isActive = s.label === current;
-          return (
-            <Link
-              key={s.href}
-              href={s.href}
-              role="menuitem"
-              aria-current={isActive ? "page" : undefined}
-              onClick={() => setOpen(false)}
-              className={cn(
-                "flex items-center justify-between rounded-md px-3 py-2 text-body transition-colors hover:bg-white/[0.05]",
-                isActive && "bg-white/[0.04] text-foreground",
-                !isActive && "text-foreground",
-              )}
-            >
-              <span>{s.label}</span>
-              {isActive && (
-                <span aria-hidden className="size-1.5 rounded-full bg-primary" />
-              )}
-            </Link>
-          );
-        })}
-      </div>
+    <div
+      role="tablist"
+      aria-label="App view"
+      className="inline-flex h-[var(--ui-h-input)] items-center gap-0.5 rounded-lg bg-white/[0.04] p-0.5 ring-1 ring-inset ring-white/[0.06]"
+    >
+      <ViewModeTab
+        active={viewMode === "trading"}
+        onClick={() => setViewMode("trading")}
+        label="Trade"
+        controls="shells-view-trading"
+      />
+      <ViewModeTab
+        active={viewMode === "explore"}
+        onClick={() => setViewMode("explore")}
+        label="Paths"
+        controls="shells-view-explore"
+      />
     </div>
+  );
+}
+
+function ViewModeTab({
+  active,
+  onClick,
+  label,
+  controls,
+}: {
+  active: boolean;
+  onClick: () => void;
+  label: string;
+  controls: string;
+}) {
+  const target: ViewMode = label === "Trade" ? "trading" : "explore";
+  return (
+    <button
+      type="button"
+      role="tab"
+      aria-selected={active}
+      aria-controls={controls}
+      data-target={target}
+      onClick={onClick}
+      className={cn(
+        "rounded-md px-3 py-1.5 text-body font-medium transition-[background-color,color,scale] duration-150 ease-out active:scale-[0.96]",
+        active
+          ? "bg-white/[0.10] text-foreground shadow-[inset_0_-1px_0_rgba(0,0,0,0.12)]"
+          : "text-muted-foreground hover:text-foreground",
+      )}
+    >
+      {label}
+    </button>
   );
 }
 

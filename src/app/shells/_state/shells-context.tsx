@@ -13,7 +13,10 @@ import { MARKETS } from "../_data/mocks";
 import type { Market } from "../_types";
 
 export type Density = "small" | "medium" | "large";
+export type ViewMode = "trading" | "explore";
+
 const DENSITY_KEY = "wf-shells-density";
+const VIEW_MODE_KEY = "wf-shells-view-v1";
 
 type ShellsContextValue = {
   activeMarket: Market;
@@ -24,6 +27,8 @@ type ShellsContextValue = {
   toggleCommand: () => void;
   density: Density;
   setDensity: (d: Density) => void;
+  viewMode: ViewMode;
+  setViewMode: (m: ViewMode) => void;
 };
 
 const ShellsContext = createContext<ShellsContextValue | null>(null);
@@ -32,6 +37,7 @@ export function ShellsProvider({ children }: { children: ReactNode }) {
   const [activeMarket, setActiveMarket] = useState<Market>(MARKETS[0]);
   const [commandOpen, setCommandOpen] = useState(false);
   const [density, setDensityState] = useState<Density>("medium");
+  const [viewMode, setViewModeState] = useState<ViewMode>("trading");
 
   // Hydrate density from localStorage after mount (SSR-safe).
   useEffect(() => {
@@ -40,6 +46,10 @@ export function ShellsProvider({ children }: { children: ReactNode }) {
       if (saved === "small" || saved === "medium" || saved === "large") {
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setDensityState(saved);
+      }
+      const savedView = window.localStorage.getItem(VIEW_MODE_KEY);
+      if (savedView === "trading" || savedView === "explore") {
+        setViewModeState(savedView);
       }
     } catch {
       /* storage unavailable */
@@ -66,6 +76,15 @@ export function ShellsProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  const setViewMode = useCallback((m: ViewMode) => {
+    setViewModeState(m);
+    try {
+      window.localStorage.setItem(VIEW_MODE_KEY, m);
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
   const openCommand = useCallback(() => setCommandOpen(true), []);
   const closeCommand = useCallback(() => setCommandOpen(false), []);
   const toggleCommand = useCallback(() => setCommandOpen((v) => !v), []);
@@ -80,6 +99,8 @@ export function ShellsProvider({ children }: { children: ReactNode }) {
       toggleCommand,
       density,
       setDensity,
+      viewMode,
+      setViewMode,
     }),
     [
       activeMarket,
@@ -89,6 +110,8 @@ export function ShellsProvider({ children }: { children: ReactNode }) {
       toggleCommand,
       density,
       setDensity,
+      viewMode,
+      setViewMode,
     ],
   );
 
@@ -124,4 +147,12 @@ export function useDensity() {
     throw new Error("useDensity must be used inside <ShellsProvider>");
   }
   return { density: ctx.density, setDensity: ctx.setDensity };
+}
+
+export function useViewMode() {
+  const ctx = useContext(ShellsContext);
+  if (!ctx) {
+    throw new Error("useViewMode must be used inside <ShellsProvider>");
+  }
+  return { viewMode: ctx.viewMode, setViewMode: ctx.setViewMode };
 }

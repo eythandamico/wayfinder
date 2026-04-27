@@ -12,12 +12,13 @@ import { cn } from "@/lib/utils";
 import { ChartPanel } from "./_components/ChartPanel";
 import { ChatPanel } from "./_components/ChatPanel";
 import { CommandBar } from "./_components/CommandBar";
+import { ExplorePathsPanel } from "./_components/ExplorePathsPanel";
 import { MarketHeader } from "./_components/MarketHeader";
 import { OrderBookPanel } from "./_components/OrderBook";
 import { PortfolioPanel } from "./_components/PortfolioPanel";
 import { TradePanel } from "./_components/TradePanel";
 import { MobileLayout } from "./_components/mobile/MobileLayout";
-import { ShellsProvider } from "./_state/shells-context";
+import { ShellsProvider, useViewMode } from "./_state/shells-context";
 
 /* ------------------------------------------------------------------ */
 /*  Media query — render desktop or mobile shell                       */
@@ -163,67 +164,75 @@ function DesktopShell() {
     [],
   );
 
+  const { viewMode } = useViewMode();
+
   return (
     <main className="fixed inset-0 flex flex-col overflow-hidden bg-background p-1 text-foreground">
       <MarketHeader />
-      <div
-        ref={containerRef}
-        className="mt-1 flex min-h-0 min-w-0 flex-1"
-      >
-        {/* Left column: Chart / Portfolio */}
+      {viewMode === "trading" ? (
         <div
-          ref={leftColRef}
-          className="flex min-h-0 min-w-0 flex-col"
-          style={{ flexBasis: `${cols[0]}%`, flexShrink: 0, flexGrow: 0 }}
+          ref={containerRef}
+          className="mt-1 flex min-h-0 min-w-0 flex-1"
         >
+          {/* Left column: Chart / Portfolio */}
           <div
-            className="min-h-0 min-w-0"
-            style={{ flexBasis: `${leftRows[0]}%`, flexShrink: 0, flexGrow: 0 }}
+            ref={leftColRef}
+            className="flex min-h-0 min-w-0 flex-col"
+            style={{ flexBasis: `${cols[0]}%`, flexShrink: 0, flexGrow: 0 }}
           >
-            <ChartPanel />
+            <div
+              className="min-h-0 min-w-0"
+              style={{ flexBasis: `${leftRows[0]}%`, flexShrink: 0, flexGrow: 0 }}
+            >
+              <ChartPanel />
+            </div>
+            <ResizeHandle orientation="vertical" onDrag={onDragLeftRows} />
+            <div
+              className="min-h-0 min-w-0"
+              style={{ flexBasis: `${leftRows[1]}%`, flexShrink: 0, flexGrow: 0 }}
+            >
+              <PortfolioPanel />
+            </div>
           </div>
-          <ResizeHandle orientation="vertical" onDrag={onDragLeftRows} />
+
+          <ResizeHandle orientation="horizontal" onDrag={onDragCols(0)} />
+
+          {/* Middle column: Trade / Order book */}
+          <div
+            ref={midColRef}
+            className="flex min-h-0 min-w-0 flex-col"
+            style={{ flexBasis: `${cols[1]}%`, flexShrink: 0, flexGrow: 0 }}
+          >
+            <div
+              className="min-h-0 min-w-0"
+              style={{ flexBasis: `${midRows[0]}%`, flexShrink: 0, flexGrow: 0 }}
+            >
+              <TradePanel />
+            </div>
+            <ResizeHandle orientation="vertical" onDrag={onDragMidRows} />
+            <div
+              className="min-h-0 min-w-0"
+              style={{ flexBasis: `${midRows[1]}%`, flexShrink: 0, flexGrow: 0 }}
+            >
+              <OrderBookPanel />
+            </div>
+          </div>
+
+          <ResizeHandle orientation="horizontal" onDrag={onDragCols(1)} />
+
+          {/* Right column: Chat */}
           <div
             className="min-h-0 min-w-0"
-            style={{ flexBasis: `${leftRows[1]}%`, flexShrink: 0, flexGrow: 0 }}
+            style={{ flexBasis: `${cols[2]}%`, flexShrink: 0, flexGrow: 0 }}
           >
-            <PortfolioPanel />
+            <ChatPanel />
           </div>
         </div>
-
-        <ResizeHandle orientation="horizontal" onDrag={onDragCols(0)} />
-
-        {/* Middle column: Trade / Order book */}
-        <div
-          ref={midColRef}
-          className="flex min-h-0 min-w-0 flex-col"
-          style={{ flexBasis: `${cols[1]}%`, flexShrink: 0, flexGrow: 0 }}
-        >
-          <div
-            className="min-h-0 min-w-0"
-            style={{ flexBasis: `${midRows[0]}%`, flexShrink: 0, flexGrow: 0 }}
-          >
-            <TradePanel />
-          </div>
-          <ResizeHandle orientation="vertical" onDrag={onDragMidRows} />
-          <div
-            className="min-h-0 min-w-0"
-            style={{ flexBasis: `${midRows[1]}%`, flexShrink: 0, flexGrow: 0 }}
-          >
-            <OrderBookPanel />
-          </div>
+      ) : (
+        <div className="mt-1 flex min-h-0 min-w-0 flex-1">
+          <ExplorePathsPanel />
         </div>
-
-        <ResizeHandle orientation="horizontal" onDrag={onDragCols(1)} />
-
-        {/* Right column: Chat */}
-        <div
-          className="min-h-0 min-w-0"
-          style={{ flexBasis: `${cols[2]}%`, flexShrink: 0, flexGrow: 0 }}
-        >
-          <ChatPanel />
-        </div>
-      </div>
+      )}
     </main>
   );
 }
