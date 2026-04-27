@@ -12,16 +12,17 @@ import {
 } from "lucide-react";
 import { WALLET_ADDRESS } from "../../_data/mocks";
 import {
+  useCommandBar,
   useDensity,
   useViewMode,
   type Density,
   type ViewMode,
 } from "../../_state/shells-context";
-import { CommandSearchIconButton } from "../CommandBar";
+import { CheckIcon, CopyIcon, SearchIcon } from "../icons";
+import { shortAddress } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 export function MobileTopBar() {
-  const short = `${WALLET_ADDRESS.slice(0, 6)}…${WALLET_ADDRESS.slice(-4)}`;
   return (
     <div
       className="flex shrink-0 items-center justify-between gap-2 px-3"
@@ -48,29 +49,21 @@ export function MobileTopBar() {
         <MobileViewModeToggle />
       </div>
 
-      <div className="flex items-center gap-1.5">
-        <span
-          className="inline-flex size-8 items-center justify-center rounded-full bg-white/5 text-body tabular-nums text-foreground sm:size-auto sm:gap-1.5 sm:px-2.5"
-          aria-label={`Wallet ${short}`}
-          title={short}
-        >
-          <span
-            aria-hidden
-            className="size-1.5 rounded-full bg-primary shadow-[0_0_6px_var(--primary)]"
-          />
-          <span className="hidden sm:inline">{short}</span>
-        </span>
-        <CommandSearchIconButton />
+      <div className="flex items-center gap-1">
+        <SearchButton />
         <MoreMenu />
+        <WalletDropdown address={WALLET_ADDRESS} />
       </div>
     </div>
   );
 }
 
+/* ----- View mode toggle (icon + label) ----- */
+
 function MobileViewModeToggle() {
   const { viewMode, setViewMode } = useViewMode();
   return (
-    <div className="flex items-center gap-0.5">
+    <div className="flex items-center gap-1">
       <ToggleButton
         active={viewMode === "trading"}
         onClick={() => setViewMode("trading")}
@@ -106,21 +99,38 @@ function ToggleButton({
     <button
       type="button"
       aria-pressed={active}
-      aria-label={`${label} view`}
-      title={label}
       data-target={target}
       onClick={onClick}
       className={cn(
-        "flex size-8 items-center justify-center rounded-md transition-[background-color,color,scale] duration-150 ease-out active:scale-[0.96]",
+        "inline-flex h-9 items-center gap-1.5 rounded-md px-3 text-body font-medium transition-[background-color,color,scale] duration-150 ease-out active:scale-[0.96]",
         active
-          ? "bg-white/[0.08] text-foreground"
+          ? "bg-white/[0.10] text-foreground"
           : "text-muted-foreground hover:bg-white/[0.04] hover:text-foreground",
       )}
     >
       <Icon strokeWidth={1.75} className="size-4" aria-hidden />
+      {label}
     </button>
   );
 }
+
+/* ----- Search trigger ----- */
+
+function SearchButton() {
+  const { openCommand } = useCommandBar();
+  return (
+    <button
+      type="button"
+      aria-label="Search tokens and paths"
+      onClick={openCommand}
+      className="flex size-9 items-center justify-center rounded-md text-muted-foreground transition-[background-color,color] duration-150 ease-out hover:bg-white/[0.04] hover:text-foreground"
+    >
+      <SearchIcon />
+    </button>
+  );
+}
+
+/* ----- Density / overflow menu ----- */
 
 function MoreMenu() {
   const [open, setOpen] = useState(false);
@@ -143,7 +153,7 @@ function MoreMenu() {
         aria-haspopup="menu"
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
-        className="flex size-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-white/5 hover:text-foreground"
+        className="flex size-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-white/[0.04] hover:text-foreground"
       >
         <MoreHorizontal strokeWidth={1.5} className="size-4" aria-hidden />
       </button>
@@ -151,7 +161,7 @@ function MoreMenu() {
         role="menu"
         aria-hidden={!open}
         className={cn(
-          "absolute right-0 top-full z-30 mt-1 w-56 origin-top-right rounded-lg bg-background p-2 shadow-xl ring-1 ring-white/5 transition-[opacity,transform] duration-150 ease-[var(--ease-strong)]",
+          "absolute right-0 top-full z-30 mt-1 w-56 origin-top-right rounded-lg bg-background p-2 shadow-2xl transition-[opacity,transform] duration-150 ease-[var(--ease-strong)]",
           open
             ? "opacity-100 translate-y-0 scale-100"
             : "pointer-events-none opacity-0 -translate-y-1 scale-[0.98]",
@@ -160,7 +170,7 @@ function MoreMenu() {
         <div className="px-1 pb-1.5 text-body text-muted-foreground">
           Display density
         </div>
-        <div className="flex items-center gap-1 rounded-md bg-white/[0.04] p-0.5 ring-1 ring-inset ring-white/[0.04]">
+        <div className="flex items-center gap-1 rounded-md bg-white/[0.04] p-0.5">
           {options.map((opt) => {
             const active = density === opt.value;
             return (
@@ -183,6 +193,84 @@ function MoreMenu() {
             );
           })}
         </div>
+      </div>
+    </div>
+  );
+}
+
+/* ----- Wallet dropdown — far right ----- */
+
+function WalletDropdown({ address }: { address: string }) {
+  const [open, setOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useClickOutside(ref, () => setOpen(false), open);
+
+  const short = shortAddress(address);
+
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(address);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1600);
+    } catch {
+      /* ignore */
+    }
+  };
+
+  return (
+    <div ref={ref} className="relative shrink-0">
+      <button
+        type="button"
+        aria-haspopup="menu"
+        aria-expanded={open}
+        aria-label={`Wallet: ${short}. Open menu`}
+        title={short}
+        onClick={() => setOpen((v) => !v)}
+        className="inline-flex h-9 items-center gap-1.5 rounded-full bg-white/[0.06] px-3 text-body tabular-nums text-foreground transition-[background-color,scale] duration-150 ease-out hover:bg-white/[0.10] active:scale-[0.96]"
+      >
+        <span
+          aria-hidden
+          className="size-1.5 rounded-full bg-primary shadow-[0_0_6px_var(--primary)]"
+        />
+        <span className="hidden sm:inline">{short}</span>
+      </button>
+      <div
+        role="menu"
+        aria-hidden={!open}
+        className={cn(
+          "absolute right-0 top-full z-30 mt-1 w-64 origin-top-right rounded-lg bg-background p-1 shadow-2xl transition-[opacity,transform] duration-150 ease-[var(--ease-strong)]",
+          open
+            ? "opacity-100 translate-y-0 scale-100"
+            : "pointer-events-none opacity-0 -translate-y-1 scale-[0.98]",
+        )}
+      >
+        <div className="flex flex-col gap-2 px-2 pb-1.5 pt-2">
+          <span className="text-body text-muted-foreground">
+            Connected wallet
+          </span>
+          <div className="flex items-center justify-between gap-2 rounded-md bg-white/[0.04] px-2.5 py-2">
+            <span className="truncate text-body tabular-nums text-foreground">
+              {short}
+            </span>
+            <button
+              type="button"
+              aria-label={copied ? "Address copied" : "Copy address"}
+              onClick={copy}
+              className="flex size-7 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-white/[0.05] hover:text-foreground"
+            >
+              {copied ? <CheckIcon /> : <CopyIcon />}
+            </button>
+          </div>
+        </div>
+        <button
+          type="button"
+          role="menuitem"
+          className="flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-body text-foreground transition-colors hover:bg-white/[0.05]"
+        >
+          <span>Disconnect</span>
+        </button>
       </div>
     </div>
   );
