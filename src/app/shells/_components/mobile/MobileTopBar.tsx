@@ -26,8 +26,8 @@ export function MobileTopBar() {
     <div
       className="flex shrink-0 items-center justify-between gap-2 px-3"
       style={{
-        paddingTop: "calc(env(safe-area-inset-top) + 0.5rem)",
-        paddingBottom: "0.5rem",
+        paddingTop: "calc(env(safe-area-inset-top) + 0.75rem)",
+        paddingBottom: "0.75rem",
       }}
     >
       <div className="flex items-center gap-2">

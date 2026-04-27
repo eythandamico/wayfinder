@@ -27,9 +27,9 @@ export function BottomBar({
   return (
     <div
       ref={wrapperRef}
-      className="relative shrink-0 px-3 pt-2"
+      className="relative shrink-0 px-3 pt-3"
       style={{
-        paddingBottom: "calc(env(safe-area-inset-bottom) + 0.5rem)",
+        paddingBottom: "calc(env(safe-area-inset-bottom) + 0.75rem)",
       }}
     >
       {/* Action drawer — floats above the main row when open. Absolute so the
