@@ -27,7 +27,7 @@ export function BottomBar({
   return (
     <div
       ref={wrapperRef}
-      className="relative shrink-0 bg-muted/95 px-3 pt-2"
+      className="relative shrink-0 px-3 pt-2"
       style={{
         paddingBottom: "calc(env(safe-area-inset-bottom) + 0.5rem)",
       }}

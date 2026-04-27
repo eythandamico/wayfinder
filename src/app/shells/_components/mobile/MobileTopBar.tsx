@@ -24,7 +24,7 @@ export function MobileTopBar() {
   const short = `${WALLET_ADDRESS.slice(0, 6)}…${WALLET_ADDRESS.slice(-4)}`;
   return (
     <div
-      className="flex shrink-0 items-center justify-between gap-2 bg-muted px-3"
+      className="flex shrink-0 items-center justify-between gap-2 px-3"
       style={{
         paddingTop: "calc(env(safe-area-inset-top) + 0.5rem)",
         paddingBottom: "0.5rem",
