@@ -2,7 +2,18 @@
 
 import { useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { Download, Search, Star } from "lucide-react";
+import {
+  Activity,
+  Code2,
+  Download,
+  Search,
+  Shield,
+  Star,
+  TrendingUp,
+  Wrench,
+  Zap,
+  type LucideIcon,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useClickOutside } from "@/lib/hooks/useClickOutside";
 import { CREATE_PATH_URL } from "@/lib/links";
@@ -40,6 +51,48 @@ const STATUS_ORDER: Record<PathStatus, number> = {
   "pending-update": 1,
   probation: 2,
   unbonded: 3,
+};
+
+const KIND_TONES: Record<
+  PathKind,
+  { bg: string; tint: string; icon: LucideIcon; iconClass: string }
+> = {
+  strategy: {
+    bg: "bg-[var(--wf-accent-mint-soft)]",
+    tint: "from-[var(--wf-accent-mint)]/25",
+    icon: TrendingUp,
+    iconClass: "text-[var(--wf-accent-mint)]",
+  },
+  skill: {
+    bg: "bg-[var(--wf-accent-violet-soft)]",
+    tint: "from-[var(--wf-accent-violet)]/25",
+    icon: Zap,
+    iconClass: "text-[var(--wf-accent-violet)]",
+  },
+  monitor: {
+    bg: "bg-[var(--wf-accent-sky-soft)]",
+    tint: "from-[var(--wf-accent-sky)]/25",
+    icon: Activity,
+    iconClass: "text-[var(--wf-accent-sky)]",
+  },
+  policy: {
+    bg: "bg-[var(--wf-accent-amber-soft)]",
+    tint: "from-[var(--wf-accent-amber)]/25",
+    icon: Shield,
+    iconClass: "text-[var(--wf-accent-amber)]",
+  },
+  script: {
+    bg: "bg-white/[0.05]",
+    tint: "from-white/10",
+    icon: Code2,
+    iconClass: "text-muted-foreground",
+  },
+  tool: {
+    bg: "bg-white/[0.05]",
+    tint: "from-white/10",
+    icon: Wrench,
+    iconClass: "text-muted-foreground",
+  },
 };
 
 const STATUS_STYLES: Record<
@@ -424,72 +477,105 @@ function PathCard({ path }: { path: Path }) {
     path.cost === "0 PROMPT" ? "Install" : `Install · ${path.cost}`;
 
   return (
-    <article className="group/card flex h-full flex-col gap-4 rounded-2xl bg-card/60 p-5 ring-1 ring-inset ring-white/[0.06] transition-[transform,box-shadow,background-color] duration-200 ease-out hover:-translate-y-px hover:bg-card/80 hover:ring-white/[0.12]">
-      {/* Meta — kind + status */}
-      <div className="flex items-center justify-between gap-3">
-        <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-          {PATH_KIND_LABELS[path.kind]}
-        </span>
-        <StatusBadge status={path.status} />
-      </div>
-
-      {/* Title + author */}
-      <div className="flex flex-col gap-1">
-        <h3 className="font-heading text-lg font-semibold leading-tight text-foreground">
-          {path.name}
-        </h3>
-        <span className="font-mono text-[11px] text-muted-foreground">
-          {path.author}
-        </span>
-      </div>
-
-      {/* Description */}
-      <p className="line-clamp-2 text-pretty text-sm leading-relaxed text-muted-foreground">
-        {path.description}
-      </p>
-
-      {/* Stats + CTA */}
-      <div className="mt-auto flex items-center justify-between gap-3">
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-muted-foreground">
-          {path.yieldPct && (
-            <span className="font-mono text-[11px] uppercase tracking-wider tabular-nums text-primary">
-              {path.yieldPct}
-            </span>
-          )}
-          <span
-            aria-label={`${path.stars} stars`}
-            className="inline-flex items-center gap-1 font-mono text-[11.5px] tabular-nums"
-          >
-            <Star
-              strokeWidth={0}
-              fill="currentColor"
-              className="size-3"
-              aria-hidden
-            />
-            {path.stars.toLocaleString()}
+    <article className="group/card flex h-full flex-col overflow-hidden rounded-2xl bg-card/60 ring-1 ring-inset ring-white/[0.06] transition-[transform,box-shadow,background-color] duration-200 ease-out hover:-translate-y-px hover:bg-card/80 hover:ring-white/[0.12]">
+      <PathCardHeader kind={path.kind} />
+      <div className="flex flex-1 flex-col gap-4 p-5">
+        {/* Meta — kind + status */}
+        <div className="flex items-center justify-between gap-3">
+          <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+            {PATH_KIND_LABELS[path.kind]}
           </span>
-          <span
-            aria-label={`${path.installs} installs`}
-            className="inline-flex items-center gap-1 font-mono text-[11.5px] tabular-nums"
-          >
-            <Download strokeWidth={1.6} className="size-3" aria-hidden />
-            {path.installs.toLocaleString()}
+          <StatusBadge status={path.status} />
+        </div>
+
+        {/* Title + author */}
+        <div className="flex flex-col gap-1">
+          <h3 className="font-heading text-lg font-semibold leading-tight text-foreground">
+            {path.name}
+          </h3>
+          <span className="font-mono text-[11px] text-muted-foreground">
+            {path.author}
           </span>
         </div>
-        <button
-          type="button"
-          aria-label={`Install ${path.name}`}
-          className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-md bg-primary/15 px-3 text-sm font-medium text-primary transition-colors duration-150 ease-out hover:bg-primary/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
-        >
-          <Download
-            strokeWidth={1.75}
-            className="size-3.5 transition-transform duration-150 ease-out group-hover/card:translate-y-0.5"
-            aria-hidden
-          />
-          {costLabel}
-        </button>
+
+        {/* Description */}
+        <p className="line-clamp-2 text-pretty text-sm leading-relaxed text-muted-foreground">
+          {path.description}
+        </p>
+
+        {/* Stats + CTA */}
+        <div className="mt-auto flex items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-muted-foreground">
+            {path.yieldPct && (
+              <span className="font-mono text-[11px] uppercase tracking-wider tabular-nums text-primary">
+                {path.yieldPct}
+              </span>
+            )}
+            <span
+              aria-label={`${path.stars} stars`}
+              className="inline-flex items-center gap-1 font-mono text-[11.5px] tabular-nums"
+            >
+              <Star
+                strokeWidth={0}
+                fill="currentColor"
+                className="size-3"
+                aria-hidden
+              />
+              {path.stars.toLocaleString()}
+            </span>
+            <span
+              aria-label={`${path.installs} installs`}
+              className="inline-flex items-center gap-1 font-mono text-[11.5px] tabular-nums"
+            >
+              <Download strokeWidth={1.6} className="size-3" aria-hidden />
+              {path.installs.toLocaleString()}
+            </span>
+          </div>
+          <button
+            type="button"
+            aria-label={`Install ${path.name}`}
+            className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-md bg-primary/15 px-3 text-sm font-medium text-primary transition-colors duration-150 ease-out hover:bg-primary/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+          >
+            <Download
+              strokeWidth={1.75}
+              className="size-3.5 transition-transform duration-150 ease-out group-hover/card:translate-y-0.5"
+              aria-hidden
+            />
+            {costLabel}
+          </button>
+        </div>
       </div>
     </article>
+  );
+}
+
+/* Procedural header — colored tint + faded kind glyph. Avoids managing image
+ * assets per path while still giving each card a recognizable visual. */
+function PathCardHeader({ kind }: { kind: PathKind }) {
+  const tone = KIND_TONES[kind];
+  const Icon = tone.icon;
+  return (
+    <div
+      aria-hidden
+      className={cn(
+        "relative h-24 overflow-hidden border-b border-white/[0.04]",
+        tone.bg,
+      )}
+    >
+      <div
+        className={cn(
+          "absolute inset-0 bg-gradient-to-br to-transparent opacity-80",
+          tone.tint,
+        )}
+      />
+      <Icon
+        strokeWidth={1.25}
+        className={cn(
+          "absolute -bottom-3 -right-2 size-24 opacity-30 transition-transform duration-300 ease-out group-hover/card:scale-[1.06] group-hover/card:rotate-[2deg]",
+          tone.iconClass,
+        )}
+      />
+    </div>
   );
 }
 
