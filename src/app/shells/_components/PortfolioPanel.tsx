@@ -16,8 +16,6 @@ const MOCK_ACCOUNT = {
   balance: 26523.12,
   changeUsd: 201.82,
   changePct: 0.14,
-  buyingPower: 13320.36,
-  optionsBuyingPower: 9283.1,
   sparkline: [
     9.1, 9.5, 9.2, 8.8, 9.4, 10.1, 9.8, 10.4, 10.9, 11.3, 11.0, 11.8, 12.4,
     12.0, 12.6, 13.4, 13.8, 13.2, 14.1, 14.9, 15.4, 15.0, 16.2, 17.1, 17.8,
@@ -86,19 +84,6 @@ export function PortfolioPanel() {
 
         {/* Sparkline */}
         <Sparkline data={MOCK_ACCOUNT.sparkline} up={isUp} />
-
-        {/* Overview */}
-        <div className="flex flex-col gap-2">
-          <SectionLabel label="Overview" />
-          <StatRow
-            label="Buying power"
-            value={hidden ? "••••" : USD.format(MOCK_ACCOUNT.buyingPower)}
-          />
-          <StatRow
-            label="Options buying power"
-            value={hidden ? "••••" : USD.format(MOCK_ACCOUNT.optionsBuyingPower)}
-          />
-        </div>
 
         {/* Positions */}
         <div className="flex flex-col gap-2">
@@ -296,15 +281,6 @@ function Sparkline({ data, up }: { data: number[]; up: boolean }) {
 }
 
 /* ----- Bits ----- */
-
-function StatRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex items-center justify-between gap-3 text-body">
-      <span className="text-muted-foreground">{label}</span>
-      <span className="tabular-nums text-foreground">{value}</span>
-    </div>
-  );
-}
 
 function SmallIconButton({
   children,
