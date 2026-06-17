@@ -1,0 +1,607 @@
+/* Modal / popover surface #252529e6 (translucent) — see :root --card and
+ * --popover. */
+@import "tailwindcss";
+@import "tw-animate-css";
+/* Vendored from `shadcn/dist/tailwind.css` (shadcn CLI package).
+ * Kept local because the package's `style` export condition isn't
+ * resolved by @tailwindcss/vite the same way Next's bundler handles
+ * it. Re-vendor if/when the package is updated. */
+@import "./shadcn-base.css";
+@import "../components/ds/tokens.css";
+
+/* Brand typeface, self-hosted from /public/fonts/. Replaces the
+ * next/font/local block from the old src/app/layout.tsx — same
+ * weights, same display: swap, same fallback ramp. */
+@font-face {
+  font-family: "RestartSoft";
+  src: url("/fonts/RestartSoft-Light.otf") format("opentype");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "RestartSoft";
+  src: url("/fonts/RestartSoft-SemiBold.otf") format("opentype");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Bind the variables the @theme block reads. next/font set these
+ * automatically via class injection on <html>; here we define them
+ * directly. Geist Mono is loaded via @fontsource/geist-mono in
+ * src/main.tsx. */
+:root {
+  --font-heading: "RestartSoft", -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+  --font-geist-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo,
+    Monaco, "Liberation Mono", monospace;
+}
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-heading);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-tone-down: var(--tone-down);
+  /* Dark text used WITH bg-tone-down. The down-tone (#f07575) is
+   * light enough that white-tier foreground reads as orange-on-pink;
+   * pairing with a dark token keeps loss/short pills legible. */
+  --color-tone-down-foreground: var(--tone-down-foreground);
+  --color-signal: var(--signal);
+  /* Disabled body text. Replaces the disabled:opacity-50 stacked on
+   * text-muted-foreground anti-pattern (which computed to ~1.4:1
+   * contrast on bg-background — fails WCAG AA). */
+  --color-text-disabled: var(--text-disabled);
+  /* Surface ramp — promoted from the existing .surface-1/2/3 utility
+   * classes (which work as standalone class but can't compose with
+   * variants like hover:/focus-visible:/data-[…]:). Exposing as
+   * @theme color tokens generates bg-surface-1, hover:bg-surface-1,
+   * focus-visible:bg-surface-2, etc. Replaces the 11-opacity
+   * bg-white/[0.0X] sprawl across shells. */
+  --color-surface-1: rgba(255, 255, 255, 0.04);
+  --color-surface-2: rgba(255, 255, 255, 0.06);
+  --color-surface-3: rgba(255, 255, 255, 0.08);
+  /* surface-4 — added in design-audit Pass 1D for the 45-site
+   * "selected / pressed" cluster (was bg-white/[0.10]). Extends the
+   * ramp's fourth step; .12/.14/.15/.16 outliers round here too. */
+  --color-surface-4: rgba(255, 255, 255, 0.10);
+  /* Drop-shadow scale — added in design-audit Pass 0. Three steps
+   * derived from clusters already in use across shells. */
+  --drop-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.60);
+  --drop-shadow-md: 0 2px 6px rgba(0, 0, 0, 0.55);
+  --drop-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.50);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-brand-mint: var(--brand-mint);
+  --color-brand-navy: var(--brand-navy);
+  --radius-sm: calc(var(--radius) * 0.55);
+  --radius-md: calc(var(--radius) * 0.75);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+:root {
+  /* Wayfinder brand, dark-first palette */
+  --brand-mint: oklch(0.88 0.17 140);
+  --brand-navy: oklch(0.18 0.04 235);
+
+  --background: #101012;
+  --foreground: oklch(0.965 0.005 180);
+
+  /* Elevation hierarchy: card (lightest, "above panel") > muted
+   * (panel) > background (page). Pushing card lighter than muted so
+   * modals / floating cards visibly pop off panels, the standard
+   * dark-UI elevation cue. */
+  /* Modal / dropdown surfaces — slightly translucent so backdrop-blur
+   * on consumers reads as a real frosted glass instead of a solid
+   * panel. ~90% alpha; behind these surfaces is dark page bg so the
+   * transparency is only visible when there's overlapping content. */
+  --card: #252529cc;
+  --card-foreground: oklch(0.965 0.005 180);
+  --popover: #252529cc;
+  --popover-foreground: oklch(0.965 0.005 180);
+
+  --primary: oklch(0.88 0.17 140);
+  --primary-foreground: oklch(0.13 0.012 200);
+
+  --secondary: oklch(0.215 0.014 195);
+  --secondary-foreground: oklch(0.96 0.005 180);
+
+  --muted: oklch(0.2 0.012 195);
+  /* Bumped 0.68 → 0.72 to clear WCAG AA 4.5:1 on text-[11px] over
+   * bg-muted/45 backgrounds, which was right at the threshold. */
+  --muted-foreground: oklch(0.72 0.018 180);
+
+  --accent: oklch(0.235 0.022 180);
+  --accent-foreground: oklch(0.96 0.005 180);
+
+  --destructive: oklch(0.7 0.19 25);
+
+  /* Trading "down" semantic — short side, asks, sells, price-down. Distinct
+   * from --destructive (which is for delete/error UI). Use via the Tailwind
+   * utility text-tone-down / bg-tone-down. */
+  --tone-down: #f07575;
+  /* Foreground color for content sitting on bg-tone-down. Match
+   * --primary-foreground (the existing dark foreground convention)
+   * so all "dark text on accent surface" pairs read as one family. */
+  --tone-down-foreground: oklch(0.13 0.012 200);
+
+  /* Signal accent — soft light blue (sky). Lightness 0.84 keeps it
+   * pale and friendly; chroma 0.09 is intentionally low so the
+   * color stays inside sRGB gamut and renders consistently (high
+   * chroma at 200–230° can clamp into purple-blue in render). Hue
+   * 230° = clear sky blue, well clear of brand mint (140°), red
+   * down-tone (25°), and amber (80°). Used by the card surface,
+   * pile-in button, toast tint, and aurora flash. */
+  --signal: oklch(0.84 0.09 230);
+
+  --border: oklch(1 0 0 / 0.09);
+  --input: oklch(1 0 0 / 0.12);
+  --ring: oklch(0.88 0.17 140 / 0.55);
+  /* Disabled body text. Lightness chosen to clear 4.5:1 against
+   * bg-background and 3:1 against bg-popover, replacing the
+   * disabled:opacity-50-on-muted-text anti-pattern. */
+  --text-disabled: oklch(0.55 0.012 195);
+  --chart-2: oklch(0.72 0.12 175);
+  --chart-3: oklch(0.55 0.12 205);
+  --chart-4: oklch(0.42 0.05 210);
+  --chart-5: oklch(0.28 0.025 205);
+
+  --radius: 0.875rem;
+
+  --sidebar: oklch(0.13 0.012 200);
+  --sidebar-foreground: oklch(0.96 0.005 180);
+  --sidebar-primary: oklch(0.88 0.17 140);
+  --sidebar-primary-foreground: oklch(0.13 0.012 200);
+  --sidebar-accent: oklch(0.22 0.015 195);
+  --sidebar-accent-foreground: oklch(0.96 0.005 180);
+  --sidebar-border: oklch(1 0 0 / 0.09);
+  --sidebar-ring: oklch(0.88 0.17 140 / 0.55);
+}
+
+.dark {
+  /* Site is dark-only; mirror :root so dark: utilities behave consistently */
+  --background: #101012;
+  --foreground: oklch(0.965 0.005 180);
+
+  /* Elevation hierarchy: card (lightest, "above panel") > muted
+   * (panel) > background (page). Pushing card lighter than muted so
+   * modals / floating cards visibly pop off panels, the standard
+   * dark-UI elevation cue. */
+  /* Modal / dropdown surfaces — slightly translucent so backdrop-blur
+   * on consumers reads as a real frosted glass instead of a solid
+   * panel. ~90% alpha; behind these surfaces is dark page bg so the
+   * transparency is only visible when there's overlapping content. */
+  --card: #252529cc;
+  --card-foreground: oklch(0.965 0.005 180);
+  --popover: #252529cc;
+  --popover-foreground: oklch(0.965 0.005 180);
+
+  --primary: oklch(0.88 0.17 140);
+  --primary-foreground: oklch(0.13 0.012 200);
+
+  --secondary: oklch(0.215 0.014 195);
+  --secondary-foreground: oklch(0.96 0.005 180);
+
+  --muted: oklch(0.2 0.012 195);
+  /* Bumped 0.68 → 0.72 to clear WCAG AA 4.5:1 on text-[11px] over
+   * bg-muted/45 backgrounds, which was right at the threshold. */
+  --muted-foreground: oklch(0.72 0.018 180);
+
+  --accent: oklch(0.235 0.022 180);
+  --accent-foreground: oklch(0.96 0.005 180);
+
+  --destructive: oklch(0.7 0.19 25);
+  --tone-down: #f07575;
+  --tone-down-foreground: oklch(0.13 0.012 200);
+  --signal: oklch(0.84 0.09 230);
+
+  --border: oklch(1 0 0 / 0.09);
+  --input: oklch(1 0 0 / 0.12);
+  --ring: oklch(0.88 0.17 140 / 0.55);
+  --text-disabled: oklch(0.55 0.012 195);
+
+  --chart-1: oklch(0.88 0.17 140);
+  --chart-2: oklch(0.72 0.12 175);
+  --chart-3: oklch(0.55 0.12 205);
+  --chart-4: oklch(0.42 0.05 210);
+  --chart-5: oklch(0.28 0.025 205);
+
+  --sidebar: oklch(0.13 0.012 200);
+  --sidebar-foreground: oklch(0.96 0.005 180);
+  --sidebar-primary: oklch(0.88 0.17 140);
+  --sidebar-primary-foreground: oklch(0.13 0.012 200);
+  --sidebar-accent: oklch(0.22 0.015 195);
+  --sidebar-accent-foreground: oklch(0.96 0.005 180);
+  --sidebar-border: oklch(1 0 0 / 0.09);
+  --sidebar-ring: oklch(0.88 0.17 140 / 0.55);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "ss01", "cv11";
+    letter-spacing: -0.005em;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  html {
+    @apply font-sans;
+  }
+  h1, h2, h3, h4 {
+    letter-spacing: -0.02em;
+  }
+
+  /* Baseline keyboard focus indicator. Components that opt out via
+   * `focus-visible:outline-none` are expected to provide their own
+   * visible replacement (ring / bg shift) — this rule guarantees
+   * everything else has SOMETHING. Matches a11y best-practice over
+   * the Tailwind v4 default. */
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  /* Restore `cursor: pointer` on interactive elements. Tailwind v4
+   * dropped the pre-v3 preflight rule and defers to the browser
+   * default (which is `cursor: default` on <button>) — instead of
+   * patching every component, we restore the expected affordance
+   * once here. Disabled controls keep the default arrow cursor (or
+   * `not-allowed` when explicitly set via Tailwind utilities). */
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  [type="button"]:not(:disabled),
+  [type="submit"]:not(:disabled),
+  [type="reset"]:not(:disabled),
+  a[href],
+  label[for],
+  summary,
+  select:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
+/* Shells type scale — 3 semantic tiers, density-controlled.
+ * Hierarchy comes mostly from color (text-foreground vs text-muted-foreground)
+ * and weight (font-medium / font-semibold). Size hierarchy is reserved for
+ * places where browsable card titles or hero numbers genuinely need to lift
+ * out of a dense list. Robinhood Legend pattern, with one exception.
+ *   text-body    — default for ~95% of UI: nav, sections, tables, buttons, inputs
+ *   text-title   — card / item titles in browsable content (paths catalog, etc.)
+ *   text-display — hero numbers only (account balance, etc.)
+ *
+ * If you add a new size utility, register it in the font-size class group in
+ * src/lib/utils.ts so tailwind-merge doesn't strip it on cn() calls.
+ */
+:root {
+  /* Text. text-caption + text-micro cover the sub-body sizes that
+   * were previously hand-rolled as text-[10px] / text-[11px] / etc.
+   * Captions = supporting labels (subtitles, eyebrows). Micro =
+   * dense data context (chip counts, timestamps). */
+  --text-micro: 10px;
+  --text-caption: 12px;
+  --text-body: 14px;
+  --text-title: 17px;
+  --text-display: 28px;
+  /* Interactive chrome — scales with density alongside text */
+  --ui-y: 0.625rem;       /* py-2.5 — tabs */
+  --ui-y-tight: 0.25rem;  /* py-1 — timeframe pills */
+  --ui-x-tight: 0.5rem;   /* px-2 — timeframe pills */
+  --ui-h-pill: 2.25rem;   /* h-9 — wallet/usage pills, action strip */
+  --ui-h-input: 2.75rem;  /* h-11 — compact composer */
+}
+[data-density="small"] {
+  --text-micro: 9px;
+  --text-caption: 11px;
+  --text-body: 13px;
+  --text-title: 15px;
+  --text-display: 24px;
+  --ui-y: 0.4375rem;
+  --ui-y-tight: 0.1875rem;
+  --ui-x-tight: 0.375rem;
+  --ui-h-pill: 1.875rem;
+  --ui-h-input: 2.5rem;
+}
+[data-density="large"] {
+  --text-micro: 11px;
+  --text-caption: 13px;
+  --text-body: 16px;
+  --text-title: 20px;
+  --text-display: 32px;
+  --ui-y: 0.8125rem;
+  --ui-y-tight: 0.3125rem;
+  --ui-x-tight: 0.625rem;
+  --ui-h-pill: 2.5rem;
+  --ui-h-input: 3rem;
+}
+
+@layer utilities {
+  .text-micro { font-size: var(--text-micro); }
+  .text-caption { font-size: var(--text-caption); }
+  .text-body { font-size: var(--text-body); }
+  .text-title { font-size: var(--text-title); line-height: 1.25; }
+  .text-display { font-size: var(--text-display); }
+
+  /* Surface tints — semantic step ramp used for hover bg / row fill.
+   * Use these instead of bg-white/[0.04] / 0.06 / 0.08 ad-hoc values
+   * so the elevation feel stays consistent across panels. */
+  .surface-1 { background-color: rgba(255, 255, 255, 0.04); }
+  .surface-2 { background-color: rgba(255, 255, 255, 0.06); }
+  .surface-3 { background-color: rgba(255, 255, 255, 0.08); }
+  .hover-1:hover { background-color: rgba(255, 255, 255, 0.04); }
+  .hover-2:hover { background-color: rgba(255, 255, 255, 0.06); }
+  .hover-3:hover { background-color: rgba(255, 255, 255, 0.08); }
+
+  .text-balance { text-wrap: balance; }
+  .text-pretty { text-wrap: pretty; }
+  .mask-fade-b {
+    mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
+  }
+
+  /* Consistent, unobtrusive scrollbars for in-panel scroll regions */
+  .scroll-thin {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+  }
+  .scroll-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .scroll-thin::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 999px;
+  }
+  .scroll-thin::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(255, 255, 255, 0.18);
+  }
+  .scroll-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  /* Hide scrollbars entirely while keeping the element scrollable. Used for
+   * horizontal strips (chat circles, trading-card dock) where a bar would
+   * distract from the row of items. */
+  .scroll-none {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .scroll-none::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Custom easing curves. CSS's built-in ease-out is too weak — these strong
+ * variants from Emil Kowalski's design engineering principles give animations
+ * a more intentional feel without changing duration. */
+:root {
+  --ease-strong: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+
+  /* Z-index scale. Use these via `style={{ zIndex: 'var(--z-modal)' }}`
+   * (or hand-coded Tailwind arbitrary values that match) so layering
+   * stays intentional. Old magic numbers (z-[80] / z-[120] / z-[200])
+   * are being migrated to these. */
+  --z-base: 0;
+  --z-aurora: 0;
+  --z-content: 10;
+  --z-side-sheet: 30;
+  --z-cmd: 50;
+  --z-modal-bg: 80;
+  --z-modal: 81;
+  --z-toast: 100;
+  --z-dopamine: 120;
+  --z-cursor-overlay: 200;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-120%) skewX(-18deg);
+  }
+  55%,
+  100% {
+    transform: translateX(520%) skewX(-18deg);
+  }
+}
+
+/* Boot sequence — used by ShellsBoot screen on /shells. Subtle scale breathing
+ * on the brand icon and a sequential dot-loader. */
+@keyframes wayfinder-breathe {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.96;
+  }
+  50% {
+    transform: scale(1.04);
+    opacity: 1;
+  }
+}
+@keyframes wayfinder-boot-dot {
+  0%, 80%, 100% {
+    opacity: 0.25;
+    transform: scale(0.9);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@layer utilities {
+  .animate-breathe {
+    animation: wayfinder-breathe 1.8s ease-in-out infinite;
+  }
+  .animate-boot-dot {
+    animation: wayfinder-boot-dot 1.4s ease-in-out infinite;
+  }
+}
+
+/* Respect the user's motion preference. Disables looping
+ * animations + the shader's continuous drift, plus any element
+ * that has opted-in via the `motion-safe` Tailwind variant. Page-
+ * level transitions (modals, side sheet open) are still allowed
+ * because they communicate state change, not decoration. */
+@media (prefers-reduced-motion: reduce) {
+  .animate-breathe,
+  .animate-boot-dot,
+  .animate-ping,
+  .animate-pulse {
+    animation: none !important;
+  }
+  [data-aurora] {
+    /* AuroraAmbient reads this to short-circuit its rAF loop. */
+    --aurora-paused: 1;
+  }
+}
+
+/* Feature-card art loops — used by the iso scenes in features.tsx */
+@keyframes wf-float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+@keyframes wf-pulse-soft {
+  0%, 100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+@keyframes wf-spark-trail {
+  0% {
+    stroke-dashoffset: 200;
+  }
+  60%, 100% {
+    stroke-dashoffset: 0;
+  }
+}
+@layer utilities {
+  .animate-float-slow {
+    animation: wf-float 4.2s ease-in-out infinite;
+  }
+  .animate-pulse-soft {
+    animation: wf-pulse-soft 2.6s ease-in-out infinite;
+  }
+  .animate-spark-trail {
+    stroke-dasharray: 200;
+    animation: wf-spark-trail 4s ease-out infinite;
+  }
+  /* Sweeping highlight across a button face. Skewed gradient; the parent
+   * must clip overflow. Uses the existing `shimmer` keyframe declared above. */
+  .animate-shimmer {
+    animation: shimmer 3s ease-in-out infinite;
+  }
+}
+
+/* Disable iOS Safari text autosizing. Without this, Safari boosts font-size
+ * in long readable blocks (chat messages, paragraphs) but not in short UI
+ * labels (tabs, buttons), which breaks our type scale on mobile. */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* Stop iOS Safari auto-zooming when an input is focused. Trigger threshold
+ * is font-size < 16px. Forcing 16px on mobile inputs keeps the page from
+ * scaling up when you tap a textarea or search field. !important wins
+ * against Tailwind text-* utilities. Doesn't affect accessibility pinch-
+ * zoom — only auto-zoom-on-focus. */
+@media (max-width: 767px) {
+  input,
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+  /* iOS keys off the input's own font-size to decide whether to auto-zoom on
+   * focus — placeholder font-size doesn't factor in. Letting placeholders use
+   * the density-scaled text-body token keeps them visually matching the
+   * surrounding chrome (model selector, etc.) while typed input stays at 16px
+   * so focus doesn't trigger Safari's zoom. */
+  input::placeholder,
+  textarea::placeholder {
+    font-size: var(--text-body);
+  }
+}
+
+/* While the shells layout is being drag-rearranged, stop iframes
+   (TradingView, etc.) from eating pointer events so the document-level
+   pointermove listener keeps firing as the cursor sweeps over them. */
+body[data-layout-dragging="true"] iframe {
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Top-of-shell marquee — continuous horizontal scroll. The content
+ * track is rendered twice so translating from 0 → -50% loops without
+ * a visible seam. Hovering or focusing within pauses the animation so
+ * the user can read a cell before it scrolls off.
+ *
+ * !important is required to defeat the global `prefers-reduced-motion`
+ * reset above (which snaps animation-duration to 0.01ms on every
+ * element). The marquee is opt-in via the add-panel menu — the user's
+ * toggle is consent for the motion, so we honor their choice over the
+ * OS-level preference here. (Native panels in the app still respect
+ * reduced-motion via the global rule.) */
+@keyframes wf-marquee-scroll {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-50%, 0, 0); }
+}
+.wf-marquee-track {
+  animation: wf-marquee-scroll var(--wf-marquee-duration, 60s) linear infinite !important;
+  animation-iteration-count: infinite !important;
+  will-change: transform;
+}
+.wf-marquee:hover .wf-marquee-track,
+.wf-marquee:focus-within .wf-marquee-track {
+  animation-play-state: paused !important;
+}

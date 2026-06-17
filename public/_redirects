@@ -1,0 +1,5 @@
+# SPA fallback for Cloudflare Pages.
+# Any non-API path that doesn't match a real asset gets index.html
+# so React Router can resolve the route client-side. Pages Functions
+# at /api/* still take precedence — they're served before this rule.
+/*    /index.html   200

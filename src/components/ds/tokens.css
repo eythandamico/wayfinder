@@ -1,0 +1,63 @@
+/**
+ * Wayfinder DS — additive token layer.
+ *
+ * Core color tokens (--background, --foreground, --primary, --card, --border, …)
+ * live in globals.css where Tailwind v4's @theme inline block picks them up.
+ * This file only adds what the marketing surface actually needs on top:
+ *
+ *   • Accent palette for per-card / per-section accents (mint/amber/sky/violet).
+ *   • Shadow scale for cards, floating mockups, and CTA glows.
+ *
+ * Referenced via Tailwind arbitrary values, e.g.
+ *   text-[var(--wf-accent-amber)]
+ *   bg-[var(--wf-accent-sky-soft)]
+ *   shadow-[var(--wf-shadow-mockup)]
+ */
+
+:root {
+  /* Accent palette — on-brand primary + three editorial siblings */
+  --wf-accent-mint: var(--primary);
+  --wf-accent-mint-soft: color-mix(in oklch, var(--primary) 14%, transparent);
+
+  --wf-accent-amber: oklch(0.82 0.14 75);
+  --wf-accent-amber-soft: color-mix(in oklch, oklch(0.82 0.14 75) 12%, transparent);
+
+  --wf-accent-sky: oklch(0.84 0.1 225);
+  --wf-accent-sky-soft: color-mix(in oklch, oklch(0.84 0.1 225) 12%, transparent);
+
+  --wf-accent-violet: oklch(0.78 0.13 295);
+  --wf-accent-violet-soft: color-mix(in oklch, oklch(0.78 0.13 295) 12%, transparent);
+
+  /* Pro mode palette — official Wayfinder Pro gradient
+   * (black → indigo → magenta → gold → magenta → indigo)
+   * Use anywhere the UI references Pro (upgrade CTAs, pro-only badges, etc.) */
+  --wf-pro-black: #000;
+  --wf-pro-indigo: #170046;
+  --wf-pro-magenta: #e53366;
+  --wf-pro-gold: #ffc346;
+  --wf-pro-accent: var(--wf-pro-gold);
+
+  --WayfinderPro-Gradient: radial-gradient(
+    272.38% 136.78% at 0% 104.13%,
+    #000 0%,
+    #170046 8.62%,
+    #e53366 23.62%,
+    #ffc346 39.61%,
+    #e53366 69.95%,
+    #170046 91.8%
+  );
+  --wf-pro-gradient: var(--WayfinderPro-Gradient);
+
+  /* Shadow scale */
+  --wf-shadow-card:
+    0 0 0 1px oklch(1 0 0 / 0.04),
+    0 1px 2px -1px oklch(0 0 0 / 0.4),
+    0 16px 40px -24px oklch(0 0 0 / 0.75);
+  --wf-shadow-mockup:
+    0 24px 56px -24px oklch(0 0 0 / 0.95);
+  --wf-shadow-cta:
+    0 1px 2px oklch(0 0 0 / 0.35),
+    0 8px 20px -8px oklch(0 0 0 / 0.5);
+  --wf-ring-inset: inset 0 0 0 1px oklch(1 0 0 / 0.06);
+  --wf-ring-inset-strong: inset 0 0 0 1px oklch(1 0 0 / 0.1);
+}

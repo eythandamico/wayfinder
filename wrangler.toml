@@ -1,0 +1,12 @@
+# Cloudflare Pages configuration.
+# Build command: npm run build → outputs to dist/
+# Pages Functions auto-discovered from functions/
+name = "wayfinder"
+compatibility_date = "2025-01-01"
+pages_build_output_dir = "dist"
+
+# Env vars / secrets that the api/* functions need.
+# Set real values via `wrangler pages secret put UNSPLASH_ACCESS_KEY`
+# or in the Cloudflare dashboard under Pages → Settings → Environment.
+[vars]
+# Public, non-secret values can go here.
