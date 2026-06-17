@@ -324,24 +324,20 @@ function MainView({
             Diff #3 feedback was "hard to see and the spot is not
             super intuitive"; promoting these out of the 4-up Buy /
             Swap / Send / Receive grid clears that up. */}
+        {/* Deposit and Withdraw are equal-weight account actions — both
+         *  ride the subdued surface so neither flood-fills the row.
+         *  The earlier mint-fill on Withdraw made it the loudest thing
+         *  on the screen (especially on mobile where the pill grows to
+         *  half the viewport) and read as the recommended action,
+         *  which it isn't. */}
         <div className="grid grid-cols-2 gap-1.5 px-4 pt-4">
           <SubduedButton aria-label="Deposit to wallet" className="h-9 px-3">
             Deposit
           </SubduedButton>
-          <button
-            type="button"
-            aria-label="Withdraw from wallet"
-            className="group relative inline-flex h-9 items-center justify-center gap-1.5 overflow-hidden rounded-md bg-primary px-3 text-body font-semibold text-primary-foreground transition-[filter,scale] duration-150 ease-out hover:brightness-[1.04] active:scale-[0.97]"
-          >
-            <span
-              aria-hidden
-              className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-b from-white/40 to-transparent"
-            />
-            <span className="relative inline-flex items-center gap-1.5">
-              <ArrowUpRight strokeWidth={2} className="size-3.5" aria-hidden />
-              Withdraw
-            </span>
-          </button>
+          <SubduedButton aria-label="Withdraw from wallet" className="h-9 px-3 gap-1.5">
+            <ArrowUpRight strokeWidth={2} className="size-3.5" aria-hidden />
+            Withdraw
+          </SubduedButton>
         </div>
 
         {/* Hero balance — value on its own line, change row stacked
