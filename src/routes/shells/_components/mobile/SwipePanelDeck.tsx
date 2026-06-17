@@ -50,8 +50,8 @@ export function SwipePanelDeck({ panels, defaultIndex = 0 }: Props) {
     el.scrollTo({ left: el.clientWidth * defaultIndex, behavior: "instant" });
     setActiveIndex(defaultIndex);
     // Run once per mount — re-centering on prop change would yank
-    // the user mid-swipe.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // the user mid-swipe. defaultIndex is intentionally read once at
+    // mount and not added to the deps list.
   }, []);
 
   // Track which panel is in view by snapping the scrollLeft to a
