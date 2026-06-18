@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { ArrowUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useChatSession } from "../../_state/chat-context";
@@ -13,10 +13,20 @@ import { useChatSession } from "../../_state/chat-context";
 export const MOBILE_AGENT_SUBMIT_EVENT = "wf:agent:submit";
 
 type Props = {
-  /** Fires after a successful submit. Used by MobileLayout to snap
-   *  the swipe deck back to the Chat panel so the user sees the
-   *  agent's reply without an extra swipe. */
+  /** Fires after a successful submit. Today MobileLayout uses this
+   *  to ensure the chat takeover sheet is open so the user sees the
+   *  agent's reply land. */
   onAfterSubmit?: () => void;
+  /** Fires when the user engages with the input (focus OR click).
+   *  MobileLayout uses this to open the chat takeover sheet. Both
+   *  events feed it because a real mobile tap fires focus, but
+   *  programmatic/test clicks may only fire click. */
+  onEngage?: () => void;
+  /** Whether the chat takeover sheet is currently open. When this
+   *  flips from false → true, the composer reclaims focus on the
+   *  next tick because Base UI's Dialog autofocuses its own close
+   *  button on open, stealing focus from this input. */
+  chatOpen?: boolean;
 };
 
 /**
@@ -31,9 +41,27 @@ type Props = {
  * the user can tell the agent is wired up). Power features stay on
  * the Chat panel when the user explicitly swipes to it.
  */
-export function MobileAgentComposer({ onAfterSubmit }: Props) {
+export function MobileAgentComposer({
+  onAfterSubmit,
+  onEngage,
+  chatOpen,
+}: Props) {
   const { input, setInput } = useChatSession();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Reclaim focus after the chat sheet opens. Base UI's Dialog moves
+  // focus to its first focusable child (the close button) on mount,
+  // and that runs asynchronously after the open transition, so a
+  // requestAnimationFrame is too early. A small setTimeout outlasts
+  // Base UI's focus dance and lets us land focus on the textarea so
+  // the user's typing cursor never moves.
+  useEffect(() => {
+    if (!chatOpen) return;
+    const t = window.setTimeout(() => {
+      textareaRef.current?.focus({ preventScroll: true });
+    }, 80);
+    return () => window.clearTimeout(t);
+  }, [chatOpen]);
 
   const submit = () => {
     const v = input.trim();
@@ -78,6 +106,8 @@ export function MobileAgentComposer({ onAfterSubmit }: Props) {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={onKeyDown}
+          onFocus={onEngage}
+          onClick={onEngage}
           rows={1}
           // 64dvh keeps very long drafts from pushing the deck out of
           // view; the textarea grows from one row up to that ceiling.
