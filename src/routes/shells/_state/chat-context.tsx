@@ -3,6 +3,7 @@
 import {
   createContext,
   useContext,
+  useEffect,
   useState,
   type Dispatch,
   type ReactNode,
@@ -14,6 +15,37 @@ import type { TradingCard as TradingCardData } from "../_data/trading-cards";
 import type { Job, Session } from "../_types";
 import type { InterviewState } from "../_lib/interview";
 import type { OpenerChip } from "../_lib/opener";
+
+/* localStorage keys for chat state that needs to outlive a reload.
+ * Without these the morning brief, transcript, and opener-fired
+ * tracking all reset on every refresh and the brief re-streams
+ * front-and-center every visit — confusing once the user has
+ * already read it. Keys are versioned (`-v1`) so we can break the
+ * schema later by bumping. */
+const TRANSCRIPT_KEY = "wf-chat-transcript-v1";
+const BRIEF_DELIVERED_KEY = "wf-chat-brief-delivered-v1";
+const FIRED_OPENER_KEY = "wf-chat-fired-opener-v1";
+
+function readJSON<T>(key: string, fallback: T): T {
+  if (typeof window === "undefined") return fallback;
+  try {
+    const raw = window.localStorage.getItem(key);
+    if (!raw) return fallback;
+    return JSON.parse(raw) as T;
+  } catch {
+    return fallback;
+  }
+}
+
+function writeJSON(key: string, value: unknown): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    /* quota / serialization error — surface as a console.warn during
+     * dev but don't crash the chat. */
+  }
+}
 
 /**
  * Lifted chat-session state.
@@ -97,14 +129,32 @@ export function ChatSessionProvider({ children }: { children: ReactNode }) {
     SAMPLE_SESSIONS[0],
   );
   const [tab, setTab] = useState<"chat" | "paths" | "jobs">("chat");
-  const [transcriptItems, setTranscriptItems] = useState<TranscriptItem[]>([]);
+  // Hydrated from localStorage so a reload doesn't wipe the chat
+  // and re-stream the morning brief. Pure SPA — no SSR, so reading
+  // localStorage in the lazy init is safe (no hydration mismatch).
+  const [transcriptItems, setTranscriptItems] = useState<TranscriptItem[]>(
+    () => readJSON<TranscriptItem[]>(TRANSCRIPT_KEY, []),
+  );
   const [replyChips, setReplyChips] = useState<OpenerChip[] | null>(null);
   const [firedOpenerFor, setFiredOpenerFor] = useState<ReadonlySet<string>>(
-    () => new Set(),
+    () => new Set(readJSON<string[]>(FIRED_OPENER_KEY, [])),
   );
   const [briefDeliveredFor, setBriefDeliveredFor] = useState<
     ReadonlySet<string>
-  >(() => new Set());
+  >(() => new Set(readJSON<string[]>(BRIEF_DELIVERED_KEY, [])));
+
+  // Persist on change. Sets are serialized to arrays since JSON
+  // doesn't natively round-trip Set. Effects are throttled by
+  // React's batching — one write per render cycle.
+  useEffect(() => {
+    writeJSON(TRANSCRIPT_KEY, transcriptItems);
+  }, [transcriptItems]);
+  useEffect(() => {
+    writeJSON(FIRED_OPENER_KEY, Array.from(firedOpenerFor));
+  }, [firedOpenerFor]);
+  useEffect(() => {
+    writeJSON(BRIEF_DELIVERED_KEY, Array.from(briefDeliveredFor));
+  }, [briefDeliveredFor]);
   const [dismissedToastSessions, setDismissedToastSessions] = useState<
     ReadonlySet<string>
   >(() => new Set());

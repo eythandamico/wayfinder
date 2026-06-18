@@ -697,10 +697,13 @@ export function ChatPanel({ embedded = false }: ChatPanelProps = {}) {
                     value={input}
                     onChange={setInput}
                     onSubmit={startThinking}
-                    // One promo at a time — the SMS opt-in toast for
-                    // the morning brief is action-tied and takes
-                    // precedence over the open-ended Pro upsell.
-                    showUpgrade={showUpgrade && !briefToastVisible}
+                    // Upgrade banner stays visible regardless of the
+                    // brief-delivery toast. Both live in the same
+                    // composer chrome but read as separate
+                    // information rows (status promo vs. action
+                    // toast); suppressing one for the other made the
+                    // chrome feel flickery on reload.
+                    showUpgrade={showUpgrade}
                     onDismissUpgrade={dismissUpgrade}
                   />
                 </div>
