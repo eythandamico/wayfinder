@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
+import { cn } from "@/lib/utils";
 import { ActivityPanel } from "../ActivityPanel";
 import { ChartPanel } from "../ChartPanel";
 import { ExplorePathsPanel } from "../ExplorePathsPanel";
@@ -57,30 +58,6 @@ export function MobileLayout() {
   const { open: portfolioOpen, closePortfolio } = usePortfolioSheet();
   const [activeWallet, setActiveWallet] = useState(WALLETS[0]);
   const [chatOpen, setChatOpen] = useState(false);
-
-  // Composer height → CSS variable. The ChatTakeoverSheet reads this
-  // to position its bottom edge just above the composer instead of
-  // covering it. ResizeObserver tracks dynamic changes (keyboard
-  // open, multi-line input growth, safe-area inset shifts).
-  const composerRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const el = composerRef.current;
-    if (!el) return;
-    const apply = () => {
-      const h = el.getBoundingClientRect().height;
-      document.documentElement.style.setProperty(
-        "--mobile-composer-h",
-        `${Math.ceil(h)}px`,
-      );
-    };
-    apply();
-    const ro = new ResizeObserver(apply);
-    ro.observe(el);
-    return () => {
-      ro.disconnect();
-      document.documentElement.style.removeProperty("--mobile-composer-h");
-    };
-  }, []);
 
   // Panel order: read-mostly surfaces, Activity in the middle as
   // default. Order chosen so a single swipe in either direction lands
@@ -145,10 +122,20 @@ export function MobileLayout() {
       <MobileTopBar />
       <SwipePanelDeck panels={panels} defaultIndex={ACTIVITY_PANEL_INDEX} />
 
-      {/* Persistent reduced composer — tapping (focus) or sending
-          opens the chat takeover sheet. Wrapped in a ref'd div so we
-          can observe its height for the sheet's bottom offset. */}
-      <div ref={composerRef} className="relative z-50">
+      {/* Persistent reduced composer — collapsed form of the agent
+          chat input. Tapping it (focus or click) "morphs" into the
+          full ChatPanel composer at the bottom of ChatTakeoverSheet
+          as the sheet rises from the bottom. While the sheet is
+          open this bar fades out and inerts so the full composer
+          inside the sheet is the only interactive input. */}
+      <div
+        aria-hidden={chatOpen}
+        inert={chatOpen}
+        className={cn(
+          "relative z-30 transition-opacity duration-200 ease-out",
+          chatOpen && "pointer-events-none opacity-0",
+        )}
+      >
         <MobileAgentComposer
           chatOpen={chatOpen}
           onEngage={() => setChatOpen(true)}
@@ -156,10 +143,9 @@ export function MobileLayout() {
         />
       </div>
 
-      {/* Chat takeover — slides down from the top, stops at the
-          composer's top edge. The persistent composer stays
-          functional underneath so the user keeps the same input
-          throughout the conversation. */}
+      {/* Chat takeover — slides up from the bottom. Contains the
+          full ChatPanel including its native composer (model picker,
+          attach, voice), which visually replaces the mini bar above. */}
       <ChatTakeoverSheet open={chatOpen} onOpenChange={setChatOpen} />
 
       {/* Portfolio bottom sheet — driven by usePortfolioSheet so the

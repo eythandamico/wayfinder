@@ -11,28 +11,26 @@ type Props = {
 };
 
 /**
- * Full-screen chat takeover for mobile.
+ * Full-takeover agent chat sheet for mobile.
  *
- * The persistent composer at the bottom of MobileLayout is the trigger:
- * focusing or sending from it opens this sheet. The sheet covers the
- * viewport from the safe-area-top down to the composer's top edge, so
- * the composer remains visible and functional underneath — the user
- * can keep typing and the agent reply lands in the chat above.
+ * Sliding behavior: the sheet rises from the bottom of the viewport
+ * — same direction the persistent mini composer sits, so visually it
+ * reads as the input "growing up" into a full chat surface. The
+ * mini composer fades behind the sheet as it rises; on close the
+ * sheet drops back down and the mini composer reappears in place.
  *
- * Why a custom sheet rather than the BottomSheet primitive: this one
- * needs `bottom` to be the composer's top edge (not the screen
- * bottom), and a slightly different chrome (drag handle + Agent title
- * + close ×) without the BottomSheet's interior padding for the
- * composer-less use case.
+ * Composer behavior: inside the sheet we render the full ChatPanel
+ * with its native composer (model picker, chat mode toggle, attach,
+ * voice). That's the "morph" — collapsed = the reduced bar, expanded
+ * = the full desktop-tier composer at the bottom of the sheet.
+ *
+ * Focus management: Base UI's default `initialFocus` and `finalFocus`
+ * are both disabled. The full composer inside ChatPanel auto-focuses
+ * its own textarea via its existing logic; we don't want Base UI
+ * yanking focus to the close × before that happens.
  */
 export function ChatTakeoverSheet({ open, onOpenChange }: Props) {
   return (
-    // `modal={false}` is critical: the persistent composer lives
-    // OUTSIDE this dialog, and a focus trap would yank focus into
-    // the popup the moment the sheet opens — breaking the user's
-    // typing flow. The non-modal mode also lets the composer remain
-    // interactive underneath the sheet without the dialog inerting
-    // it. We still wire Escape to close via onKeyDown below.
     <Dialog.Root open={open} onOpenChange={onOpenChange} modal={false}>
       <Dialog.Portal>
         <Dialog.Backdrop
@@ -43,39 +41,25 @@ export function ChatTakeoverSheet({ open, onOpenChange }: Props) {
           )}
         />
         <Dialog.Popup
-          // Disable Base UI's initial focus management — the
-          // persistent composer that triggers this sheet lives
-          // outside the popup, and Base UI's default behavior of
-          // focusing the first tabbable child (the close ×) would
-          // yank focus away mid-typing. With this off, the keyboard
-          // stays open on the composer and the user types
-          // continuously through the open transition.
           initialFocus={false}
-          // Similarly, don't restore focus to the trigger on close —
-          // the composer never lost focus, so there's nothing to
-          // restore. Avoids an extra re-focus event on dismiss.
           finalFocus={false}
           className={cn(
-            "fixed inset-x-0 top-0 z-40 flex flex-col overflow-hidden rounded-b-2xl bg-muted",
-            "shadow-[0_20px_60px_-20px_rgba(0,0,0,0.65)]",
+            "fixed inset-x-0 bottom-0 z-40 flex flex-col overflow-hidden rounded-t-2xl bg-muted",
+            "shadow-[0_-20px_60px_-20px_rgba(0,0,0,0.65)]",
             "transition-transform duration-300 ease-[var(--ease-drawer)]",
-            "data-[starting-style]:-translate-y-full data-[ending-style]:-translate-y-full",
-            // Reserves the composer's slot at the bottom of the
-            // viewport — the CSS variable is set by MobileLayout via
-            // a ResizeObserver on the composer wrapper.
-            "[bottom:var(--mobile-composer-h,4rem)]",
-            "pt-[env(safe-area-inset-top)]",
+            "data-[starting-style]:translate-y-full data-[ending-style]:translate-y-full",
+            // Leaves a sliver at the top so the user has a visible
+            // backdrop tap target. Respects the iOS notch / dynamic
+            // island via env(safe-area-inset-top).
+            "[height:calc(100dvh-env(safe-area-inset-top)-1.5rem)]",
           )}
         >
-          {/* Drag handle — purely a visual affordance; closing happens
-              via the × button, backdrop tap, or Escape. */}
+          {/* Drag handle — purely visual; close via × button,
+              backdrop tap, or Escape. */}
           <div className="flex shrink-0 items-center justify-center pt-2.5 pb-1.5">
-            <span
-              aria-hidden
-              className="h-1 w-10 rounded-full bg-white/15"
-            />
+            <span aria-hidden className="h-1 w-10 rounded-full bg-white/15" />
           </div>
-          <div className="flex shrink-0 items-center justify-between gap-2 px-4 pb-2">
+          <div className="flex shrink-0 items-center justify-between gap-2 px-4 pb-1">
             <Dialog.Title className="text-body font-semibold text-foreground">
               Agent
             </Dialog.Title>
@@ -87,13 +71,13 @@ export function ChatTakeoverSheet({ open, onOpenChange }: Props) {
             </Dialog.Close>
           </div>
           <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
-            {/* embedded: ChatPanel's local composer is suppressed —
-                the global persistent composer in MobileLayout (which
-                still sits below this sheet, visible and functional)
-                owns the send affordance. Submitting from there
-                continues to route through the wf:agent:submit event
-                ChatPanel listens for. */}
-            <ChatPanel embedded />
+            {/* Full ChatPanel — composer included. This is the
+                "morphed" form of the mini composer below: collapsed
+                state shows the reduced bar at the screen bottom;
+                expanded state is the full desktop-tier composer
+                pinned to the bottom of this sheet with chat history
+                above it. */}
+            <ChatPanel />
           </div>
         </Dialog.Popup>
       </Dialog.Portal>
