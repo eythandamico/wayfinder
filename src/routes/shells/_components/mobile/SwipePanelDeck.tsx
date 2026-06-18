@@ -37,6 +37,10 @@ type Props = {
   /** Default panel index when first rendered. Subsequent renders
    *  preserve scroll position; this only sets the initial. */
   defaultIndex?: number;
+  /** When provided, the indicator strip renders a 4-grid icon on the
+   *  right that calls this to open the panel manager. Omit it and
+   *  the icon disappears. */
+  onManagePanels?: () => void;
 };
 
 /**
@@ -49,7 +53,7 @@ type Props = {
  * this component fills whatever vertical space it's given.
  */
 export const SwipePanelDeck = forwardRef<SwipePanelDeckHandle, Props>(
-function SwipePanelDeck({ panels, defaultIndex = 0 }, ref) {
+function SwipePanelDeck({ panels, defaultIndex = 0, onManagePanels }, ref) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(defaultIndex);
 
@@ -110,6 +114,7 @@ function SwipePanelDeck({ panels, defaultIndex = 0 }, ref) {
         activeIndex={activeIndex}
         activeLabel={active?.label ?? ""}
         onJump={goTo}
+        onManagePanels={onManagePanels}
       />
       <div
         ref={scrollRef}
@@ -146,11 +151,13 @@ function PanelIndicator({
   activeIndex,
   activeLabel,
   onJump,
+  onManagePanels,
 }: {
   panels: SwipePanel[];
   activeIndex: number;
   activeLabel: string;
   onJump: (i: number) => void;
+  onManagePanels?: () => void;
 }) {
   // Three-column grid: title (left, takes share of the row), dots
   // (auto-width, centered between title and grid menu), and the
@@ -194,11 +201,13 @@ function PanelIndicator({
         })}
       </div>
       <div className="justify-self-end">
-        <PanelGridMenu
-          panels={panels}
-          activeIndex={activeIndex}
-          onJump={onJump}
-        />
+        {onManagePanels ? (
+          <PanelGridMenu onOpen={onManagePanels} />
+        ) : (
+          /* Keep the slot's width so the dots remain centered even
+           *  when the trigger is omitted. size-9 matches the button. */
+          <span aria-hidden className="block size-9" />
+        )}
       </div>
     </div>
   );

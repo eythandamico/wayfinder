@@ -1,24 +1,71 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
-import { ActivityPanel } from "../ActivityPanel";
-import { ChartPanel } from "../ChartPanel";
-import { ExplorePathsPanel } from "../ExplorePathsPanel";
-import { PortfolioMainView } from "../PortfolioSheet";
-import { WatchlistPanel } from "../WatchlistPanel";
+import { PANEL_REGISTRY } from "../../_layout/registry";
+import type { PanelInstance, PanelType } from "../../_layout/types";
 import { WALLETS } from "../../_data/mocks";
 import { usePortfolioSheet } from "../../_state/shells-context";
 import { BottomSheet } from "./BottomSheet";
 import { ChatTakeoverSheet } from "./ChatTakeoverSheet";
+import { MobileAddPanelPicker } from "./MobileAddPanelPicker";
 import { MobileAgentComposer } from "./MobileAgentComposer";
+import { MobilePanelDeckSheet } from "./MobilePanelDeckSheet";
 import { MobileTopBar } from "./MobileTopBar";
+import { PortfolioMainView } from "../PortfolioSheet";
 import { SwipePanelDeck, type SwipePanel } from "./SwipePanelDeck";
 
-/** Index of the Activity panel — chosen as the default landing so the
- *  user opens the app to "what did I miss" content (signals + agent
- *  updates) rather than a static portfolio snapshot. */
-const ACTIVITY_PANEL_INDEX = 1;
+/** localStorage key for the user's curated mobile swipe deck. The
+ *  shape is a list of {id, type} instance descriptors. Versioned so
+ *  the schema can break later. */
+const PANELS_KEY = "wf-mobile-panels-v1";
+
+/** Default deck — chosen to mirror the most-glanced-at desktop
+ *  panels and to give Activity the center slot so it's the user's
+ *  landing surface. The user can curate from here via the panel
+ *  manager sheet. */
+const DEFAULT_PANELS: PanelInstance[] = [
+  { id: "p-portfolio", type: "portfolio" },
+  { id: "p-activity", type: "activity" },
+  { id: "p-watchlist", type: "watchlist" },
+  { id: "p-chart", type: "chart" },
+  { id: "p-orderbook", type: "orderbook" },
+];
+
+/** Default landing index = Activity (signals + agent updates is what
+ *  the user typically wants on app open). */
+const DEFAULT_LANDING_INDEX = 1;
+
+function readPanels(): PanelInstance[] {
+  if (typeof window === "undefined") return DEFAULT_PANELS;
+  try {
+    const raw = window.localStorage.getItem(PANELS_KEY);
+    if (!raw) return DEFAULT_PANELS;
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed) || parsed.length === 0) return DEFAULT_PANELS;
+    // Defensive filter: drop entries whose type the registry no
+    // longer knows about (e.g. the user's stored panel was renamed
+    // or removed). Avoids the deck silently rendering blank slots.
+    return parsed.filter(
+      (p): p is PanelInstance =>
+        p &&
+        typeof p.id === "string" &&
+        typeof p.type === "string" &&
+        Boolean(PANEL_REGISTRY[p.type as PanelType]),
+    );
+  } catch {
+    return DEFAULT_PANELS;
+  }
+}
+
+function writePanels(panels: PanelInstance[]): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(PANELS_KEY, JSON.stringify(panels));
+  } catch {
+    /* quota / serialization — fall through silently */
+  }
+}
 
 /**
  * Mobile shell — agent-first.
@@ -26,108 +73,97 @@ const ACTIVITY_PANEL_INDEX = 1;
  * Layout:
  *   ┌──────────────────────────────┐
  *   │ thin top bar                 │
- *   │ panel indicator + label      │
+ *   │ Title  •●•••  [grid icon]    │ ← indicator strip + panel manager
  *   │                              │
- *   │ swipeable panel deck         │  ← Portfolio · Activity (default)
- *   │                              │    · Watchlist · Markets · Paths
+ *   │ swipeable panel deck         │ ← user-curated panel list,
+ *   │                              │   persisted to localStorage
  *   │                              │
  *   ├──────────────────────────────┤
- *   │ persistent composer          │  ← always visible
- *   └──────────────────────────────┘
+ *   │ persistent composer          │ ← tap or send to morph into the
+ *   └──────────────────────────────┘   full chat takeover sheet
  *
- * Tapping (focusing) or sending from the composer opens the
- * ChatTakeoverSheet — a near-full-screen sheet that slides down from
- * the safe-area-top to the composer's top edge. The composer stays
- * functional underneath the sheet so a continued conversation feels
- * uninterrupted.
- *
- * Chat is intentionally NOT one of the deck panels. The deck holds
- * read-mostly surfaces; the agent conversation gets its own dedicated
- * sheet so it can take over the screen when the user wants to engage.
- *
- * Deliberately removed from the previous mobile layout:
- *   - Market-pill row (BTC ticker with prev/next chevrons) — agent
- *     surfaces tickers contextually inside chat messages.
- *   - BottomBar with parallel Trade/composer/actions — replaced by
- *     the persistent composer + chat takeover model.
- *   - The Trade ticket bottom sheet (the loud mint-fill one) — trade
- *     entry flows through signal-card pile-in, agent intents, or a
- *     desktop session.
+ * The grid icon at the right of the indicator strip opens a
+ * full-page sheet that shows the current deck as PanelThumbnail
+ * tiles, plus a dashed "+" tile that opens a second sheet (the
+ * panel registry catalog) for adding new panels to the deck.
  */
 export function MobileLayout() {
   const { open: portfolioOpen, closePortfolio } = usePortfolioSheet();
   const [activeWallet, setActiveWallet] = useState(WALLETS[0]);
   const [chatOpen, setChatOpen] = useState(false);
 
-  // Panel order: read-mostly surfaces, Activity in the middle as
-  // default. Order chosen so a single swipe in either direction lands
-  // on the most-glanced-at neighbor.
-  const panels: SwipePanel[] = [
-    {
-      id: "portfolio",
-      label: "Portfolio",
-      render: () => (
-        <PanelFrame>
-          <PortfolioMainView
-            onOpenSettings={() => {
-              /* settings drill-in is a follow-up; the hide-balances
-                 toggle and density picker land in that view */
-            }}
-            activeWallet={activeWallet}
-            setActiveWallet={setActiveWallet}
-          />
-        </PanelFrame>
-      ),
-    },
-    {
-      id: "activity",
-      label: "Activity",
-      render: () => (
-        <PanelFrame>
-          <ActivityPanel />
-        </PanelFrame>
-      ),
-    },
-    {
-      id: "watchlist",
-      label: "Watchlist",
-      render: () => (
-        <PanelFrame>
-          <WatchlistPanel panel={{ id: "mobile-watchlist", type: "watchlist" }} />
-        </PanelFrame>
-      ),
-    },
-    {
-      id: "markets",
-      label: "Markets",
-      render: () => (
-        <PanelFrame>
-          <ChartPanel tfPosition="below" />
-        </PanelFrame>
-      ),
-    },
-    {
-      id: "paths",
-      label: "Paths",
-      render: () => (
-        <PanelFrame>
-          <ExplorePathsPanel />
-        </PanelFrame>
-      ),
-    },
-  ];
+  // User-curated deck. Hydrated from localStorage on first render
+  // (pure SPA — no SSR mismatch risk). Writes back every change.
+  const [panelInstances, setPanelInstances] = useState<PanelInstance[]>(() =>
+    readPanels(),
+  );
+  useEffect(() => {
+    writePanels(panelInstances);
+  }, [panelInstances]);
+
+  // Panel manager sheet stack:
+  //   deckSheetOpen   = "Your panels" — current deck as tiles
+  //   pickerOpen      = "Add panel"   — registry catalog
+  // Stacking: picker mounts on top of deckSheet (deckSheet stays
+  // mounted underneath). Picking a panel closes both.
+  const [deckSheetOpen, setDeckSheetOpen] = useState(false);
+  const [pickerOpen, setPickerOpen] = useState(false);
+
+  const addPanel = (type: PanelType) => {
+    setPanelInstances((prev) => [
+      ...prev,
+      { id: `p-${type}-${prev.length + 1}`, type },
+    ]);
+  };
+
+  // Map each persisted PanelInstance to a SwipePanel by looking the
+  // Component up in the registry. Registry types whose Component
+  // requires layout-tree props get a minimal panel arg so they
+  // render correctly outside the desktop LayoutRenderer.
+  const swipePanels: SwipePanel[] = useMemo(() => {
+    return panelInstances
+      .map((instance): SwipePanel | null => {
+        const descriptor = PANEL_REGISTRY[instance.type];
+        if (!descriptor) return null;
+        const { label, Component } = descriptor;
+        return {
+          id: instance.id,
+          label,
+          render: () => (
+            <PanelFrame>
+              <Component panel={instance} />
+            </PanelFrame>
+          ),
+        };
+      })
+      .filter((p): p is SwipePanel => p !== null);
+  }, [panelInstances]);
+
+  const presentTypes = useMemo(
+    () => new Set(panelInstances.map((p) => p.type)),
+    [panelInstances],
+  );
+
+  // If the deck has fewer panels than DEFAULT_LANDING_INDEX (e.g.
+  // user nuked their deck down to one panel), land on whatever
+  // panel index 0 maps to instead.
+  const landingIndex = Math.min(
+    DEFAULT_LANDING_INDEX,
+    Math.max(0, swipePanels.length - 1),
+  );
 
   return (
     <div className="flex h-dvh flex-col overflow-hidden bg-background">
       <MobileTopBar />
-      <SwipePanelDeck panels={panels} defaultIndex={ACTIVITY_PANEL_INDEX} />
+      <SwipePanelDeck
+        panels={swipePanels}
+        defaultIndex={landingIndex}
+        onManagePanels={() => setDeckSheetOpen(true)}
+      />
 
-      {/* Persistent reduced composer — collapsed form of the agent
-          chat input. Tapping it (focus or click) "morphs" into the
-          full ChatPanel composer at the bottom of ChatTakeoverSheet
-          as the sheet rises from the bottom. While the sheet is
-          open this bar fades out and inerts so the full composer
-          inside the sheet is the only interactive input. */}
+      {/* Persistent reduced composer — tapping (focus or click) or
+       *  sending morphs into the full ChatPanel composer inside
+       *  ChatTakeoverSheet as the sheet rises from the bottom. */}
       <div
         aria-hidden={chatOpen}
         inert={chatOpen}
@@ -143,14 +179,34 @@ export function MobileLayout() {
         />
       </div>
 
-      {/* Chat takeover — slides up from the bottom. Contains the
-          full ChatPanel including its native composer (model picker,
-          attach, voice), which visually replaces the mini bar above. */}
       <ChatTakeoverSheet open={chatOpen} onOpenChange={setChatOpen} />
 
-      {/* Portfolio bottom sheet — driven by usePortfolioSheet so the
-          wallet avatar in the top bar can pop the rich drill-in even
-          when the user isn't on the Portfolio panel. */}
+      {/* Panel manager — current deck + Add tile. We compute the
+       *  active index naively as the landing index; in practice the
+       *  sheet is informational + add-only, so the active marker is
+       *  just a visual hint. */}
+      <MobilePanelDeckSheet
+        open={deckSheetOpen}
+        onOpenChange={setDeckSheetOpen}
+        panels={panelInstances}
+        activeIndex={landingIndex}
+        onJump={() => setDeckSheetOpen(false)}
+        onAddTile={() => setPickerOpen(true)}
+      />
+
+      <MobileAddPanelPicker
+        open={pickerOpen}
+        onOpenChange={setPickerOpen}
+        presentTypes={presentTypes}
+        onPick={(type) => {
+          addPanel(type);
+          setPickerOpen(false);
+          setDeckSheetOpen(false);
+        }}
+      />
+
+      {/* Portfolio bottom sheet — wallet avatar in the top bar pops
+       *  this drill-in regardless of which panel is active. */}
       <BottomSheet
         open={portfolioOpen}
         onOpenChange={(o) => !o && closePortfolio()}
@@ -159,7 +215,7 @@ export function MobileLayout() {
         <div className="flex h-full flex-col">
           <PortfolioMainView
             onOpenSettings={() => {
-              /* see note above — settings is a Phase 2 surface */
+              /* settings drill-in is a follow-up surface */
             }}
             activeWallet={activeWallet}
             setActiveWallet={setActiveWallet}
