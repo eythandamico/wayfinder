@@ -10,6 +10,7 @@ import {
   useState,
 } from "react";
 import { cn } from "@/lib/utils";
+import { PanelGridMenu } from "./PanelGridMenu";
 
 /** Imperative handle exposed to parents who need to drive the deck
  *  programmatically — e.g. the mobile sticky composer snapping back
@@ -114,9 +115,11 @@ function SwipePanelDeck({ panels, defaultIndex = 0 }, ref) {
         ref={scrollRef}
         onScroll={onScroll}
         className={cn(
-          "scroll-thin flex min-h-0 flex-1 snap-x snap-mandatory overflow-x-auto overflow-y-hidden overscroll-x-contain",
-          // Hide native scrollbar; the indicator above is the affordance.
-          "[scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
+          "flex min-h-0 flex-1 snap-x snap-mandatory overflow-x-auto overflow-y-hidden overscroll-x-contain",
+          // Hide native scrollbar — the indicator above is the
+          // affordance. Don't combine with `scroll-thin` since that
+          // sets scrollbar-width: thin and would override these.
+          "[scrollbar-width:none] [&::-webkit-scrollbar]:hidden [&::-webkit-scrollbar]:size-0",
         )}
         // Block vertical browser overscroll bounce on iOS while the
         // user swipes horizontally — fewer accidental pull-to-refresh
@@ -149,12 +152,17 @@ function PanelIndicator({
   activeLabel: string;
   onJump: (i: number) => void;
 }) {
+  // Three-column grid: title (left, takes share of the row), dots
+  // (auto-width, centered between title and grid menu), and the
+  // all-panels grid menu (right, takes equal share to balance the
+  // title column visually). `minmax(0,1fr)` on the title slot lets
+  // long labels truncate without pushing the dots off-center.
   return (
-    <div className="flex shrink-0 items-center justify-between gap-2 px-4 py-2">
-      <span className="text-caption font-medium uppercase tracking-[0.16em] text-foreground">
+    <div className="grid shrink-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3 px-4 pt-1 pb-2">
+      <h2 className="truncate text-lg font-semibold leading-none text-foreground">
         {activeLabel}
-      </span>
-      <div className="flex items-center gap-1.5" role="tablist">
+      </h2>
+      <div className="flex items-center justify-self-center gap-1.5" role="tablist">
         {panels.map((p, i) => {
           const isActive = i === activeIndex;
           return (
@@ -167,6 +175,8 @@ function PanelIndicator({
               onClick={() => onJump(i)}
               className={cn(
                 "relative flex items-center justify-center transition-[width,background-color] duration-200 ease-out",
+                // Larger invisible tap target so the dots stay easy
+                // to hit even though the visible mark is tiny.
                 "before:absolute before:-inset-2 before:content-['']",
                 isActive
                   ? "h-1.5 w-6 rounded-full bg-primary"
@@ -182,6 +192,13 @@ function PanelIndicator({
             </button>
           );
         })}
+      </div>
+      <div className="justify-self-end">
+        <PanelGridMenu
+          panels={panels}
+          activeIndex={activeIndex}
+          onJump={onJump}
+        />
       </div>
     </div>
   );

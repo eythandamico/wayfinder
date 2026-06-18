@@ -352,6 +352,26 @@
   --ui-h-input: 3rem;
 }
 
+/* Mobile floor — body text below 16px triggers iOS Safari's
+ * auto-zoom on input focus and falls below the readability floor
+ * for thumb-distance reading. Override the density tokens that
+ * affect primary copy + interactive text. Caption and micro stay
+ * smaller so badges, timestamps, and dense metadata keep their
+ * visual hierarchy. Selectors match the density rules' specificity
+ * (one attribute) and source-order-later so they win the cascade
+ * over the default `:root` block AND any [data-density="..."] the
+ * user has chosen. */
+@media (max-width: 767px) {
+  :where(:root),
+  :where([data-density="small"]),
+  :where([data-density="medium"]),
+  :where([data-density="large"]) {
+    --text-body: 16px;
+    --text-caption: 14px;
+    --text-title: 20px;
+  }
+}
+
 @layer utilities {
   .text-micro { font-size: var(--text-micro); }
   .text-caption { font-size: var(--text-caption); }
