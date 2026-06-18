@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { ActivityPanel } from "../ActivityPanel";
 import { ChartPanel } from "../ChartPanel";
 import { ChatPanel } from "../ChatPanel";
@@ -10,8 +10,18 @@ import { WatchlistPanel } from "../WatchlistPanel";
 import { WALLETS } from "../../_data/mocks";
 import { usePortfolioSheet } from "../../_state/shells-context";
 import { BottomSheet } from "./BottomSheet";
+import { MobileAgentComposer } from "./MobileAgentComposer";
 import { MobileTopBar } from "./MobileTopBar";
-import { SwipePanelDeck, type SwipePanel } from "./SwipePanelDeck";
+import {
+  SwipePanelDeck,
+  type SwipePanel,
+  type SwipePanelDeckHandle,
+} from "./SwipePanelDeck";
+
+/** Index of the Chat panel inside the deck. Kept as a constant so
+ *  the composer's snap-back-on-send logic stays in sync with the
+ *  panel order defined below. */
+const CHAT_PANEL_INDEX = 2;
 
 /**
  * Mobile shell — agent-first.
@@ -40,6 +50,7 @@ import { SwipePanelDeck, type SwipePanel } from "./SwipePanelDeck";
 export function MobileLayout() {
   const { open: portfolioOpen, closePortfolio } = usePortfolioSheet();
   const [activeWallet, setActiveWallet] = useState(WALLETS[0]);
+  const deckRef = useRef<SwipePanelDeckHandle>(null);
 
   // Panel order: chat sits in the middle (default landing index 2),
   // with the most-glanced-at surfaces immediately adjacent so a
@@ -75,7 +86,11 @@ export function MobileLayout() {
       label: "Agent",
       render: () => (
         <PanelFrame>
-          <ChatPanel />
+          {/* embedded: the chat's local composer is hidden — the
+              global MobileAgentComposer mounted below owns the send
+              affordance across every panel. ChatPanel still listens
+              for `wf:agent:submit` events the composer dispatches. */}
+          <ChatPanel embedded />
         </PanelFrame>
       ),
     },
@@ -111,7 +126,19 @@ export function MobileLayout() {
   return (
     <div className="flex h-dvh flex-col overflow-hidden bg-background">
       <MobileTopBar />
-      <SwipePanelDeck panels={panels} defaultIndex={2} />
+      <SwipePanelDeck
+        ref={deckRef}
+        panels={panels}
+        defaultIndex={CHAT_PANEL_INDEX}
+      />
+
+      {/* Persistent reduced composer — focal action of the mobile
+          surface, always at the bottom regardless of which panel the
+          user is currently swiped to. Snaps the deck back to Chat on
+          send so the agent's reply lands in view. */}
+      <MobileAgentComposer
+        onAfterSubmit={() => deckRef.current?.goTo(CHAT_PANEL_INDEX)}
+      />
 
       {/* Portfolio bottom sheet — driven by usePortfolioSheet so the
           wallet avatar in the top bar can pop the rich drill-in even

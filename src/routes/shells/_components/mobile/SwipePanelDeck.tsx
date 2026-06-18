@@ -1,13 +1,22 @@
 "use client";
 
 import {
+  forwardRef,
   ReactNode,
   useCallback,
   useEffect,
+  useImperativeHandle,
   useRef,
   useState,
 } from "react";
 import { cn } from "@/lib/utils";
+
+/** Imperative handle exposed to parents who need to drive the deck
+ *  programmatically — e.g. the mobile sticky composer snapping back
+ *  to the Chat panel after a send. */
+export type SwipePanelDeckHandle = {
+  goTo: (index: number) => void;
+};
 
 export type SwipePanel = {
   /** Stable id used as React key and aria description. */
@@ -38,9 +47,28 @@ type Props = {
  * Renders inside its parent's flex column. Caller owns the height —
  * this component fills whatever vertical space it's given.
  */
-export function SwipePanelDeck({ panels, defaultIndex = 0 }: Props) {
+export const SwipePanelDeck = forwardRef<SwipePanelDeckHandle, Props>(
+function SwipePanelDeck({ panels, defaultIndex = 0 }, ref) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(defaultIndex);
+
+  // Expose imperative `goTo` so parents can snap to a panel without
+  // owning the scroll container themselves. Used by the mobile
+  // composer to scroll back to Chat after a send.
+  useImperativeHandle(
+    ref,
+    () => ({
+      goTo: (index: number) => {
+        const el = scrollRef.current;
+        if (!el) return;
+        el.scrollTo({
+          left: el.clientWidth * index,
+          behavior: "smooth",
+        });
+      },
+    }),
+    [],
+  );
 
   // Center on the default panel before paint. Subsequent panel
   // changes are user-driven so we don't re-center on every render.
@@ -108,7 +136,7 @@ export function SwipePanelDeck({ panels, defaultIndex = 0 }: Props) {
       </div>
     </div>
   );
-}
+});
 
 function PanelIndicator({
   panels,

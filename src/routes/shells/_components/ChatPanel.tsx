@@ -82,7 +82,20 @@ import {
   MicRecordingIcon,
 } from "./icons";
 
-export function ChatPanel() {
+/** Custom event name the mobile composer dispatches when the user
+ *  hits send. Kept in sync with `MobileAgentComposer.MOBILE_AGENT_SUBMIT_EVENT`. */
+const MOBILE_AGENT_SUBMIT_EVENT = "wf:agent:submit";
+
+type ChatPanelProps = {
+  /** When true, the local composer is hidden because something
+   *  outside this component (today: the mobile sticky composer in
+   *  MobileLayout) owns the send affordance. We still listen for
+   *  `wf:agent:submit` events so the external composer can route
+   *  user input through this panel's existing pipeline. */
+  embedded?: boolean;
+};
+
+export function ChatPanel({ embedded = false }: ChatPanelProps = {}) {
   // Persistent chat state — lifted into a context that mounts above
   // the layout tree so panel moves don't wipe it. ChatPanel itself is
   // unmount-prone (any structural layout change reshapes its React
@@ -411,6 +424,22 @@ export function ChatPanel() {
     runAgentReply(reply, 520);
   };
 
+  // Receive submits from external composers (today: the mobile sticky
+  // composer in MobileLayout). The event payload is the user's draft
+  // string — same shape the local ChatComposer passes via onSubmit.
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent<string>).detail;
+      if (typeof detail === "string" && detail.trim()) {
+        startThinking(detail);
+      }
+    };
+    window.addEventListener(MOBILE_AGENT_SUBMIT_EVENT, handler);
+    return () => window.removeEventListener(MOBILE_AGENT_SUBMIT_EVENT, handler);
+    // startThinking is recreated each render; we re-bind to capture
+    // the latest closure (fresh refs to setTranscriptItems, etc.).
+  });
+
   /**
    * Chip tap router. Default flow goes through the regular user-send
    * path. The interview flows append the chip's submit string as a
@@ -630,7 +659,11 @@ export function ChatPanel() {
                   <OpenerChipRow chips={replyChips} onSelect={handleChipTap} />
                 )}
               </div>
-              <div className="relative z-[1] px-3 pb-3">
+              {/* Composer block — suppressed in embedded mode (mobile,
+                  where MobileLayout owns a global sticky composer).
+                  The brief-delivery SMS toast moves up into the panel
+                  body in embedded mode so the user still sees it. */}
+              <div className={cn("relative z-[1] px-3 pb-3", embedded && "hidden")}>
                 <div className="relative">
                   {/* In-context toast — floats above the composer
                       when a job has run something worth acting on.
