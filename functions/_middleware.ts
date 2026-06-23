@@ -32,6 +32,16 @@ export const onRequest: PagesFunction<Env> = async (context) => {
   if (/\.[a-z0-9]{2,5}$/i.test(url.pathname)) return response;
 
   // SPA route — serve the shell so React Router can handle it.
+  // Force fresh: prior Next.js deploys cached the shell with long
+  // max-age and browsers + Cloudflare's edge can keep serving the
+  // old HTML otherwise. no-store ensures every request re-fetches.
   const indexUrl = new URL("/index.html", url);
-  return env.ASSETS.fetch(indexUrl);
+  const shellResponse = await env.ASSETS.fetch(indexUrl);
+  const headers = new Headers(shellResponse.headers);
+  headers.set("Cache-Control", "no-store, no-cache, must-revalidate");
+  return new Response(shellResponse.body, {
+    status: shellResponse.status,
+    statusText: shellResponse.statusText,
+    headers,
+  });
 };

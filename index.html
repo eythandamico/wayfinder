@@ -27,6 +27,24 @@
   </head>
   <body class="min-h-full flex flex-col bg-background text-foreground font-sans">
     <div id="root"></div>
+    <!--
+      Kill stale Service Workers from the previous Next.js deploy.
+      next-on-pages registers a SW that intercepts every request and
+      can keep serving cached old pages even after the deploy moves
+      to Vite. This unregisters any SW + clears its caches on next
+      page load. Harmless if no SW exists. Safe to remove ~30 days
+      after the cutover when no clients have stale SWs left.
+    -->
+    <script>
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.getRegistrations().then((regs) => {
+          for (const r of regs) r.unregister();
+        });
+        if (window.caches) {
+          caches.keys().then((keys) => keys.forEach((k) => caches.delete(k)));
+        }
+      }
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
