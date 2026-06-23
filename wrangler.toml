@@ -3,6 +3,11 @@
 # Pages Functions auto-discovered from functions/
 name = "wayfinder"
 compatibility_date = "2025-01-01"
+# nodejs_compat: polyfills `node:stream`, `node:crypto`, etc. Some
+# third-party deps pulled in by the functions/ Workers import these
+# directly; without the flag the deploy fails at the Function-
+# publish step with "No such module 'node:stream'".
+compatibility_flags = ["nodejs_compat"]
 pages_build_output_dir = "dist"
 
 # Env vars / secrets that the api/* functions need.
