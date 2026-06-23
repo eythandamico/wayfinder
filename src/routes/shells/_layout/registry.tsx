@@ -18,7 +18,6 @@ import {
   ShoppingBag,
   TrendingUp,
   Tv,
-  Users,
   Vote,
   Wallet,
   type LucideIcon,
@@ -32,7 +31,6 @@ import {
 import { ChatPanel } from "../_components/ChatPanel";
 import { ConcertsPanel } from "../_components/ConcertsPanel";
 import { CustomChartPanel } from "../_components/CustomChartPanel";
-import { FriendsPanel } from "../_components/FriendsPanel";
 import { GolfPanel } from "../_components/GolfPanel";
 import { MarketplacePanel } from "../_components/MarketplacePanel";
 import { MediaPanel } from "../_components/MediaPanel";
@@ -221,14 +219,6 @@ export const PANEL_REGISTRY: Record<PanelType, PanelDescriptor> = {
     category: "social",
     pro: true,
   },
-  friends: {
-    type: "friends",
-    label: "Friends",
-    Icon: Users,
-    Component: FriendsPanel,
-    category: "social",
-  },
-
   // ─── Extras ──────────────────────────────────────────────────────
   calendar: {
     type: "calendar",

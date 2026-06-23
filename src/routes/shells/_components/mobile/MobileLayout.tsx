@@ -214,9 +214,6 @@ export function MobileLayout() {
       >
         <div className="flex h-full flex-col">
           <PortfolioMainView
-            onOpenSettings={() => {
-              /* settings drill-in is a follow-up surface */
-            }}
             activeWallet={activeWallet}
             setActiveWallet={setActiveWallet}
           />

@@ -16,12 +16,19 @@ import { DemoOverlay } from "./_components/DemoOverlay";
 import { DevTools } from "./_components/DevTools";
 import { DopamineLayer } from "./_components/DopamineLayer";
 import { ExplorePathsPanel } from "./_components/ExplorePathsPanel";
+import { SettingsPage } from "./_components/SettingsPage";
 import { MarketHeader } from "./_components/MarketHeader";
 import { Marquee } from "./_components/Marquee";
 import {
   PortfolioSheet,
   PORTFOLIO_SHEET_WIDTH,
 } from "./_components/PortfolioSheet";
+import {
+  FriendsSheet,
+  FRIENDS_SHEET_WIDTH,
+} from "./_components/FriendsSheet";
+import { LeftRail } from "./_components/LeftRail";
+import { RightRail } from "./_components/RightRail";
 import { AgentProofOfLife } from "./_components/AgentProofOfLife";
 import { PhoneNumberModal } from "./_components/PhoneNumberModal";
 import { ShellsBoot } from "./_components/ShellsBoot";
@@ -44,6 +51,7 @@ import {
 import type { LayoutAction, LayoutNode } from "./_layout/types";
 import {
   ShellsProvider,
+  useFriendsSheet,
   useMarquee,
   usePortfolioSheet,
   useViewMode,
@@ -53,6 +61,8 @@ import { ChatSessionProvider } from "./_state/chat-context";
 import { PlanProvider } from "./_state/plan-context";
 import { SignalsProvider } from "./_state/signals-context";
 import { PricingModal } from "./_components/PricingModal";
+import { DepositModal } from "./_components/DepositModal";
+import { AddFriendModal } from "./_components/AddFriendModal";
 import { AuthorSheet } from "./_components/AuthorSheet";
 import { ShortcutHelp } from "./_components/ShortcutHelp";
 import { useShellsKeyboard } from "./_hooks/useShellsKeyboard";
@@ -162,6 +172,8 @@ export function ShellsPage() {
         <AgentProofOfLife />
         <PhoneNumberModal />
         <PricingModal />
+        <DepositModal />
+        <AddFriendModal />
         <AuthorSheet />
         <KeyboardHost />
         <ShortcutHelp />
@@ -255,6 +267,7 @@ function DesktopShell() {
   const { viewMode } = useViewMode();
   const { enabled: marqueeEnabled } = useMarquee();
   const { open: portfolioOpen } = usePortfolioSheet();
+  const { open: friendsOpen } = useFriendsSheet();
 
   return (
     <LayoutProvider
@@ -266,43 +279,56 @@ function DesktopShell() {
     >
       <DragProvider>
         <main
-          className="fixed bottom-0 left-0 right-0 top-0 flex flex-col overflow-hidden bg-background p-3 text-foreground"
+          className="fixed inset-0 flex flex-col overflow-hidden bg-background py-2 text-foreground"
         >
           {marqueeEnabled && (
-            <div className="-mx-3 -mt-3 mb-3">
+            <div className="-mt-2 mb-2">
               <Marquee />
             </div>
           )}
           <MarketHeader />
-          {/* Panel grid wrapper — animates its right margin when the
-              portfolio sheet opens so the panels squeeze leftward
-              while the nav strip above stays full-width and stable.
-              `data-panel-grid-top` lets the portfolio sheet observe
-              this element's top edge and line up against it. */}
-          <div
-            data-panel-grid-top
-            className="mt-3 flex min-h-0 min-w-0 flex-1 transition-[margin] duration-300 ease-[var(--ease-drawer)]"
-            style={{
-              // Sheet's footprint from the right viewport edge is
-              // PORTFOLIO_SHEET_WIDTH. main has p-3 (12px) right padding,
-              // so subtracting it lands the panels flush with the sheet
-              // and adding 6px back keeps a panel-gap-sized seam
-              // (matches the 6px ResizeHandle between adjacent panels).
-              marginRight: portfolioOpen ? PORTFOLIO_SHEET_WIDTH - 6 : 0,
-            }}
-          >
-            {viewMode === "trading" ? (
-              <LayoutRenderer node={layout} dispatch={dispatch} />
-            ) : (
-              <ExplorePathsPanel />
-            )}
+          {/* Inner row — left rail, panel grid, right rail. Rails sit
+              flush against the viewport edges (no horizontal padding
+              on main); the panel-grid wrapper restores px-2 of
+              breathing room around the layout tree. */}
+          <div className="mt-2 flex min-h-0 min-w-0 flex-1">
+            <LeftRail />
+            <div
+              data-panel-grid-top
+              className="flex min-h-0 min-w-0 flex-1 px-2 transition-[margin] duration-300 ease-[var(--ease-drawer)]"
+              style={{
+                // Each sheet's footprint from its viewport edge is
+                // FRIENDS_SHEET_WIDTH / PORTFOLIO_SHEET_WIDTH including
+                // the SHEET_GUTTER inset. Pushing the panel-grid
+                // wrapper by the full sheet width — combined with the
+                // wrapper's own px-2 padding — yields the same 8px
+                // seam between sheet and panels that the rails get on
+                // the closed side. Both sheets can be open at once;
+                // left and right margins animate independently so the
+                // panels squeeze from whichever side is active.
+                marginLeft: friendsOpen ? FRIENDS_SHEET_WIDTH : 0,
+                marginRight: portfolioOpen ? PORTFOLIO_SHEET_WIDTH : 0,
+              }}
+            >
+              {viewMode === "trading" ? (
+                <LayoutRenderer node={layout} dispatch={dispatch} />
+              ) : viewMode === "explore" ? (
+                <ExplorePathsPanel />
+              ) : viewMode === "settings" ? (
+                <SettingsPage />
+              ) : (
+                <LoopsComingSoon />
+              )}
+            </div>
+            <RightRail />
           </div>
-          {/* Portfolio sheet lives INSIDE main so it shares main's
+          {/* Side sheets live INSIDE main so they share main's
               stacking context with MarketHeader. position: fixed on main
               creates a root-level stacking context — anything rendered as
               a sibling of main (z-30) ends up above main's contents
-              (including the z-40 nav dropdowns). Keeping the sheet here
-              means dropdowns naturally paint above it. */}
+              (including the z-40 nav dropdowns). Keeping the sheets here
+              means dropdowns naturally paint above them. */}
+          <FriendsSheet />
           <PortfolioSheet />
         </main>
         <DropPreview />
@@ -310,5 +336,23 @@ function DesktopShell() {
         <DemoLayoutBridge />
       </DragProvider>
     </LayoutProvider>
+  );
+}
+
+/** Coming-soon placeholder for the Loops view mode. Renders inside
+ *  the panel grid slot so the rails + top bar remain available;
+ *  switching back to Trade restores the layout tree. */
+function LoopsComingSoon() {
+  return (
+    <div className="flex h-full w-full items-center justify-center rounded-lg bg-surface-1 ring-1 ring-inset ring-white/[0.06]">
+      <div className="flex flex-col items-center gap-2 text-center">
+        <span className="text-caption uppercase tracking-[0.18em] text-muted-foreground">
+          Loops
+        </span>
+        <span className="text-display font-semibold text-foreground">
+          Coming soon
+        </span>
+      </div>
+    </div>
   );
 }

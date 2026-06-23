@@ -21,8 +21,9 @@ import { MARKETS } from "../_data/mocks";
 import { CircleStack } from "./CircleStack";
 import { ContactAvatar } from "./ContactAvatar";
 import { TokenLogo } from "./TokenLogo";
+import { useFriends } from "../_state/shells-context";
 import { useSignals } from "../_state/signals-context";
-import type { Trader } from "./FriendsPanel";
+import { isMutual, type Trader } from "./FriendsPanel";
 
 const USD = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -63,8 +64,16 @@ export function TraderProfile({
   onBack: () => void;
 }) {
   const [scope, setScope] = useState<Scope>("24h");
-  const { isFollowing, toggleFollow } = useSignals();
+  const {
+    isFollowing,
+    toggleFollow,
+    isAutoMirroring,
+    toggleAutoMirror,
+  } = useSignals();
+  const { openFriendChat } = useFriends();
   const following = isFollowing(trader.id);
+  const copying = isAutoMirroring(trader.id);
+  const mutual = isMutual(trader);
 
   const profile = useMemo(() => statsFor(trader, scope), [trader, scope]);
   const positions = useMemo(() => positionsFor(trader), [trader]);
@@ -90,44 +99,86 @@ export function TraderProfile({
       </div>
 
       <div className="scroll-thin min-h-0 flex-1 overflow-y-auto px-3 pb-4">
-        {/* Avatar + actions */}
+        {/* Avatar + actions. Message is always the primary CTA —
+         *  social action is the point of this surface. Follow and
+         *  Copy Trade live as secondary icon toggles. */}
         <div className="flex items-center gap-3 pt-1">
           <TraderAvatar trader={trader} size={64} />
           <div className="ml-auto flex items-center gap-1.5">
-            {following ? (
-              <>
-                <PrimaryCta
-                  icon={<Send strokeWidth={2} className="size-3.5" aria-hidden />}
-                  label="Message"
-                  ariaLabel={`Message ${trader.name}`}
-                />
-                <SecondaryIconButton
-                  onClick={() => toggleFollow(trader.id)}
-                  ariaLabel="Unfollow"
-                  ariaPressed
-                  variant="active"
-                >
-                  <Check strokeWidth={2.25} className="size-4" aria-hidden />
-                </SecondaryIconButton>
-              </>
+            {mutual ? (
+              <PrimaryCta
+                icon={<Send strokeWidth={2} className="size-3.5" aria-hidden />}
+                label="Message"
+                ariaLabel={`Message ${trader.name}`}
+                onClick={() => openFriendChat(trader.id)}
+              />
             ) : (
-              <>
-                <PrimaryCta
-                  icon={<UserPlus strokeWidth={2} className="size-3.5" aria-hidden />}
-                  label="Follow"
-                  ariaLabel={`Follow ${trader.name}`}
-                  onClick={() => toggleFollow(trader.id)}
-                />
-                <SecondaryIconButton
-                  ariaLabel={`Message ${trader.name}`}
-                  variant="ghost"
-                >
-                  <Send strokeWidth={2} className="size-4" aria-hidden />
-                </SecondaryIconButton>
-              </>
+              // Non-mutual: DM is unavailable. Replace the primary
+              // action with Follow so the only visible CTA is the
+              // one that could unblock messaging.
+              <PrimaryCta
+                icon={<UserPlus strokeWidth={2} className="size-3.5" aria-hidden />}
+                label={following ? "Following" : "Follow"}
+                ariaLabel={following ? `Unfollow ${trader.name}` : `Follow ${trader.name}`}
+                onClick={() => toggleFollow(trader.id)}
+              />
             )}
+            {mutual && (
+              <SecondaryIconButton
+                onClick={() => toggleFollow(trader.id)}
+                ariaLabel={following ? "Unfollow" : `Follow ${trader.name}`}
+                ariaPressed={following}
+                variant={following ? "active" : "ghost"}
+              >
+                {following ? (
+                  <Check strokeWidth={2.25} className="size-4" aria-hidden />
+                ) : (
+                  <UserPlus strokeWidth={2} className="size-4" aria-hidden />
+                )}
+              </SecondaryIconButton>
+            )}
+            <SecondaryIconButton
+              onClick={() => toggleAutoMirror(trader.id)}
+              ariaLabel={
+                copying
+                  ? `Stop copying ${trader.name}`
+                  : `Copy ${trader.name}'s trades`
+              }
+              ariaPressed={copying}
+              variant={copying ? "active" : "ghost"}
+            >
+              <Repeat2 strokeWidth={2} className="size-4" aria-hidden />
+            </SecondaryIconButton>
           </div>
         </div>
+
+        {/* Non-mutual hint — explains the missing DM affordance
+         *  without taking up much room. Reads as informational
+         *  rather than blocking. */}
+        {!mutual && (
+          <p className="mt-2 text-caption text-muted-foreground">
+            {trader.name} doesn't follow you back yet — DMs unlock on mutual
+            follow.
+          </p>
+        )}
+
+        {/* Copy Trades status row — only when active. Mirrors the
+         *  AuthorSheet's mirror affordance so the surface reads as a
+         *  declared, ongoing relationship rather than a one-time
+         *  click. Subtle enough to not compete with the profile body. */}
+        {copying && (
+          <div className="mt-3 flex items-center gap-2 rounded-md bg-surface-2 px-3 py-2 text-caption text-muted-foreground">
+            <Repeat2
+              strokeWidth={2}
+              className="size-3.5 shrink-0 text-primary"
+              aria-hidden
+            />
+            <span className="flex-1">
+              <span className="text-foreground">Copying {trader.name}'s trades.</span>{" "}
+              Auto-mirror up to the daily R cap.
+            </span>
+          </div>
+        )}
 
         {/* Name + handle */}
         <div className="mt-3 flex items-center gap-1.5">
@@ -181,54 +232,34 @@ export function TraderProfile({
 
         <Divider />
 
-        {/* Hero balance + scope */}
+        {/* Hero performance — friend account totals are private, so
+         *  the hero shows the percent change for the active scope as
+         *  the headline number instead of a dollar balance. */}
         <div className="flex items-end justify-between gap-3">
           <div className="min-w-0">
-            <div className="font-heading text-display font-semibold leading-none tabular-nums text-foreground">
-              {USD.format(profile.balance)}
-            </div>
+            <span className="text-caption uppercase tracking-[0.14em] text-muted-foreground">
+              Performance · {scope}
+            </span>
             <div
               className={cn(
-                "mt-2 text-body tabular-nums",
-                profile.delta >= 0 ? "text-primary" : "text-tone-down",
+                "font-heading mt-1 text-display font-semibold leading-none tabular-nums",
+                profile.deltaPct >= 0 ? "text-primary" : "text-tone-down",
               )}
             >
-              {profile.delta >= 0 ? "+" : ""}
-              {USD.format(profile.delta)}{" "}
-              <span className="text-muted-foreground">{scope}</span>
+              {profile.deltaPct >= 0 ? "+" : ""}
+              {profile.deltaPct.toFixed(2)}%
             </div>
           </div>
           <ScopeChips scope={scope} setScope={setScope} />
         </div>
 
-        {/* Sparkline */}
+        {/* Sparkline — shape only, no axis values. */}
         <div className="mt-3">
           <BigSparkline
             data={profile.sparkline}
-            positive={profile.delta >= 0}
+            positive={profile.deltaPct >= 0}
           />
         </div>
-
-        {/* Cash balance */}
-        <button
-          type="button"
-          className="mt-4 flex w-full items-center gap-3 rounded-lg bg-surface-1 px-3 py-2.5 text-left transition-colors hover:bg-surface-2"
-        >
-          <span
-            aria-hidden
-            className="flex size-10 shrink-0 items-center justify-center rounded-full bg-surface-3 text-foreground"
-          >
-            $
-          </span>
-          <div className="flex min-w-0 flex-col leading-tight">
-            <span className="text-body text-muted-foreground">
-              Cash balance
-            </span>
-            <span className="text-body font-semibold tabular-nums text-foreground">
-              {USD.format(profile.cashBalance)}
-            </span>
-          </div>
-        </button>
 
         {/* Open positions */}
         <div className="mt-4 flex items-center justify-between">
@@ -307,7 +338,7 @@ function PrimaryCta({
       type="button"
       onClick={onClick}
       aria-label={ariaLabel}
-      className="group relative inline-flex h-9 items-center justify-center gap-1.5 overflow-hidden rounded-lg bg-primary px-4 text-body font-semibold text-primary-foreground transition-[filter,scale] duration-150 ease-out hover:brightness-[1.04] active:scale-[0.96]"
+      className="group relative inline-flex h-9 items-center justify-center gap-1.5 overflow-hidden rounded-md bg-primary px-4 text-body font-semibold text-primary-foreground transition-[filter,scale] duration-150 ease-out hover:brightness-[1.04] active:scale-[0.96]"
     >
       <span
         aria-hidden
@@ -341,10 +372,10 @@ function SecondaryIconButton({
       aria-label={ariaLabel}
       aria-pressed={ariaPressed}
       className={cn(
-        "inline-flex size-9 shrink-0 items-center justify-center rounded-lg ring-1 ring-inset transition-[background-color,color,scale] duration-150 ease-out active:scale-[0.96]",
+        "inline-flex size-9 shrink-0 items-center justify-center rounded-md transition-[background-color,color,scale] duration-150 ease-out active:scale-[0.96]",
         variant === "active"
-          ? "bg-primary/10 text-primary ring-primary/30 hover:bg-primary/15"
-          : "bg-transparent text-muted-foreground ring-white/[0.10] hover:bg-surface-1 hover:text-foreground",
+          ? "bg-surface-3 text-foreground hover:bg-surface-4"
+          : "bg-surface-1 text-muted-foreground hover:bg-surface-2 hover:text-foreground",
       )}
     >
       {children}
@@ -503,12 +534,9 @@ function PositionRow({ position }: { position: PositionDetail }) {
         </span>
       </div>
       <div className="flex shrink-0 flex-col items-end leading-tight">
-        <span className="text-body font-semibold tabular-nums text-foreground">
-          {USD.format(position.valueUsd)}
-        </span>
         <span
           className={cn(
-            "text-body tabular-nums",
+            "text-body font-semibold tabular-nums",
             up ? "text-primary" : "text-tone-down",
           )}
         >
@@ -570,9 +598,16 @@ function statsFor(trader: Trader, scope: Scope) {
     { id: "m2", seed: (trader.seed * 7) % 100000 },
   ];
 
+  // Percent form of the delta — the social surfaces only show this,
+  // not the absolute dollar amount (which would back-compute the
+  // friend's total balance). Kept in the stats so the hero can read
+  // it directly.
+  const deltaPct = (delta / balance) * 100;
+
   return {
     balance,
     delta,
+    deltaPct,
     cashBalance,
     followingCount,
     followersCount,

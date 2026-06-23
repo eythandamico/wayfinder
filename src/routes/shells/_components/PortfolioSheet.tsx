@@ -33,6 +33,7 @@ import { MOCK_USAGE, WALLETS } from "../_data/mocks";
 import type { UsageData } from "../_types";
 import {
   useDensity,
+  useDepositModal,
   usePortfolioSheet,
   type Density,
 } from "../_state/shells-context";
@@ -44,6 +45,7 @@ import {
   type TradingWalletVenue,
 } from "./TradingWalletDialog";
 import { PositionList } from "./portfolio/PositionList";
+import { RIGHT_RAIL_WIDTH } from "./RightRail";
 
 /** Width of the side sheet when open, including the gutter on its
  *  right side. page.tsx uses this to compute the main element's right
@@ -52,10 +54,9 @@ import { PositionList } from "./portfolio/PositionList";
 export const PORTFOLIO_SHEET_WIDTH = 480;
 
 /** Inset on the top, right, and bottom so the sheet floats as a
- *  rounded panel matching the shell's chrome rhythm. The left edge
- *  stays flush against the shell so the two surfaces read as
- *  connected rather than as a floating window stranded over them. */
-const SHEET_GUTTER = 12;
+ *  rounded panel matching the shell's chrome rhythm. 8px keeps the
+ *  same rhythm the rails and panel grid use elsewhere in the shell. */
+const SHEET_GUTTER = 8;
 /** Conservative fallback used until the panel-grid top is measured.
  *  Real value comes from observing the panel grid's bounding box —
  *  MarketHeader height shifts with density and CommandSearchBar
@@ -187,9 +188,11 @@ export function PortfolioSheet() {
           // Sit underneath the MarketHeader strip rather than over it,
           // so the top nav stays full-width and reachable when the
           // sheet is open. Top offset matches the panel-grid top edge
-          // (p-3 main + MarketHeader ≈48 + mt-3 ≈ 72).
+          // (p-3 main + MarketHeader ≈48 + mt-3 ≈ 72). Right offset
+          // accounts for the right rail so the sheet anchors to the
+          // rail's inner edge, not the viewport edge.
           top: sheetTop,
-          right: SHEET_GUTTER,
+          right: RIGHT_RAIL_WIDTH + SHEET_GUTTER,
           bottom: SHEET_GUTTER,
           width: PORTFOLIO_SHEET_WIDTH - SHEET_GUTTER,
           // Translate fully off-screen plus the right gutter so the
@@ -213,37 +216,17 @@ export function PortfolioSheet() {
  * Two views always rendered so leaving them mounted preserves scroll
  * position when the user navigates back.
  */
-function SheetContents({ onClose }: { onClose: () => void }) {
-  const [view, setView] = useState<"main" | "settings">("main");
+function SheetContents({ onClose: _onClose }: { onClose: () => void }) {
   const [activeWallet, setActiveWallet] = useState(WALLETS[0]);
-
+  // Settings used to live as a second view inside this sheet —
+  // now it has its own page accessible from the left rail. Sheet
+  // shows MainView only.
   return (
-    <div className="relative h-full overflow-hidden">
-      <div
-        className={cn(
-          "absolute inset-0 flex flex-col transition-transform duration-300 ease-[var(--ease-drawer)]",
-          view === "main" ? "translate-x-0" : "-translate-x-full",
-        )}
-        aria-hidden={view !== "main"}
-      >
-        <MainView
-          onOpenSettings={() => setView("settings")}
-          activeWallet={activeWallet}
-          setActiveWallet={setActiveWallet}
-        />
-      </div>
-      <div
-        className={cn(
-          "absolute inset-0 flex flex-col transition-transform duration-300 ease-[var(--ease-drawer)]",
-          view === "settings" ? "translate-x-0" : "translate-x-full",
-        )}
-        aria-hidden={view !== "settings"}
-      >
-        <SettingsView
-          onClose={onClose}
-          onBack={() => setView("main")}
-        />
-      </div>
+    <div className="flex h-full flex-col overflow-hidden">
+      <MainView
+        activeWallet={activeWallet}
+        setActiveWallet={setActiveWallet}
+      />
     </div>
   );
 }
@@ -251,7 +234,6 @@ function SheetContents({ onClose }: { onClose: () => void }) {
 type WalletInstance = (typeof WALLETS)[number];
 
 export function PortfolioMainView(props: {
-  onOpenSettings: () => void;
   activeWallet: WalletInstance;
   setActiveWallet: (w: WalletInstance) => void;
 }) {
@@ -259,11 +241,9 @@ export function PortfolioMainView(props: {
 }
 
 function MainView({
-  onOpenSettings,
   activeWallet,
   setActiveWallet,
 }: {
-  onOpenSettings: () => void;
   activeWallet: WalletInstance;
   setActiveWallet: (w: WalletInstance) => void;
 }) {
@@ -272,6 +252,7 @@ function MainView({
   const [tab, setTab] = useState<Tab>("perps");
   const [copied, setCopied] = useState(false);
   const [balancesHidden, setBalancesHidden] = useState(false);
+  const { openDeposit } = useDepositModal();
   // Trading-wallet transfer modal target — null when closed, "hyperliquid" /
   // "polymarket" when open against that venue.
   const [transferVenue, setTransferVenue] =
@@ -297,24 +278,12 @@ function MainView({
        *  BottomSheet has a drag handle + close button. MainView never
        *  renders its own close affordance. */}
       <div className="shrink-0 border-b border-white/[0.05] px-4 pt-4 pb-3">
-        <div className="flex items-center justify-between gap-2">
-          <WalletSelector
-            active={activeWallet}
-            onSelect={setActiveWallet}
-            copied={copied}
-            onCopy={copyAddress}
-          />
-          <div className="flex shrink-0 items-center gap-0.5">
-            <button
-              type="button"
-              aria-label="Settings"
-              onClick={onOpenSettings}
-              className="inline-flex size-9 items-center justify-center rounded-md text-muted-foreground transition-[background-color,color,scale] duration-150 ease-out hover:bg-surface-1 hover:text-foreground active:scale-[0.96]"
-            >
-              <SettingsIcon strokeWidth={1.75} className="size-4" aria-hidden />
-            </button>
-          </div>
-        </div>
+        <WalletSelector
+          active={activeWallet}
+          onSelect={setActiveWallet}
+          copied={copied}
+          onCopy={copyAddress}
+        />
       </div>
 
       {/* Scrollable body */}
@@ -331,7 +300,11 @@ function MainView({
          *  half the viewport) and read as the recommended action,
          *  which it isn't. */}
         <div className="grid grid-cols-2 gap-1.5 px-4 pt-4">
-          <SubduedButton aria-label="Deposit to wallet" className="h-9 px-3">
+          <SubduedButton
+            aria-label="Deposit to wallet"
+            className="h-9 px-3"
+            onClick={openDeposit}
+          >
             Deposit
           </SubduedButton>
           <SubduedButton aria-label="Withdraw from wallet" className="h-9 px-3 gap-1.5">
@@ -1072,433 +1045,6 @@ function TabButton({
 }
 
 
-/* ------------------------------------------------------------------ */
-/*  Settings view — second stage of the sheet's mini-router            */
-/* ------------------------------------------------------------------ */
-
-function SettingsView({
-  onClose,
-  onBack,
-}: {
-  onClose: () => void;
-  onBack: () => void;
-}) {
-  // Settings only ever shows the user's connected (primary) wallet —
-  // never the agent wallets. Agent wallets live in the WalletSelector
-  // on the main portfolio view, where you can switch between them to
-  // inspect their balances and activity.
-  const connectedWallet =
-    WALLETS.find((w) => w.primary) ?? WALLETS[0];
-  // Toggles are local state until real preference persistence lands.
-  const [hideBalances, setHideBalances] = useState(false);
-  const [confirmOrders, setConfirmOrders] = useState(true);
-  const [slippage, setSlippage] = useState<"0.1" | "0.5" | "1.0">("0.5");
-  const [leverage, setLeverage] = useState<"1x" | "3x" | "5x">("3x");
-  const [notifyFills, setNotifyFills] = useState(true);
-  const [notifyAlerts, setNotifyAlerts] = useState(true);
-  const [notifyMentions, setNotifyMentions] = useState(true);
-  const [soundEffects, setSoundEffects] = useState(true);
-  const [hidePnL, setHidePnL] = useState(false);
-  const [anonymizeHandle, setAnonymizeHandle] = useState(false);
-
-  const layoutDispatch = useLayoutDispatch();
-  const resetLayout = () => layoutDispatch?.({ type: "resetLayout" });
-
-  const openEtherscan = () =>
-    window.open(
-      `https://etherscan.io/address/${connectedWallet.address}`,
-      "_blank",
-    );
-
-  const copyAddress = async () => {
-    try {
-      await navigator.clipboard.writeText(connectedWallet.address);
-    } catch {
-      /* ignore */
-    }
-  };
-
-  return (
-    <>
-      {/* Header: ← Back / Settings / × */}
-      <div className="shrink-0 border-b border-white/[0.05] px-2 pt-3 pb-3">
-        <div className="flex items-center justify-between gap-2">
-          <button
-            type="button"
-            aria-label="Back to portfolio"
-            onClick={onBack}
-            className="inline-flex h-9 items-center gap-1 rounded-md px-2 text-body text-muted-foreground transition-[background-color,color,scale] duration-150 ease-out hover:bg-surface-1 hover:text-foreground active:scale-[0.96]"
-          >
-            <ArrowLeft strokeWidth={1.75} className="size-4" aria-hidden />
-            Back
-          </button>
-          <span className="text-body font-semibold text-foreground">
-            Settings
-          </span>
-          <button
-            type="button"
-            aria-label="Close portfolio"
-            onClick={onClose}
-            className="inline-flex size-8 items-center justify-center rounded-md text-muted-foreground transition-[background-color,color,scale] duration-150 ease-out hover:bg-surface-1 hover:text-foreground active:scale-[0.96]"
-          >
-            <X strokeWidth={1.75} className="size-4" aria-hidden />
-          </button>
-        </div>
-      </div>
-
-      <div className="scroll-thin min-h-0 flex-1 overflow-y-auto px-4 py-4">
-        {/* --- Wallet section ---------------------------------------- */}
-        <Section label="Wallet">
-          <ConnectedWalletCard
-            wallet={connectedWallet}
-            onCopy={copyAddress}
-            onEtherscan={openEtherscan}
-          />
-          <SettingsRow
-            label="Add wallet"
-            description="Connect another address"
-            onClick={() => {}}
-            trailing={<ChevronRight strokeWidth={1.75} className="size-4" />}
-          />
-          <SettingsRow
-            label="Disconnect"
-            description="Sign out of this wallet"
-            tone="danger"
-            onClick={() => {}}
-            trailing={<LogOut strokeWidth={1.75} className="size-4" />}
-          />
-        </Section>
-
-        {/* --- Display section --------------------------------------- */}
-        <Section label="Display">
-          <DensitySetting />
-          <SettingsRow
-            label="Hide balances"
-            description="Mask amounts with ••• until you tap"
-            trailing={<Switch checked={hideBalances} onChange={setHideBalances} label="Hide balances" />}
-          />
-        </Section>
-
-        {/* --- Trading section --------------------------------------- */}
-        <Section label="Trading">
-          <SettingsRow
-            label="Confirm orders"
-            description="Show a confirmation before submitting"
-            trailing={<Switch checked={confirmOrders} onChange={setConfirmOrders} label="Confirm orders" />}
-          />
-          <SegmentedRow
-            label="Default slippage"
-            description="Max price drift you'll accept"
-            value={slippage}
-            options={[
-              { value: "0.1", label: "0.1%" },
-              { value: "0.5", label: "0.5%" },
-              { value: "1.0", label: "1.0%" },
-            ]}
-            onChange={setSlippage}
-          />
-          <SegmentedRow
-            label="Default leverage"
-            description="Pre-fill the leverage slider"
-            value={leverage}
-            options={[
-              { value: "1x", label: "1×" },
-              { value: "3x", label: "3×" },
-              { value: "5x", label: "5×" },
-            ]}
-            onChange={setLeverage}
-          />
-        </Section>
-
-        {/* --- Notifications section --------------------------------- */}
-        <Section label="Notifications">
-          <SettingsRow
-            label="Trade fills"
-            description="Ping when an order fills"
-            trailing={<Switch checked={notifyFills} onChange={setNotifyFills} label="Trade fills" />}
-          />
-          <SettingsRow
-            label="Price alerts"
-            description="Ping when alerts trigger"
-            trailing={<Switch checked={notifyAlerts} onChange={setNotifyAlerts} label="Price alerts" />}
-          />
-          <SettingsRow
-            label="Companion mentions"
-            description="Ping when the companion @mentions you"
-            trailing={<Switch checked={notifyMentions} onChange={setNotifyMentions} label="Companion mentions" />}
-          />
-          <SettingsRow
-            label="Sound effects"
-            description="Subtle audio on trade events"
-            trailing={<Switch checked={soundEffects} onChange={setSoundEffects} label="Sound effects" />}
-          />
-        </Section>
-
-        {/* --- Privacy section --------------------------------------- */}
-        <Section label="Privacy">
-          <SettingsRow
-            label="Hide PnL"
-            description="Replace dollar PnL with %"
-            trailing={<Switch checked={hidePnL} onChange={setHidePnL} label="Hide PnL" />}
-          />
-          <SettingsRow
-            label="Anonymize handle"
-            description="Show as a random name in group chats"
-            trailing={<Switch checked={anonymizeHandle} onChange={setAnonymizeHandle} label="Anonymize handle" />}
-          />
-        </Section>
-
-        {/* --- Advanced section -------------------------------------- */}
-        <Section label="Advanced">
-          <SettingsRow
-            label="Reset layout"
-            description="Restore the default panel arrangement"
-            onClick={resetLayout}
-            trailing={<RotateCcw strokeWidth={1.75} className="size-4" />}
-          />
-        </Section>
-
-        <div className="pb-4 pt-2 text-center text-micro uppercase tracking-[0.2em] text-muted-foreground">
-          Wayfinder · v0.1
-        </div>
-      </div>
-    </>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/*  Settings primitives                                                */
-/* ------------------------------------------------------------------ */
-
-function Section({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <section className="mb-5">
-      <div className="mb-1.5 px-1 text-micro uppercase tracking-[0.18em] text-muted-foreground">
-        {label}
-      </div>
-      <div className="overflow-hidden rounded-lg">
-        {children}
-      </div>
-    </section>
-  );
-}
-
-function ConnectedWalletCard({
-  wallet,
-  onCopy,
-  onEtherscan,
-}: {
-  wallet: WalletInstance;
-  onCopy: () => void;
-  onEtherscan: () => void;
-}) {
-  const [copied, setCopied] = useState(false);
-  const handleCopy = () => {
-    onCopy();
-    setCopied(true);
-    window.setTimeout(() => setCopied(false), 1400);
-  };
-
-  return (
-    <div className="flex items-center gap-3 border-b border-white/[0.05] bg-surface-1 px-3 py-3">
-      <span
-        aria-hidden
-        className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-full ring-1 ring-inset ring-white/[0.10]"
-      >
-        <Jazzicon diameter={40} seed={jsNumberForAddress(wallet.address)} />
-      </span>
-      <div className="flex min-w-0 flex-1 flex-col">
-        <span className="truncate text-body font-medium text-foreground">
-          {wallet.name}
-        </span>
-        <span className="truncate text-body text-muted-foreground tabular-nums">
-          {shortAddress(wallet.address)}
-        </span>
-      </div>
-      <button
-        type="button"
-        aria-label={copied ? "Copied" : "Copy address"}
-        onClick={handleCopy}
-        className="inline-flex size-7 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-[background-color,color,scale] duration-150 ease-out hover:bg-surface-1 hover:text-foreground active:scale-[0.96]"
-      >
-        <Copy
-          strokeWidth={1.75}
-          className={cn(
-            "size-3.5 transition-colors",
-            copied && "text-primary",
-          )}
-        />
-      </button>
-      <button
-        type="button"
-        aria-label="View on Etherscan"
-        onClick={onEtherscan}
-        className="inline-flex size-7 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-[background-color,color,scale] duration-150 ease-out hover:bg-surface-1 hover:text-foreground active:scale-[0.96]"
-      >
-        <ExternalLink strokeWidth={1.75} className="size-3.5" />
-      </button>
-    </div>
-  );
-}
-
-function SettingsRow({
-  label,
-  description,
-  trailing,
-  onClick,
-  tone,
-}: {
-  label: string;
-  description?: string;
-  trailing?: React.ReactNode;
-  onClick?: () => void;
-  tone?: "danger";
-}) {
-  const Tag = onClick ? "button" : "div";
-  return (
-    <Tag
-      {...(onClick ? { type: "button" as const, onClick } : {})}
-      className={cn(
-        "flex w-full items-center gap-3 border-b border-white/[0.05] px-3 py-3 text-left last:border-b-0 transition-colors",
-        onClick && "hover:bg-surface-1",
-      )}
-    >
-      <div className="flex min-w-0 flex-1 flex-col">
-        <span
-          className={cn(
-            "text-body",
-            tone === "danger" ? "text-tone-down" : "text-foreground",
-          )}
-        >
-          {label}
-        </span>
-        {description && (
-          <span className="text-caption text-muted-foreground">
-            {description}
-          </span>
-        )}
-      </div>
-      {trailing && (
-        <span
-          className={cn(
-            "shrink-0",
-            tone === "danger" ? "text-tone-down" : "text-muted-foreground",
-          )}
-        >
-          {trailing}
-        </span>
-      )}
-    </Tag>
-  );
-}
-
-function SegmentedRow<T extends string>({
-  label,
-  description,
-  value,
-  options,
-  onChange,
-}: {
-  label: string;
-  description?: string;
-  value: T;
-  options: { value: T; label: string }[];
-  onChange: (next: T) => void;
-}) {
-  return (
-    <div className="flex flex-col gap-2 border-b border-white/[0.05] px-3 py-3 last:border-b-0">
-      <div className="flex min-w-0 flex-col">
-        <span className="text-body text-foreground">{label}</span>
-        {description && (
-          <span className="text-caption text-muted-foreground">
-            {description}
-          </span>
-        )}
-      </div>
-      <div
-        role="radiogroup"
-        className="flex items-center gap-1 rounded-md bg-surface-1 p-0.5"
-      >
-        {options.map((opt) => {
-          const active = value === opt.value;
-          return (
-            <button
-              key={opt.value}
-              type="button"
-              role="radio"
-              aria-checked={active}
-              onClick={() => onChange(opt.value)}
-              className={cn(
-                "flex h-7 flex-1 items-center justify-center rounded-sm text-body transition-[background-color,color,scale] duration-150 ease-out active:scale-[0.96]",
-                active
-                  ? "bg-surface-3 font-semibold text-foreground"
-                  : "text-muted-foreground hover:text-foreground",
-              )}
-            >
-              {opt.label}
-            </button>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-function DensitySetting() {
-  const { density, setDensity } = useDensity();
-  const options: { value: Density; label: string }[] = [
-    { value: "small", label: "Compact" },
-    { value: "medium", label: "Default" },
-    { value: "large", label: "Roomy" },
-  ];
-  return (
-    <SegmentedRow
-      label="Display density"
-      description="How tightly UI text and rows pack together"
-      value={density}
-      options={options}
-      onChange={setDensity}
-    />
-  );
-}
-
-function Switch({
-  checked,
-  onChange,
-  label,
-}: {
-  checked: boolean;
-  onChange: (next: boolean) => void;
-  label: string;
-}) {
-  return (
-    <button
-      type="button"
-      role="switch"
-      aria-checked={checked}
-      aria-label={label}
-      onClick={() => onChange(!checked)}
-      className={cn(
-        "relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors duration-150 ease-out",
-        checked ? "bg-primary" : "bg-surface-4",
-      )}
-    >
-      <span
-        aria-hidden
-        className={cn(
-          "absolute size-4 rounded-full bg-white shadow-[0_2px_4px_rgba(0,0,0,0.3)] transition-transform duration-150 ease-out",
-          checked ? "translate-x-[18px]" : "translate-x-0.5",
-        )}
-      />
-    </button>
-  );
-}
 
 /* ------------------------------------------------------------------ */
 /*  Tab contents                                                       */

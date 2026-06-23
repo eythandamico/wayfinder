@@ -16,7 +16,12 @@ import {
   Compass,
   Gauge,
   Layers,
+  ArrowDownLeft,
   LayoutGrid,
+  PanelLeftClose,
+  PanelLeftOpen,
+  PanelRightClose,
+  PanelRightOpen,
   Plus,
   Radio,
   RotateCcw,
@@ -27,6 +32,8 @@ import {
 } from "lucide-react";
 import Jazzicon, { jsNumberForAddress } from "react-jazzicon";
 import {
+  useDepositModal,
+  useFriendsSheet,
   usePortfolioSheet,
   useViewMode,
   useWalletConnection,
@@ -35,6 +42,8 @@ import {
 import { useActivity } from "../_state/activity-context";
 import { ActivityRow } from "./ActivityRow";
 import { CommandSearchBar } from "./CommandBar";
+import { WalletPill } from "./WalletPill";
+import { MOCK_ACCOUNT } from "./PortfolioPanel";
 import { AlertDialog } from "@base-ui/react/alert-dialog";
 import { Dialog } from "@base-ui/react/dialog";
 import {
@@ -59,24 +68,30 @@ import { CreateChartDialog } from "./CreateChartDialog";
 import type { CustomChartConfig } from "./CustomChartPanel";
 
 export function MarketHeader() {
+  // Top bar sits ABOVE the left + right rails. Brand mark and wallet
+  // pill live here as the identity-and-account anchors of the shell;
+  // workspace-shaping tools (add panel, layouts) sit alongside; the
+  // search/command bar takes the center.
   return (
-    <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 px-3 py-2">
-      <div className="flex items-center gap-3">
+    <div className="grid grid-cols-[auto_1fr_auto] items-center gap-3 px-3 py-1">
+      <div className="flex items-center gap-2">
         <Link
           to="/"
-          className="flex shrink-0 items-center rounded-md px-1 transition-opacity hover:opacity-80"
           aria-label="Wayfinder home"
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md transition-opacity duration-150 ease-out hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
         >
           <img
-            src="/brand/wayfinder-logomark.svg"
+            src="/brand/wayfinder-mark.svg"
             alt="Wayfinder"
-            width={141}
-            height={32}
-            className="h-6 w-auto"
+            width={24}
+            height={24}
+            className="size-6"
           />
         </Link>
-
-        <ViewModeToggle />
+        <span className="mx-1 h-4 w-px bg-white/[0.08]" aria-hidden />
+        <FriendsSheetTopBarToggle />
+        <AddPanelMenu />
+        <LayoutsMenu />
       </div>
 
       <div className="w-[560px] max-w-full justify-self-center">
@@ -84,66 +99,101 @@ export function MarketHeader() {
       </div>
 
       <div className="flex items-center justify-end gap-2">
-        <AddPanelMenu />
-        <LayoutsMenu />
-        <ActivityMenu />
-        <BarDivider />
-        <ConnectedPill address={WALLET_ADDRESS} />
+        <DepositButton />
+        <PortfolioTotalChip />
+        <PortfolioSheetTopBarToggle />
+        <WalletPill address={WALLET_ADDRESS} />
       </div>
     </div>
   );
 }
 
-function ViewModeToggle() {
-  const { viewMode, setViewMode } = useViewMode();
-  return (
-    <div className="flex items-center gap-1">
-      <ViewModeButton
-        active={viewMode === "trading"}
-        onClick={() => setViewMode("trading")}
-        label="Trade"
-        target="trading"
-        icon={CandlestickChart}
-      />
-      <ViewModeButton
-        active={viewMode === "explore"}
-        onClick={() => setViewMode("explore")}
-        label="Paths"
-        target="explore"
-        icon={Compass}
-      />
-    </div>
-  );
-}
-
-function ViewModeButton({
-  active,
-  onClick,
-  label,
-  target,
-  icon: Icon,
-}: {
-  active: boolean;
-  onClick: () => void;
-  label: string;
-  target: ViewMode;
-  icon: LucideIcon;
-}) {
+/** Portfolio sheet expand/collapse — mirrors the Friends top-bar
+ *  toggle on the opposite edge. Uses the right-pointing PanelRight
+ *  icon variants so the direction reads naturally for the right
+ *  sheet. Same active-state styling as Add / Layouts / Friends. */
+function PortfolioSheetTopBarToggle() {
+  const { open, togglePortfolio } = usePortfolioSheet();
+  const Icon = open ? PanelRightClose : PanelRightOpen;
   return (
     <button
       type="button"
-      aria-pressed={active}
-      data-target={target}
-      onClick={onClick}
+      aria-label={open ? "Collapse wallet" : "Expand wallet"}
+      aria-expanded={open}
+      onClick={togglePortfolio}
       className={cn(
-        "inline-flex h-8 items-center gap-1.5 rounded-md px-2.5 text-body font-medium transition-[background-color,color,box-shadow,scale] duration-150 ease-out active:scale-[0.96]",
-        active
-          ? "bg-surface-4 text-foreground"
-          : "text-foreground hover:bg-surface-2",
+        "inline-flex size-8 shrink-0 items-center justify-center rounded-md transition-[background-color,color,scale] duration-150 ease-out active:scale-[0.96] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60",
+        open
+          ? "bg-surface-3 text-foreground"
+          : "text-muted-foreground hover:bg-surface-2 hover:text-foreground",
       )}
     >
       <Icon strokeWidth={1.75} className="size-4" aria-hidden />
-      {label}
+    </button>
+  );
+}
+
+/** Compact portfolio total — same money as the hero balance inside
+ *  the PortfolioSheet, surfaced in chrome so the number is always
+ *  glanceable. Click opens the sheet for the full breakdown. */
+function PortfolioTotalChip() {
+  const { togglePortfolio } = usePortfolioSheet();
+  const usd = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0,
+  });
+  return (
+    <button
+      type="button"
+      onClick={togglePortfolio}
+      aria-label={`Portfolio total ${usd.format(MOCK_ACCOUNT.balance)}. Open portfolio.`}
+      className="inline-flex h-8 shrink-0 items-center rounded-md px-2.5 text-body font-semibold tabular-nums text-foreground transition-[background-color] duration-150 ease-out hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
+    >
+      {usd.format(MOCK_ACCOUNT.balance)}
+    </button>
+  );
+}
+
+/** Top-bar Deposit shortcut — opens the canonical 3-step Deposit
+ *  modal (select token → network → QR). Visual treatment matches the
+ *  Add-style chip so the right cluster reads as one toolset. */
+function DepositButton() {
+  const { openDeposit } = useDepositModal();
+  return (
+    <button
+      type="button"
+      onClick={openDeposit}
+      aria-label="Deposit"
+      className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-md bg-surface-3 px-2.5 text-body font-medium text-foreground transition-[background-color,scale] duration-150 ease-out hover:bg-surface-4 active:scale-[0.96]"
+    >
+      <ArrowDownLeft strokeWidth={1.75} className="size-4" aria-hidden />
+      Deposit
+    </button>
+  );
+}
+
+/** Top-bar trigger that mirrors the Friends rail item — opens/closes
+ *  the friends side sheet. The icon swaps with the sheet's state
+ *  (PanelLeftOpen when closed → "open it", PanelLeftClose when open →
+ *  "close it") so the direction-of-action reads at a glance. */
+function FriendsSheetTopBarToggle() {
+  const { open, toggleFriends } = useFriendsSheet();
+  const Icon = open ? PanelLeftClose : PanelLeftOpen;
+  return (
+    <button
+      type="button"
+      aria-label={open ? "Collapse friends" : "Expand friends"}
+      aria-expanded={open}
+      onClick={toggleFriends}
+      className={cn(
+        "inline-flex size-8 shrink-0 items-center justify-center rounded-md transition-[background-color,color,scale] duration-150 ease-out active:scale-[0.96] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60",
+        open
+          ? "bg-surface-3 text-foreground"
+          : "text-muted-foreground hover:bg-surface-2 hover:text-foreground",
+      )}
+    >
+      <Icon strokeWidth={1.75} className="size-4" aria-hidden />
     </button>
   );
 }
@@ -247,7 +297,7 @@ function AddPanelMenu() {
         role="menu"
         aria-hidden={!open}
         className={cn(
-          "absolute right-0 top-full z-40 mt-1 flex max-h-[min(80vh,720px)] w-[480px] origin-top-right flex-col overflow-hidden rounded-lg bg-popover backdrop-blur-md ring-1 ring-inset ring-white/10 shadow-2xl transition-[opacity,transform] duration-150 ease-out",
+          "absolute left-0 top-full z-40 mt-1 flex max-h-[min(80vh,720px)] w-[480px] origin-top-left flex-col overflow-hidden rounded-lg bg-popover backdrop-blur-md ring-1 ring-inset ring-white/10 shadow-2xl transition-[opacity,transform] duration-150 ease-out",
           open
             ? "translate-y-0 scale-100 opacity-100"
             : "pointer-events-none -translate-y-1 scale-[0.98] opacity-0",
@@ -486,7 +536,7 @@ function LayoutsMenu() {
         role="menu"
         aria-hidden={!open}
         className={cn(
-          "absolute right-0 top-full z-40 mt-1 max-h-[min(80vh,640px)] w-[340px] origin-top-right overflow-y-auto rounded-lg bg-popover backdrop-blur-md ring-1 ring-inset ring-white/10 p-2 shadow-2xl transition-[opacity,transform] duration-150 ease-out",
+          "absolute left-0 top-full z-40 mt-1 max-h-[min(80vh,640px)] w-[340px] origin-top-left overflow-y-auto rounded-lg bg-popover backdrop-blur-md ring-1 ring-inset ring-white/10 p-2 shadow-2xl transition-[opacity,transform] duration-150 ease-out",
           open
             ? "translate-y-0 scale-100 opacity-100"
             : "pointer-events-none -translate-y-1 scale-[0.98] opacity-0",
@@ -781,231 +831,9 @@ function DeleteSavedLayoutDialog({
 }
 
 /* ------------------------------------------------------------------ */
-/*  Activity                                                           */
+/*  (ActivityMenu + ConnectedPill have migrated to RightRail.tsx)      */
 /* ------------------------------------------------------------------ */
 
-/**
- * Bell-icon dropdown sitting between the layouts menu and the wallet
- * pill in the top nav. Shares state with ActivityPanel via
- * useActivity() so marking an item read in either surface reflects in
- * the other. Has a header CTA that adds the Activity panel to the
- * layout, and a footer CTA that opens the phone-number modal for
- * live SMS updates.
- */
-function ActivityMenu() {
-  const [open, setOpen] = useState(false);
-  const { items, unreadCount, markAllRead } = useActivity();
-  const layoutDispatch = useLayoutDispatch();
-  const ref = useRef<HTMLDivElement>(null);
-  useClickOutside(ref, () => setOpen(false), open);
-
-  const openActivityPanel = () => {
-    if (!layoutDispatch) return;
-     
-    const id = `activity-${Date.now()}`;
-    layoutDispatch({
-      type: "addPanelIfMissing",
-      panel: { id, type: "activity" },
-    });
-    setOpen(false);
-  };
-
-  return (
-    <div ref={ref} className="relative shrink-0">
-      <button
-        type="button"
-        aria-haspopup="menu"
-        aria-expanded={open}
-        aria-controls="activity-menu"
-        aria-label={
-          unreadCount > 0 ? `Activity, ${unreadCount} unread` : "Activity"
-        }
-        onClick={() => setOpen((v) => !v)}
-        className="relative inline-flex size-8 items-center justify-center rounded-md bg-surface-3 text-foreground transition-[background-color,scale] duration-150 ease-out hover:bg-surface-4 active:scale-[0.96]"
-      >
-        <Bell strokeWidth={1.75} className="size-4" aria-hidden />
-        {unreadCount > 0 && (
-          <span
-            aria-hidden
-            className="absolute right-1 top-1 size-1.5 rounded-full bg-primary shadow-[0_0_6px_var(--primary)]"
-          />
-        )}
-      </button>
-
-      <div
-        id="activity-menu"
-        role="menu"
-        // `inert` over `aria-hidden`: closing the menu can leave a
-        // focus ring on the last clicked option (e.g. after the user
-        // drilled into TradingCardSheet from a signal row), and
-        // aria-hidden on an ancestor of a focused descendant is an
-        // a11y violation. `inert` hides AND blocks focus.
-        inert={!open}
-        className={cn(
-          "absolute right-0 top-full z-40 mt-1 flex max-h-[min(80vh,560px)] w-[380px] origin-top-right flex-col overflow-hidden rounded-lg bg-popover backdrop-blur-md ring-1 ring-inset ring-white/10 shadow-2xl transition-[opacity,transform] duration-150 ease-out",
-          open
-            ? "translate-y-0 scale-100 opacity-100"
-            : "pointer-events-none -translate-y-1 scale-[0.98] opacity-0",
-        )}
-      >
-        {/* Header — title + unread badge, plus a CTA that drops an
-            Activity panel into the layout for a persistent feed. */}
-        <div className="flex shrink-0 items-center justify-between gap-2 border-b border-white/[0.05] px-3 py-2">
-          <div className="flex items-center gap-2">
-            <span className="text-body font-semibold text-foreground">
-              Activity
-            </span>
-            {unreadCount > 0 && (
-              <span className="inline-flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-primary/15 px-1 text-micro font-semibold tabular-nums text-primary ring-1 ring-inset ring-primary/20">
-                {unreadCount}
-              </span>
-            )}
-          </div>
-          <div className="flex items-center gap-1">
-            {layoutDispatch && (
-              <button
-                type="button"
-                onClick={openActivityPanel}
-                className="inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-caption text-muted-foreground transition-colors hover:bg-surface-1 hover:text-foreground"
-              >
-                <Plus strokeWidth={2} className="size-3" aria-hidden />
-                Open panel
-              </button>
-            )}
-            <button
-              type="button"
-              onClick={markAllRead}
-              disabled={unreadCount === 0}
-              className="inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-caption text-muted-foreground transition-colors hover:bg-surface-1 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              <Check strokeWidth={2} className="size-3" aria-hidden />
-              Mark all read
-            </button>
-          </div>
-        </div>
-
-        {/* List */}
-        <div
-          role="listbox"
-          aria-label="Activity"
-          className="scroll-thin flex min-h-0 flex-1 flex-col overflow-y-auto py-1"
-        >
-          {items.length === 0 ? (
-            <div className="px-6 py-8 text-center text-body text-muted-foreground">
-              You&rsquo;re all caught up.
-            </div>
-          ) : (
-            items.map((it) => <ActivityRow key={it.id} item={it} />)
-          )}
-        </div>
-
-        {/* Footer — SMS opt-in CTA. Mirrors the chat ComposerToast
-            visual so the offer reads as the same affordance no matter
-            where the user encounters it. Suppressed once opted in. */}
-        <ActivityFooterCta onPick={() => setOpen(false)} />
-      </div>
-    </div>
-  );
-}
-
-/**
- * Wallet pill — jazzicon wrapped in a token-usage progress ring.
- * Click opens the portfolio side sheet; hover reveals a popover with
- * the full CPU/RAM/Tokens/cost breakdown that used to live in the
- * old nav UsagePill.
- *
- * Ring math: r=16 stroke=2 puts the ring centered at the button's
- * edge with a 2px gap inside between the ring and the jazzicon, and
- * 1px of breathing room outside. SVG starts rotated −90° so progress
- * grows clockwise from 12 o'clock.
- */
-function ConnectedPill({ address }: { address: string }) {
-  const { open, togglePortfolio } = usePortfolioSheet();
-  const { connected, connect } = useWalletConnection();
-  const short = shortAddress(address);
-
-  // Pre-connect: show a clear "Connect" CTA in the chrome.
-  if (!connected) {
-    return (
-      <button
-        type="button"
-        onClick={connect}
-        className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-primary px-4 text-body font-semibold text-primary-foreground transition-[filter,scale] duration-150 ease-out hover:brightness-[1.04] active:scale-[0.96] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-      >
-        Connect
-      </button>
-    );
-  }
-
-  const usage = MOCK_USAGE;
-  const tokenPct = Math.min(
-    100,
-    (usage.tokens.used / usage.tokens.total) * 100,
-  );
-  const RING_RADIUS = 16;
-  const RING_CIRC = 2 * Math.PI * RING_RADIUS;
-  const dashLen = (tokenPct / 100) * RING_CIRC;
-
-  return (
-    <div className="group relative shrink-0">
-      <button
-        type="button"
-        aria-label={`Wallet ${short}. Tokens used: ${Math.round(tokenPct)}%. Open portfolio.`}
-        aria-expanded={open}
-        data-demo="portfolio-toggle"
-        onClick={togglePortfolio}
-        className={cn(
-          "relative inline-flex size-9 items-center justify-center rounded-full transition-[background-color,scale] duration-150 ease-out active:scale-[0.96]",
-          open ? "bg-primary/10" : "hover:bg-surface-2",
-        )}
-      >
-        <svg
-          aria-hidden
-          viewBox="0 0 36 36"
-          className="pointer-events-none absolute inset-0 size-9 -rotate-90"
-        >
-          <circle
-            cx="18"
-            cy="18"
-            r={RING_RADIUS}
-            fill="none"
-            stroke="rgba(255,255,255,0.10)"
-            strokeWidth={2}
-          />
-          <circle
-            cx="18"
-            cy="18"
-            r={RING_RADIUS}
-            fill="none"
-            stroke="var(--primary)"
-            strokeWidth={2}
-            strokeLinecap="round"
-            strokeDasharray={`${dashLen} ${RING_CIRC}`}
-            className="transition-[stroke-dasharray] duration-500 ease-out"
-          />
-        </svg>
-        {/* Jazzicon (default) cross-fades with the % label (on hover).
-            Both share the same circular slot so the swap reads as
-            the icon FLIPPING to a percentage, not a popover. */}
-        <span
-          aria-hidden
-          className="relative flex size-[26px] items-center justify-center"
-        >
-          <span className="absolute inset-0 flex items-center justify-center overflow-hidden rounded-full opacity-100 transition-opacity duration-150 ease-out group-hover:opacity-0">
-            <Jazzicon diameter={26} seed={jsNumberForAddress(address)} />
-          </span>
-          <span className="absolute inset-0 flex items-center justify-center text-micro font-semibold tabular-nums text-foreground opacity-0 transition-opacity duration-150 ease-out group-hover:opacity-100">
-            {Math.round(tokenPct)}%
-          </span>
-        </span>
-      </button>
-    </div>
-  );
-}
-
-/** Inline switch row for app-level chrome the user can opt into. Lives
- *  at the top of the add-panel menu so the toggle is discoverable
- *  alongside the regular panel catalog. */
 /**
  * 2-column grid of workspace toggles. Each tile is a label + icon +
  * mini switch, no descriptions — the label is self-explanatory and

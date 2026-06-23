@@ -98,7 +98,7 @@ export function CommandSearchBar() {
         aria-label="Search tokens and paths"
         onClick={openGlobal}
         data-demo="command-trigger"
-        className="inline-flex h-[var(--ui-h-input)] w-full items-center gap-2.5 rounded-lg bg-surface-3 px-3.5 text-foreground transition-[background-color] duration-150 ease-out hover:bg-surface-4"
+        className="inline-flex h-8 w-full items-center gap-2.5 rounded-md bg-surface-3 px-3 text-foreground transition-[background-color] duration-150 ease-out hover:bg-surface-4"
       >
         <SearchIcon />
         <span className="flex-1 truncate text-left text-body text-muted-foreground">

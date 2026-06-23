@@ -10,8 +10,6 @@ import {
   RotateCw,
   Sparkles,
   Square,
-  Wrench,
-  X,
 } from "lucide-react";
 import { useClickOutside } from "@/lib/hooks/useClickOutside";
 import { cn } from "@/lib/utils";
@@ -38,6 +36,36 @@ import {
 import type { OpenerProfile } from "../_lib/opener";
 import { usePlan } from "../_state/plan-context";
 
+/** Event the LeftRail's DevTools button dispatches to toggle the
+ *  panel from outside its self-contained FAB. The Wrench FAB and the
+ *  rail button both target the same internal open state. */
+export const DEVTOOLS_TOGGLE_EVENT = "wf:devtools:toggle";
+
+/** Hook version of the gate inside <DevTools /> — exported so the
+ *  LeftRail can hide its DevTools button in production builds that
+ *  don't carry the ?dev=1 flag, matching the FAB's visibility. */
+export function useDevToolsAllowed() {
+  const [allowed, setAllowed] = useState(
+    import.meta.env.MODE !== "production",
+  );
+  useEffect(() => {
+    if (import.meta.env.MODE !== "production") return;
+    try {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("dev") === "1") {
+        window.sessionStorage.setItem("wf-shells-v3-dev", "1");
+        setAllowed(true);
+      } else if (window.sessionStorage.getItem("wf-shells-v3-dev") === "1") {
+        setAllowed(true);
+      }
+    } catch {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("dev") === "1") setAllowed(true);
+    }
+  }, []);
+  return allowed;
+}
+
 const KEYS: { key: string; label: string }[] = [
   { key: "wf-shells-v3-density", label: "Density" },
   { key: "wf-shells-v3-view-v1", label: "View mode" },
@@ -59,27 +87,7 @@ const KEYS: { key: string; label: string }[] = [
 export function DevTools() {
   // Always available in dev. On production, gated behind `?dev=1` (sticky
   // for the session via sessionStorage so the flag survives navigation).
-  const [allowed, setAllowed] = useState(
-    import.meta.env.MODE !== "production",
-  );
-
-  useEffect(() => {
-    if (import.meta.env.MODE !== "production") return;
-    try {
-      const params = new URLSearchParams(window.location.search);
-      if (params.get("dev") === "1") {
-        window.sessionStorage.setItem("wf-shells-v3-dev", "1");
-        setAllowed(true);
-      } else if (window.sessionStorage.getItem("wf-shells-v3-dev") === "1") {
-        setAllowed(true);
-      }
-    } catch {
-      // sessionStorage blocked — fall back to query-param-only
-      const params = new URLSearchParams(window.location.search);
-      if (params.get("dev") === "1") setAllowed(true);
-    }
-  }, []);
-
+  const allowed = useDevToolsAllowed();
   if (!allowed) return null;
   return <DevToolsInner />;
 }
@@ -115,6 +123,16 @@ function DevToolsInner() {
   const rootRef = useRef<HTMLDivElement>(null);
 
   useClickOutside(rootRef, () => setOpen(false), open);
+
+  // External toggle source — the LeftRail's DevTools button dispatches
+  // DEVTOOLS_TOGGLE_EVENT to flip open. Both the FAB and the rail
+  // button share this single open state.
+  useEffect(() => {
+    const onToggle = () => setOpen((v) => !v);
+    window.addEventListener(DEVTOOLS_TOGGLE_EVENT, onToggle);
+    return () =>
+      window.removeEventListener(DEVTOOLS_TOGGLE_EVENT, onToggle);
+  }, []);
 
   useEffect(() => {
     const onHide = (e: Event) => {
@@ -476,19 +494,6 @@ function DevToolsInner() {
         </div>
       )}
 
-      <button
-        type="button"
-        aria-label={open ? "Close dev tools" : "Open dev tools"}
-        aria-expanded={open}
-        onClick={() => setOpen((v) => !v)}
-        className="inline-flex size-9 items-center justify-center rounded-full bg-card backdrop-blur-md text-foreground ring-1 ring-inset ring-white/[0.10] shadow-[0_8px_20px_-8px_rgba(0,0,0,0.7)] transition-[transform,background-color] duration-150 ease-out hover:bg-card/80 active:scale-[0.96]"
-      >
-        {open ? (
-          <X strokeWidth={1.75} className="size-4" aria-hidden />
-        ) : (
-          <Wrench strokeWidth={1.75} className="size-4" aria-hidden />
-        )}
-      </button>
     </div>
   );
 }

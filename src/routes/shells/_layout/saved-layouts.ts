@@ -1,3 +1,4 @@
+import { migrateRemovedPanels } from "./persist";
 import { isWellFormed } from "./reducer";
 import { LAYOUT_SCHEMA_VERSION, type LayoutNode } from "./types";
 
@@ -42,6 +43,13 @@ export function readSavedLayouts(): SavedLayoutEntry[] {
           isWellFormed(entry.layout),
       )
       .filter((entry) => entry.version === LAYOUT_SCHEMA_VERSION)
+      // Strip removed panel types from each saved tree. Entries that
+      // emptied out entirely (their only panel was removed) get dropped.
+      .map((entry) => {
+        const migrated = migrateRemovedPanels(entry.layout);
+        return migrated ? { ...entry, layout: migrated } : null;
+      })
+      .filter((entry): entry is SavedLayoutEntry => entry !== null)
       .sort((a, b) => b.savedAt - a.savedAt);
   } catch {
     return [];

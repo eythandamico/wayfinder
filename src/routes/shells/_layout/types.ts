@@ -24,7 +24,6 @@ export type PanelType =
   | "orderbook"
   | "customChart"
   | "companion"
-  | "friends"
   | "movers"
   | "watchlist"
   | "miniCharts"

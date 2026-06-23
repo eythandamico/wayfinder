@@ -10,10 +10,11 @@ import {
   type ReactNode,
 } from "react";
 import { MARKETS } from "../_data/mocks";
+import { CONTACTS } from "../_data/contacts";
 import type { Market } from "../_types";
 
 export type Density = "small" | "medium" | "large";
-export type ViewMode = "trading" | "explore";
+export type ViewMode = "trading" | "explore" | "loops" | "settings";
 
 /**
  * Prediction-market target — the single source of truth for "what's
@@ -39,6 +40,14 @@ const MARQUEE_ENABLED_KEY = "wf-shells-v3-marquee-v1";
 const REDUCE_MOTION_KEY = "wf-shells-v3-reduce-motion-v1";
 const SOUND_KEY = "wf-shells-v3-sound-v1";
 const AMBIENT_KEY = "wf-shells-v3-ambient-v1";
+const FRIEND_IDS_KEY = "wf-shells-v3-friend-ids-v1";
+
+/** Initial friend set — seeded from CONTACTS the first time a user
+ *  loads the app. Persisted additions/removals then live in
+ *  localStorage under FRIEND_IDS_KEY. */
+const DEFAULT_FRIEND_IDS = CONTACTS.filter((c) => c.kind === "friend").map(
+  (c) => c.id,
+);
 /** Default layout's first chart panel — claims main-chart status on
  *  first load so the trade panel has something to bind to out of the
  *  box. Stays in sync with `_layout/default.ts`. */
@@ -59,6 +68,29 @@ type ShellsContextValue = {
   openPortfolio: () => void;
   closePortfolio: () => void;
   togglePortfolio: () => void;
+  friendsOpen: boolean;
+  openFriends: () => void;
+  closeFriends: () => void;
+  toggleFriends: () => void;
+  depositOpen: boolean;
+  openDeposit: () => void;
+  closeDeposit: () => void;
+  /** Friends — the user's social graph. Seeded from CONTACTS where
+   *  kind === "friend" and persisted to localStorage so additions
+   *  survive reload. */
+  friendIds: ReadonlySet<string>;
+  addFriend: (id: string) => void;
+  removeFriend: (id: string) => void;
+  isFriend: (id: string) => boolean;
+  /** Friend chat drill-in — open inside the FriendsSheet over the
+   *  panel body, same slot the TraderProfile uses. null = no chat. */
+  chatWithFriendId: string | null;
+  openFriendChat: (id: string) => void;
+  closeFriendChat: () => void;
+  /** Add-friend modal — opened from the FriendsPanel header. */
+  addFriendOpen: boolean;
+  openAddFriend: () => void;
+  closeAddFriend: () => void;
   /** Which ChartPanel is currently the "main" — its market mirrors
    *  the global activeMarket (and vice versa), so the trade panel /
    *  order book / etc. follow it. null = no main, charts are
@@ -105,6 +137,41 @@ export function ShellsProvider({ children }: { children: ReactNode }) {
   const [activeMarket, setActiveMarket] = useState<Market>(MARKETS[0]);
   const [commandOpen, setCommandOpen] = useState(false);
   const [portfolioOpen, setPortfolioOpen] = useState(false);
+  const [friendsOpen, setFriendsOpen] = useState(false);
+  const [depositOpen, setDepositOpen] = useState(false);
+  const [friendIds, setFriendIds] = useState<ReadonlySet<string>>(
+    () => new Set(DEFAULT_FRIEND_IDS),
+  );
+  const [chatWithFriendId, setChatWithFriendId] = useState<string | null>(
+    null,
+  );
+  const [addFriendOpen, setAddFriendOpen] = useState(false);
+
+  // Hydrate friendIds from localStorage on mount. Two-pass pattern
+  // (same as density/viewMode) avoids reading storage during the
+  // initial render — keeps SSR-safe + skips a hydration mismatch
+  // when the persisted list differs from the seed.
+  useEffect(() => {
+    try {
+      const raw = window.localStorage.getItem(FRIEND_IDS_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) setFriendIds(new Set(parsed));
+      }
+    } catch {
+      /* ignore — storage blocked, stick with the default seed */
+    }
+  }, []);
+  const persistFriendIds = useCallback((next: ReadonlySet<string>) => {
+    try {
+      window.localStorage.setItem(
+        FRIEND_IDS_KEY,
+        JSON.stringify(Array.from(next)),
+      );
+    } catch {
+      /* ignore */
+    }
+  }, []);
   const [density, setDensityState] = useState<Density>("medium");
   const [viewMode, setViewModeState] = useState<ViewMode>("trading");
   const [mainChartId, setMainChartIdState] = useState<string | null>(
@@ -218,6 +285,46 @@ export function ShellsProvider({ children }: { children: ReactNode }) {
   const closePortfolio = useCallback(() => setPortfolioOpen(false), []);
   const togglePortfolio = useCallback(() => setPortfolioOpen((v) => !v), []);
 
+  const openFriends = useCallback(() => setFriendsOpen(true), []);
+  const closeFriends = useCallback(() => setFriendsOpen(false), []);
+  const toggleFriends = useCallback(() => setFriendsOpen((v) => !v), []);
+
+  const openDeposit = useCallback(() => setDepositOpen(true), []);
+  const closeDeposit = useCallback(() => setDepositOpen(false), []);
+
+  const addFriend = useCallback(
+    (id: string) => {
+      setFriendIds((prev) => {
+        if (prev.has(id)) return prev;
+        const next = new Set(prev);
+        next.add(id);
+        persistFriendIds(next);
+        return next;
+      });
+    },
+    [persistFriendIds],
+  );
+  const removeFriend = useCallback(
+    (id: string) => {
+      setFriendIds((prev) => {
+        if (!prev.has(id)) return prev;
+        const next = new Set(prev);
+        next.delete(id);
+        persistFriendIds(next);
+        return next;
+      });
+    },
+    [persistFriendIds],
+  );
+  const isFriend = useCallback((id: string) => friendIds.has(id), [friendIds]);
+  const openFriendChat = useCallback(
+    (id: string) => setChatWithFriendId(id),
+    [],
+  );
+  const closeFriendChat = useCallback(() => setChatWithFriendId(null), []);
+  const openAddFriend = useCallback(() => setAddFriendOpen(true), []);
+  const closeAddFriend = useCallback(() => setAddFriendOpen(false), []);
+
   const setMainChartId = useCallback((id: string | null) => {
     setMainChartIdState(id);
     try {
@@ -318,6 +425,23 @@ export function ShellsProvider({ children }: { children: ReactNode }) {
       openPortfolio,
       closePortfolio,
       togglePortfolio,
+      friendsOpen,
+      openFriends,
+      closeFriends,
+      toggleFriends,
+      depositOpen,
+      openDeposit,
+      closeDeposit,
+      friendIds,
+      addFriend,
+      removeFriend,
+      isFriend,
+      chatWithFriendId,
+      openFriendChat,
+      closeFriendChat,
+      addFriendOpen,
+      openAddFriend,
+      closeAddFriend,
       mainChartId,
       setMainChartId,
       chartMarkets,
@@ -354,6 +478,23 @@ export function ShellsProvider({ children }: { children: ReactNode }) {
       openPortfolio,
       closePortfolio,
       togglePortfolio,
+      friendsOpen,
+      openFriends,
+      closeFriends,
+      toggleFriends,
+      depositOpen,
+      openDeposit,
+      closeDeposit,
+      friendIds,
+      addFriend,
+      removeFriend,
+      isFriend,
+      chatWithFriendId,
+      openFriendChat,
+      closeFriendChat,
+      addFriendOpen,
+      openAddFriend,
+      closeAddFriend,
       mainChartId,
       setMainChartId,
       chartMarkets,
@@ -412,6 +553,50 @@ export function usePortfolioSheet() {
     openPortfolio: ctx.openPortfolio,
     closePortfolio: ctx.closePortfolio,
     togglePortfolio: ctx.togglePortfolio,
+  };
+}
+
+export function useFriendsSheet() {
+  const ctx = useContext(ShellsContext);
+  if (!ctx) {
+    throw new Error("useFriendsSheet must be used inside <ShellsProvider>");
+  }
+  return {
+    open: ctx.friendsOpen,
+    openFriends: ctx.openFriends,
+    closeFriends: ctx.closeFriends,
+    toggleFriends: ctx.toggleFriends,
+  };
+}
+
+export function useDepositModal() {
+  const ctx = useContext(ShellsContext);
+  if (!ctx) {
+    throw new Error("useDepositModal must be used inside <ShellsProvider>");
+  }
+  return {
+    open: ctx.depositOpen,
+    openDeposit: ctx.openDeposit,
+    closeDeposit: ctx.closeDeposit,
+  };
+}
+
+export function useFriends() {
+  const ctx = useContext(ShellsContext);
+  if (!ctx) {
+    throw new Error("useFriends must be used inside <ShellsProvider>");
+  }
+  return {
+    friendIds: ctx.friendIds,
+    addFriend: ctx.addFriend,
+    removeFriend: ctx.removeFriend,
+    isFriend: ctx.isFriend,
+    chatWithFriendId: ctx.chatWithFriendId,
+    openFriendChat: ctx.openFriendChat,
+    closeFriendChat: ctx.closeFriendChat,
+    addFriendOpen: ctx.addFriendOpen,
+    openAddFriend: ctx.openAddFriend,
+    closeAddFriend: ctx.closeAddFriend,
   };
 }
 

@@ -37,6 +37,12 @@ export function AddTokenFooter({
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [triggerWidth, setTriggerWidth] = useState(POPOVER_MIN_WIDTH);
+  // Snapshot of `available` taken when the popover opens. Used for
+  // rendering instead of the live prop so the list doesn't shrink
+  // mid-interaction when the parent adds the just-picked token to
+  // its watchlist (which removes it from `available`). Refreshed on
+  // every open.
+  const [snapshot, setSnapshot] = useState<Market[]>([]);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
 
@@ -56,12 +62,12 @@ export function AddTokenFooter({
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return available;
-    return available.filter((m) => {
+    if (!q) return snapshot;
+    return snapshot.filter((m) => {
       const ticker = m.symbol.split("-")[0]?.toLowerCase() ?? "";
       return ticker.includes(q) || m.symbol.toLowerCase().includes(q);
     });
-  }, [available, query]);
+  }, [snapshot, query]);
 
   // Focus the search input when the popover opens; reset query when it
   // closes so the next open starts clean.
@@ -76,7 +82,8 @@ export function AddTokenFooter({
 
   // Snap the popover width to the trigger BEFORE opening so the first
   // measure inside useFloatingPopover lands at the correct width — no
-  // first-frame jump.
+  // first-frame jump. Also snapshot the current `available` list so
+  // the list doesn't change mid-interaction.
   const toggleOpen = () => {
     if (!open && triggerRef.current) {
       const width = Math.max(
@@ -84,6 +91,7 @@ export function AddTokenFooter({
         triggerRef.current.getBoundingClientRect().width,
       );
       setTriggerWidth(width);
+      setSnapshot(available);
     }
     setOpen((v) => !v);
   };
@@ -96,8 +104,8 @@ export function AddTokenFooter({
     }
     if (e.key === "Enter" && filtered.length > 0) {
       e.preventDefault();
-      onAdd(filtered[0]);
       close();
+      onAdd(filtered[0]);
     }
   };
 
@@ -171,8 +179,12 @@ export function AddTokenFooter({
                     role="option"
                     aria-selected={false}
                     onClick={() => {
-                      onAdd(m);
+                      // Close first so setOpen(false) sits at the
+                      // front of the React batch — the popover
+                      // unmounts cleanly even if onAdd's parent
+                      // re-render flushes asynchronously.
                       close();
+                      onAdd(m);
                     }}
                     className="flex w-full items-center gap-3 px-3 py-2 text-left transition-colors hover:bg-surface-1"
                   >

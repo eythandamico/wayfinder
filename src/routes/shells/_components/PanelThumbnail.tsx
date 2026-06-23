@@ -279,55 +279,6 @@ function MoversArt() {
   );
 }
 
-function FriendsArt() {
-  // Three rows: rank chip + avatar circle + name bar + tiny sparkline.
-  const rows = [
-    { y: 6, top: true },
-    { y: 22, top: false },
-    { y: 38, top: false },
-  ];
-  return (
-    <svg {...SVG_PROPS}>
-      {rows.map(({ y, top }, i) => (
-        <g key={i}>
-          <circle
-            cx={9}
-            cy={y + 6}
-            r={3}
-            className={top ? "fill-primary/60" : "fill-white/15"}
-          />
-          <circle cx={20} cy={y + 6} r={4} className="fill-white/30" />
-          <rect
-            x={28}
-            y={y + 3}
-            width={28}
-            height={3}
-            rx={1}
-            className="fill-white/35"
-          />
-          <rect
-            x={28}
-            y={y + 8}
-            width={18}
-            height={2}
-            rx={1}
-            className="fill-white/15"
-          />
-          <polyline
-            points={`60,${y + 9} 66,${y + 6} 72,${y + 7} 78,${y + 3} 84,${y + 1}`}
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={1.2}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="text-primary/70"
-          />
-        </g>
-      ))}
-    </svg>
-  );
-}
-
 function WatchlistArt() {
   // Four list rows: token dot + ticker bar + right-aligned price.
   // Top row starred to differentiate from Top Movers (sorted by %).
@@ -848,7 +799,6 @@ const RENDERERS: Partial<Record<PanelType, () => React.JSX.Element>> = {
   orderbook: OrderBookArt,
   companion: CompanionArt,
   movers: MoversArt,
-  friends: FriendsArt,
   watchlist: WatchlistArt,
   miniCharts: MiniChartsArt,
   polymarket: PolymarketArt,
