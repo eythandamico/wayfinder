@@ -31,19 +31,38 @@
       Kill stale Service Workers from the previous Next.js deploy.
       next-on-pages registers a SW that intercepts every request and
       can keep serving cached old pages even after the deploy moves
-      to Vite. This unregisters any SW + clears its caches on next
-      page load. Harmless if no SW exists. Safe to remove ~30 days
-      after the cutover when no clients have stale SWs left.
+      to Vite. The SW shadows our new index.html on subsequent visits,
+      so this script ONLY runs when the user hard-refreshes (which
+      bypasses the SW for the document fetch). When that happens we
+      unregister every SW, drop every CacheStorage entry, and force
+      ONE reload so the user sees the new app immediately — not on
+      a second manual refresh. Build marker below also lets us verify
+      from View Source that the new HTML actually landed.
     -->
+    <meta name="wf-build" content="vite-2026-06-24" />
     <script>
-      if ("serviceWorker" in navigator) {
-        navigator.serviceWorker.getRegistrations().then((regs) => {
-          for (const r of regs) r.unregister();
+      (function () {
+        if (!("serviceWorker" in navigator)) return;
+        var sessionKey = "wf-sw-cleanup-done";
+        if (sessionStorage.getItem(sessionKey) === "1") return;
+        navigator.serviceWorker.getRegistrations().then(function (regs) {
+          var hadAny = regs.length > 0;
+          regs.forEach(function (r) { r.unregister(); });
+          var clearCaches = window.caches
+            ? caches.keys().then(function (keys) {
+                return Promise.all(keys.map(function (k) { return caches.delete(k); }));
+              })
+            : Promise.resolve();
+          clearCaches.then(function () {
+            sessionStorage.setItem(sessionKey, "1");
+            if (hadAny) {
+              // Found a stale SW — force a clean reload so the user
+              // sees the new app on this visit, not the next one.
+              window.location.reload();
+            }
+          });
         });
-        if (window.caches) {
-          caches.keys().then((keys) => keys.forEach((k) => caches.delete(k)));
-        }
-      }
+      })();
     </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
