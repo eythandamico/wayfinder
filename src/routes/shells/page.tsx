@@ -33,7 +33,7 @@ import { AgentProofOfLife } from "./_components/AgentProofOfLife";
 import { PhoneNumberModal } from "./_components/PhoneNumberModal";
 import { ShellsBoot } from "./_components/ShellsBoot";
 import { SignalToast } from "./_components/SignalToast";
-import { MobileLayout } from "./_components/mobile/MobileLayout";
+import { MobileShell } from "./_components/mobile/MobileShell";
 import { DEFAULT_LAYOUT } from "./_layout/default";
 import { DragGhost } from "./_layout/DragGhost";
 import { DragProvider } from "./_layout/DragContext";
@@ -160,7 +160,7 @@ export function ShellsPage() {
               : "pointer-events-none opacity-0",
           )}
         >
-          {isDesktop ? <DesktopShell /> : <MobileLayout />}
+          {isDesktop ? <DesktopShell /> : <MobileShell />}
         </div>
 
         {/* Signal cascade — bottom-right toast stack mounted at root

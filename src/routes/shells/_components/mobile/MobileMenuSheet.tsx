@@ -3,35 +3,45 @@
 import {
   ArrowDownLeft,
   ChevronRight,
+  HelpCircle,
   Settings as SettingsIcon,
-  Users,
+  Sparkles,
   type LucideIcon,
 } from "lucide-react";
+import { HELP_EVENT } from "../../_hooks/useShellsKeyboard";
+import { usePlan } from "../../_state/plan-context";
 import { BottomSheet } from "./BottomSheet";
 
 /**
- * Mobile drawer — the equivalent of the desktop LeftRail's nav. The
- * hamburger in MobileTopBar opens this; tapping any row dismisses
- * the menu and triggers its action (which usually opens a more
- * specific sheet — Friends, Settings, Deposit).
+ * Mobile drawer — opens from the hamburger in MobileTopBar. The
+ * drawer holds utility destinations that don't deserve persistent
+ * top-bar real estate (Friends, Activity, and Portfolio already
+ * live up there as quick-access icons).
  *
- * The desktop has these as rail buttons + view-modes; mobile gets a
- * single drawer because the chrome's too narrow for permanent
- * iconography and the user doesn't switch between them often.
+ *   Settings  ·  Pricing / Plan  ·  Deposit  ·  Help
+ *
+ * Friends moved to the top bar; Deposit kept here as an alternate
+ * entry point (the top-bar Earn $5 chip is the primary path
+ * pre-first-deposit, but the drawer is the canonical home for
+ * deposit when the Earn $5 chip is hidden post-deposit).
  */
 export function MobileMenuSheet({
   open,
   onOpenChange,
-  onFriends,
+  onFriends: _onFriends,
   onSettings,
   onDeposit,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  /** Friends moved to the top bar; we keep this prop in the API for
+   *  shell-side wiring symmetry but the drawer no longer surfaces
+   *  it. */
   onFriends: () => void;
   onSettings: () => void;
   onDeposit: () => void;
 }) {
+  const { openPricing, isPro } = usePlan();
   return (
     <BottomSheet
       open={open}
@@ -41,31 +51,45 @@ export function MobileMenuSheet({
     >
       <div className="flex flex-col px-2 pb-2">
         <MenuRow
-          icon={Users}
-          label="Friends"
-          description="Your social graph, leaderboard, messages"
-          onClick={onFriends}
-        />
-        <MenuRow
-          icon={ArrowDownLeft}
-          label="Deposit"
-          description="Fund your account — earn $5 in agent credit"
-          onClick={onDeposit}
-        />
-        <MenuRow
           icon={SettingsIcon}
           label="Settings"
           description="Account, wallet, API"
           onClick={onSettings}
+        />
+        {!isPro && (
+          <MenuRow
+            icon={Sparkles}
+            label="Upgrade to Pro"
+            description="Unlock the full agent + Pro panels"
+            onClick={() => {
+              onOpenChange(false);
+              openPricing("manual");
+            }}
+          />
+        )}
+        <MenuRow
+          icon={ArrowDownLeft}
+          label="Deposit"
+          description="Fund your account"
+          onClick={onDeposit}
+        />
+        <MenuRow
+          icon={HelpCircle}
+          label="Keyboard shortcuts"
+          description="Quick reference"
+          onClick={() => {
+            onOpenChange(false);
+            window.dispatchEvent(new CustomEvent(HELP_EVENT));
+          }}
         />
       </div>
     </BottomSheet>
   );
 }
 
-/** Single drawer row — icon + title + description, trailing chevron.
- *  Generous touch target (h-14) so the menu feels native on a phone
- *  rather than a desktop dropdown shrunk down. */
+/** Single drawer row — icon + title + description, trailing
+ *  chevron. Generous touch target (h-14) so the menu feels native
+ *  on a phone rather than a desktop dropdown shrunk down. */
 function MenuRow({
   icon: Icon,
   label,

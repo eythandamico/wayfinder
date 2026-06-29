@@ -112,7 +112,7 @@ export function BottomSheet({
         <Dialog.Popup
           ref={popupRef}
           className={cn(
-            "fixed inset-x-0 bottom-0 z-50 flex flex-col overflow-hidden rounded-t-2xl bg-muted shadow-[0_-20px_60px_-20px_rgba(0,0,0,0.65)]",
+            "fixed inset-x-0 bottom-0 z-50 flex flex-col overflow-hidden rounded-t-2xl bg-card shadow-[0_-20px_60px_-20px_rgba(0,0,0,0.65)]",
             "pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]",
             // Transform animates UNLESS the user is mid-drag — that
             // way the snap-back uses ease-out and the live drag is
