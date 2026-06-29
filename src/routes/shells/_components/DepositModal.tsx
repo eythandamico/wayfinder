@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Dialog } from "@base-ui/react/dialog";
 import {
   ArrowLeft,
@@ -152,9 +152,34 @@ function SelectTokenStep({
     });
   }, [query, filter]);
 
+  const { hasDeposited } = useDepositModal();
   return (
     <>
       <TitleRow title="Deposit" onClose={onClose} />
+
+      {/* First-deposit reward promo — only shown until the user has
+       *  funded once. Sits above the search so the value prop is the
+       *  first thing the eye lands on. Big "$5" carries the offer;
+       *  the body explains the agent-credit unlock. */}
+      {!hasDeposited && (
+        <div className="flex items-center gap-3 border-b border-white/[0.05] bg-surface-1 px-4 py-3">
+          <span
+            aria-hidden
+            className="font-heading text-display font-semibold leading-none text-primary"
+          >
+            $5
+          </span>
+          <div className="flex min-w-0 flex-1 flex-col leading-tight">
+            <span className="text-body font-semibold text-foreground">
+              $5 in agent credit
+            </span>
+            <span className="text-caption text-muted-foreground">
+              Deposit any amount and we'll credit $5 of token usage to
+              your agent. One-time, applied automatically.
+            </span>
+          </div>
+        </div>
+      )}
 
       {/* Search row — flush with the modal, divider below. */}
       <div className="flex items-center gap-3 border-b border-white/[0.05] px-4 py-3">
@@ -328,6 +353,14 @@ function DepositStep({
   onBack: () => void;
 }) {
   const [copied, setCopied] = useState(false);
+  const { markDeposited } = useDepositModal();
+  // Reaching this step (the funded deposit screen with the QR + an
+  // address) is our proxy for "they're going to deposit". Mark once
+  // on mount — the Earn $5 chip in the top bar disappears, the
+  // in-modal promo card stops showing on subsequent opens.
+  useEffect(() => {
+    markDeposited();
+  }, [markDeposited]);
 
   const copyAddress = async () => {
     try {

@@ -93,10 +93,11 @@ export function ChartPanel({
   return (
     <div className="flex h-full flex-col overflow-hidden">
       <div className="flex items-center gap-4 px-3 pt-3 pb-3">
-        {/* On mobile (tfPosition="below") the MobileMarketBar above
-            the chart is the persistent market affordance, so we skip
-            the market selector + external link here and let metrics
-            take the full row. */}
+        {/* On mobile (tfPosition="below") the chart is one of the
+            panels in the swipe deck — the deck's title strip is the
+            persistent market affordance, so we skip the market
+            selector + external link here and let metrics take the
+            full row. */}
         {tfPosition === "header" && (
           <>
             <button

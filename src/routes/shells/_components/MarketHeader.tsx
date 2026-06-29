@@ -99,7 +99,7 @@ export function MarketHeader() {
       </div>
 
       <div className="flex items-center justify-end gap-2">
-        <DepositButton />
+        <DepositGroup />
         <PortfolioTotalChip />
         <PortfolioSheetTopBarToggle />
         <WalletPill address={WALLET_ADDRESS} />
@@ -147,25 +147,60 @@ function PortfolioTotalChip() {
     <button
       type="button"
       onClick={togglePortfolio}
-      aria-label={`Portfolio total ${usd.format(MOCK_ACCOUNT.balance)}. Open portfolio.`}
-      className="inline-flex h-8 shrink-0 items-center rounded-md px-2.5 text-body font-semibold tabular-nums text-foreground transition-[background-color] duration-150 ease-out hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
+      aria-label={`Portfolio total ${usd.format(MOCK_ACCOUNT.balance)} USD. Open portfolio.`}
+      className="inline-flex h-8 shrink-0 items-center gap-1 rounded-md px-2.5 text-body font-semibold tabular-nums text-foreground transition-[background-color] duration-150 ease-out hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
     >
       {usd.format(MOCK_ACCOUNT.balance)}
+      <span className="font-normal text-muted-foreground">USD</span>
     </button>
   );
 }
 
-/** Top-bar Deposit shortcut — opens the canonical 3-step Deposit
- *  modal (select token → network → QR). Visual treatment matches the
- *  Add-style chip so the right cluster reads as one toolset. */
-function DepositButton() {
-  const { openDeposit } = useDepositModal();
+/** Top-bar Deposit cluster — opens the canonical 3-step Deposit
+ *  modal. Before the user funds for the first time, an "Earn $5"
+ *  segment sits flush on the left of the Deposit button and shares
+ *  its border so the two read as one connected control. Once the
+ *  reward is claimed, the Earn segment disappears and Deposit's
+ *  rounding restores to a normal chip. */
+function DepositGroup() {
+  const { hasDeposited, openDeposit } = useDepositModal();
+  if (hasDeposited) {
+    return <DepositButton onClick={openDeposit} rounding="full" />;
+  }
+  return (
+    <div className="inline-flex items-stretch">
+      <button
+        type="button"
+        onClick={openDeposit}
+        aria-label="Earn $5 in agent credit by making your first deposit"
+        title="Deposit any amount and earn $5 of agent token credit"
+        className="inline-flex h-8 shrink-0 items-center rounded-l-md bg-primary/15 px-2.5 text-body font-semibold text-primary transition-colors duration-150 ease-out hover:bg-primary/20 active:scale-[0.96] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
+      >
+        Earn $5
+      </button>
+      <DepositButton onClick={openDeposit} rounding="right" />
+    </div>
+  );
+}
+
+/** Deposit chip — solid surface-3 fill, rounding swaps based on
+ *  whether the Earn $5 segment is sitting flush against it. */
+function DepositButton({
+  onClick,
+  rounding,
+}: {
+  onClick: () => void;
+  rounding: "full" | "right";
+}) {
   return (
     <button
       type="button"
-      onClick={openDeposit}
+      onClick={onClick}
       aria-label="Deposit"
-      className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-md bg-surface-3 px-2.5 text-body font-medium text-foreground transition-[background-color,scale] duration-150 ease-out hover:bg-surface-4 active:scale-[0.96]"
+      className={cn(
+        "inline-flex h-8 shrink-0 items-center gap-1.5 bg-surface-3 px-2.5 text-body font-medium text-foreground transition-[background-color,scale] duration-150 ease-out hover:bg-surface-4 active:scale-[0.96] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60",
+        rounding === "full" ? "rounded-md" : "rounded-r-md",
+      )}
     >
       <ArrowDownLeft strokeWidth={1.75} className="size-4" aria-hidden />
       Deposit

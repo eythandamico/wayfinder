@@ -41,6 +41,7 @@ const REDUCE_MOTION_KEY = "wf-shells-v3-reduce-motion-v1";
 const SOUND_KEY = "wf-shells-v3-sound-v1";
 const AMBIENT_KEY = "wf-shells-v3-ambient-v1";
 const FRIEND_IDS_KEY = "wf-shells-v3-friend-ids-v1";
+const DEPOSITED_KEY = "wf-shells-v3-has-deposited-v1";
 
 /** Initial friend set — seeded from CONTACTS the first time a user
  *  loads the app. Persisted additions/removals then live in
@@ -75,6 +76,12 @@ type ShellsContextValue = {
   depositOpen: boolean;
   openDeposit: () => void;
   closeDeposit: () => void;
+  /** Has the user reached the funded-deposit step at least once?
+   *  Persisted to localStorage. Drives the "Earn $5" affordance in
+   *  the top bar + the promo card inside the deposit modal — both
+   *  disappear after the first deposit flow completes. */
+  hasDeposited: boolean;
+  markDeposited: () => void;
   /** Friends — the user's social graph. Seeded from CONTACTS where
    *  kind === "friend" and persisted to localStorage so additions
    *  survive reload. */
@@ -139,6 +146,7 @@ export function ShellsProvider({ children }: { children: ReactNode }) {
   const [portfolioOpen, setPortfolioOpen] = useState(false);
   const [friendsOpen, setFriendsOpen] = useState(false);
   const [depositOpen, setDepositOpen] = useState(false);
+  const [hasDeposited, setHasDeposited] = useState(false);
   const [friendIds, setFriendIds] = useState<ReadonlySet<string>>(
     () => new Set(DEFAULT_FRIEND_IDS),
   );
@@ -168,6 +176,26 @@ export function ShellsProvider({ children }: { children: ReactNode }) {
         FRIEND_IDS_KEY,
         JSON.stringify(Array.from(next)),
       );
+    } catch {
+      /* ignore */
+    }
+  }, []);
+  // Hydrate the has-deposited flag from storage on mount. Two-pass
+  // (initial false → updated from storage) so first render is SSR-
+  // identical and we don't flash the Earn $5 chip before clearing it.
+  useEffect(() => {
+    try {
+      if (window.localStorage.getItem(DEPOSITED_KEY) === "1") {
+        setHasDeposited(true);
+      }
+    } catch {
+      /* ignore */
+    }
+  }, []);
+  const markDeposited = useCallback(() => {
+    setHasDeposited(true);
+    try {
+      window.localStorage.setItem(DEPOSITED_KEY, "1");
     } catch {
       /* ignore */
     }
@@ -432,6 +460,8 @@ export function ShellsProvider({ children }: { children: ReactNode }) {
       depositOpen,
       openDeposit,
       closeDeposit,
+      hasDeposited,
+      markDeposited,
       friendIds,
       addFriend,
       removeFriend,
@@ -485,6 +515,8 @@ export function ShellsProvider({ children }: { children: ReactNode }) {
       depositOpen,
       openDeposit,
       closeDeposit,
+      hasDeposited,
+      markDeposited,
       friendIds,
       addFriend,
       removeFriend,
@@ -578,6 +610,8 @@ export function useDepositModal() {
     open: ctx.depositOpen,
     openDeposit: ctx.openDeposit,
     closeDeposit: ctx.closeDeposit,
+    hasDeposited: ctx.hasDeposited,
+    markDeposited: ctx.markDeposited,
   };
 }
 

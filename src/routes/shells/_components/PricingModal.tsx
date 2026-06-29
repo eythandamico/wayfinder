@@ -233,19 +233,20 @@ function PlanCard({
         </div>
 
         {/* Price + 2-line meta — display-size number left, billing
-            cadence + period stacked right. items-center vertically
-            centers the 2-line meta block against the digit so the
-            two lines sit balanced across the price's mid-line
-            rather than baseline-anchored to its descender. Extra
-            top margin opens up breathing room between the tagline
-            and the price so the digit reads as its own section
-            rather than a third line under the blurb. */}
-        <div className="mt-3 flex items-center gap-3">
+            cadence + period stacked right. items-end pins the
+            caption stack's bottom to the price's baseline so the
+            two lines read as anchored to the digit rather than
+            floating above its visual middle (which items-center
+            produced — the $ sign's ascender pushed the small
+            captions visually high). A small pb on the captions
+            keeps "billed annually" sitting just above the baseline
+            for a touch of breathing room rather than dead-flush. */}
+        <div className="mt-3 flex items-end gap-3">
           <span className="text-display font-semibold leading-none tabular-nums text-foreground">
             {displayPrice}
           </span>
           {plan.yearlyPrice && (
-            <div className="flex flex-col text-caption leading-tight text-muted-foreground">
+            <div className="flex flex-col pb-1 text-caption leading-tight text-muted-foreground">
               <span>USD / month</span>
               <span>
                 {showYearly

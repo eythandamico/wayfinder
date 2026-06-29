@@ -99,9 +99,11 @@ export function TraderProfile({
       </div>
 
       <div className="scroll-thin min-h-0 flex-1 overflow-y-auto px-3 pb-4">
-        {/* Avatar + actions. Message is always the primary CTA —
-         *  social action is the point of this surface. Follow and
-         *  Copy Trade live as secondary icon toggles. */}
+        {/* Avatar + actions. Message is the primary CTA when mutual;
+         *  otherwise Follow takes that slot. Copy trades is promoted
+         *  to a labeled chip — it's a high-commitment action and
+         *  deserves more weight than a 36px icon. Follow stays as a
+         *  small icon-only toggle when Message is primary. */}
         <div className="flex items-center gap-3 pt-1">
           <TraderAvatar trader={trader} size={64} />
           <div className="ml-auto flex items-center gap-1.5">
@@ -123,6 +125,11 @@ export function TraderProfile({
                 onClick={() => toggleFollow(trader.id)}
               />
             )}
+            <CopyTradesChip
+              copying={copying}
+              onClick={() => toggleAutoMirror(trader.id)}
+              traderName={trader.name}
+            />
             {mutual && (
               <SecondaryIconButton
                 onClick={() => toggleFollow(trader.id)}
@@ -137,18 +144,6 @@ export function TraderProfile({
                 )}
               </SecondaryIconButton>
             )}
-            <SecondaryIconButton
-              onClick={() => toggleAutoMirror(trader.id)}
-              ariaLabel={
-                copying
-                  ? `Stop copying ${trader.name}`
-                  : `Copy ${trader.name}'s trades`
-              }
-              ariaPressed={copying}
-              variant={copying ? "active" : "ghost"}
-            >
-              <Repeat2 strokeWidth={2} className="size-4" aria-hidden />
-            </SecondaryIconButton>
           </div>
         </div>
 
@@ -348,6 +343,41 @@ function PrimaryCta({
         {icon}
         {label}
       </span>
+    </button>
+  );
+}
+
+/** Labeled Copy Trades chip — promoted from an icon-only toggle so
+ *  this high-commitment action carries visual weight. Inactive uses
+ *  the same neutral surface-3 chip as Deposit; active uses a mint
+ *  tint (no ring) so the "is copying" state reads as a declared,
+ *  ongoing relationship without re-introducing the slop pattern. */
+function CopyTradesChip({
+  copying,
+  onClick,
+  traderName,
+}: {
+  copying: boolean;
+  onClick: () => void;
+  traderName: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={copying}
+      aria-label={
+        copying ? `Stop copying ${traderName}` : `Copy ${traderName}'s trades`
+      }
+      className={cn(
+        "inline-flex h-9 items-center gap-1.5 rounded-md px-3 text-body font-semibold transition-[background-color,color,scale] duration-150 ease-out active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60",
+        copying
+          ? "bg-primary/15 text-primary hover:bg-primary/20"
+          : "bg-surface-3 text-foreground hover:bg-surface-4",
+      )}
+    >
+      <Repeat2 strokeWidth={2} className="size-4" aria-hidden />
+      {copying ? "Copying" : "Copy trades"}
     </button>
   );
 }
