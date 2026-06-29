@@ -59,7 +59,8 @@ export function SignalToast() {
     <div
       aria-live="polite"
       aria-label="Trading idea notifications"
-      className="pointer-events-none fixed bottom-6 left-6 z-50 flex flex-col-reverse gap-2"
+      className="pointer-events-none fixed inset-x-0 z-50 flex flex-col gap-2 px-3"
+      style={{ top: "calc(env(safe-area-inset-top) + 0.75rem)" }}
     >
       {stack.map((event) => (
         <ToastCard
@@ -95,21 +96,9 @@ function ToastCard({
 
   return (
     <span
-      className="pointer-events-none relative inline-block animate-in slide-in-from-left-4 fade-in zoom-in-95 ease-[var(--ease-strong)]"
+      className="pointer-events-none block animate-in slide-in-from-top-4 fade-in ease-[var(--ease-strong)]"
       style={{ animationDuration: "300ms" }}
     >
-      {/* Dark radial halo behind the card — softens whatever sits
-          underneath so the toast pops off the page without needing a
-          colored brand glow. Extends beyond the toast bounds via
-          negative inset so the gradient has room to fade. */}
-      <span
-        aria-hidden
-        className="pointer-events-none absolute -inset-8 -z-10 rounded-[28px]"
-        style={{
-          background:
-            "radial-gradient(ellipse 60% 70% at 50% 50%, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.35) 45%, rgba(0,0,0,0.1) 70%, transparent 90%)",
-        }}
-      />
       <button
         type="button"
         onClick={onOpen}
@@ -118,10 +107,8 @@ function ToastCard({
         className={cn(
           // Clean dropdown surface — same DNA as the activity dropdown
           // and chat history menus: bg-popover + backdrop blur + inset
-          // white ring + a single dark drop shadow. No colored halo —
-          // the dark radial behind the card carries the "this is
-          // arriving" presence instead.
-          "pointer-events-auto group relative w-[340px] overflow-hidden rounded-lg bg-popover text-left backdrop-blur-md ring-1 ring-inset ring-white/10 shadow-[0_16px_36px_-12px_rgba(0,0,0,0.6),0_4px_12px_-4px_rgba(0,0,0,0.4)] transition-[transform,box-shadow] duration-150 ease-out hover:-translate-y-px hover:ring-white/15",
+          // white ring + a single dark drop shadow.
+          "pointer-events-auto group relative block w-full overflow-hidden rounded-lg bg-popover text-left backdrop-blur-md ring-1 ring-inset ring-white/10 shadow-[0_16px_36px_-12px_rgba(0,0,0,0.6),0_4px_12px_-4px_rgba(0,0,0,0.4)] transition-[box-shadow] duration-150 ease-out hover:ring-white/15",
         )}
       >
       {/* Same anatomy as a NotificationRow — avatar + title row +

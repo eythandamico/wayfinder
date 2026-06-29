@@ -53,9 +53,10 @@ export function FloatingComposer({
       className={cn(
         "pointer-events-none absolute inset-x-3 z-30",
         // Floats just above the bottom tab bar — the tab bar's
-        // height (~52px) + safe-area inset, plus a small gap so
-        // the composer's shadow has room to read.
-        "[bottom:calc(env(safe-area-inset-bottom)+3.75rem)]",
+        // height (~68px after the v3 padding bump) + safe-area
+        // inset, plus extra breathing room so the composer reads
+        // as separate from the nav, not glued to it.
+        "[bottom:calc(env(safe-area-inset-bottom)+5.25rem)]",
       )}
     >
       <div

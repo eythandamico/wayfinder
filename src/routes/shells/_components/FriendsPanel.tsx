@@ -140,6 +140,7 @@ export function FriendsPanel() {
         id={`friends-panel-${tab}`}
         role="tabpanel"
         className="scroll-thin min-h-0 flex-1 overflow-y-auto"
+        style={{ paddingBottom: "var(--shell-footer-pad, 0)" }}
       >
         {tab === "friends" && (
           <FriendsTab query={query} onSelect={setSelectedId} />

@@ -287,7 +287,10 @@ function MainView({
       </div>
 
       {/* Scrollable body */}
-      <div className="scroll-thin min-h-0 flex-1 overflow-y-auto">
+      <div
+        className="scroll-thin min-h-0 flex-1 overflow-y-auto"
+        style={{ paddingBottom: "var(--shell-footer-pad, 0)" }}
+      >
         {/* Wallet-level Deposit / Withdraw — sits right under the
             wallet identity row so the funding affordance is obvious.
             Diff #3 feedback was "hard to see and the spot is not

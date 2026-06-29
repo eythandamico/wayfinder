@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Home,
   LayoutGrid,
   LineChart,
   Users,
@@ -9,7 +10,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export type ShellTab = "friends" | "trade" | "portfolio" | "more";
+export type ShellTab = "home" | "friends" | "trade" | "portfolio" | "more";
 
 /**
  * Four-tab bottom nav. Friends / Trade / Portfolio are the real
@@ -34,9 +35,15 @@ export function BottomTabs({
     <nav
       role="tablist"
       aria-label="Primary"
-      className="flex shrink-0 items-stretch gap-1 border-t border-white/[0.05] bg-background px-2 pt-1"
-      style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 0.25rem)" }}
+      className="absolute inset-x-0 bottom-0 z-30 flex items-stretch gap-1 px-2 pt-2"
+      style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 0.625rem)" }}
     >
+      <TabButton
+        active={active === "home"}
+        onClick={() => onChange("home")}
+        label="Home"
+        icon={Home}
+      />
       <TabButton
         active={active === "friends"}
         onClick={() => onChange("friends")}
