@@ -9,88 +9,61 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { HELP_EVENT } from "../../_hooks/useShellsKeyboard";
+import { useDepositModal } from "../../_state/shells-context";
 import { usePlan } from "../../_state/plan-context";
-import { BottomSheet } from "./BottomSheet";
 
 /**
- * Mobile drawer — opens from the hamburger in MobileTopBar. The
- * drawer holds utility destinations that don't deserve persistent
- * top-bar real estate (Friends, Activity, and Portfolio already
- * live up there as quick-access icons).
+ * More tab body — the overflow page for secondary destinations.
+ * Replaces the v2 hamburger drawer entirely; tapping the More
+ * bottom-tab makes this view active rather than overlaying a
+ * sheet. Each row launches a modal/sheet for its destination.
  *
- *   Settings  ·  Pricing / Plan  ·  Deposit  ·  Help
- *
- * Friends moved to the top bar; Deposit kept here as an alternate
- * entry point (the top-bar Earn $5 chip is the primary path
- * pre-first-deposit, but the drawer is the canonical home for
- * deposit when the Earn $5 chip is hidden post-deposit).
+ * Settings (full-screen sheet), Pricing/Plan (centered modal),
+ * Deposit (centered modal), Keyboard shortcuts (event dispatch).
  */
-export function MobileMenuSheet({
-  open,
-  onOpenChange,
-  onFriends: _onFriends,
-  onSettings,
-  onDeposit,
-}: {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  /** Friends moved to the top bar; we keep this prop in the API for
-   *  shell-side wiring symmetry but the drawer no longer surfaces
-   *  it. */
-  onFriends: () => void;
-  onSettings: () => void;
-  onDeposit: () => void;
-}) {
+export function MoreTab({ onOpenSettings }: { onOpenSettings: () => void }) {
+  const { openDeposit } = useDepositModal();
   const { openPricing, isPro } = usePlan();
   return (
-    <BottomSheet
-      open={open}
-      onOpenChange={onOpenChange}
-      title="Menu"
-      heightFraction={0.55}
-    >
-      <div className="flex flex-col px-2 pb-2">
-        <MenuRow
+    <div className="scroll-thin flex h-full min-h-0 flex-col overflow-y-auto px-3 pt-3 pb-32">
+      <div className="px-1 pb-2 text-caption uppercase tracking-[0.14em] text-muted-foreground">
+        More
+      </div>
+      <div className="flex flex-col">
+        <MoreRow
           icon={SettingsIcon}
           label="Settings"
           description="Account, wallet, API"
-          onClick={onSettings}
+          onClick={onOpenSettings}
         />
         {!isPro && (
-          <MenuRow
+          <MoreRow
             icon={Sparkles}
             label="Upgrade to Pro"
             description="Unlock the full agent + Pro panels"
-            onClick={() => {
-              onOpenChange(false);
-              openPricing("manual");
-            }}
+            onClick={() => openPricing("manual")}
           />
         )}
-        <MenuRow
+        <MoreRow
           icon={ArrowDownLeft}
           label="Deposit"
           description="Fund your account"
-          onClick={onDeposit}
+          onClick={openDeposit}
         />
-        <MenuRow
+        <MoreRow
           icon={HelpCircle}
           label="Keyboard shortcuts"
           description="Quick reference"
           onClick={() => {
-            onOpenChange(false);
             window.dispatchEvent(new CustomEvent(HELP_EVENT));
           }}
         />
       </div>
-    </BottomSheet>
+    </div>
   );
 }
 
-/** Single drawer row — icon + title + description, trailing
- *  chevron. Generous touch target (h-14) so the menu feels native
- *  on a phone rather than a desktop dropdown shrunk down. */
-function MenuRow({
+function MoreRow({
   icon: Icon,
   label,
   description,
@@ -105,7 +78,7 @@ function MenuRow({
     <button
       type="button"
       onClick={onClick}
-      className="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left transition-colors hover:bg-surface-2 active:bg-surface-3"
+      className="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left transition-colors hover:bg-surface-1 active:bg-surface-2"
     >
       <span
         aria-hidden

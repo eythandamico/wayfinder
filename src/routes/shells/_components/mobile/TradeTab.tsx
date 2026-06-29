@@ -1,23 +1,29 @@
 "use client";
 
 import { TradePanel } from "../TradePanel";
+import { ChartYoke } from "./ChartYoke";
 
 /**
- * Trade tab body — for v1, render the desktop TradePanel inside a
- * single-column scrollable container. TradePanel.tsx is already a
- * vertically-stacked form on narrow viewports (long/short toggle,
- * size input, leverage slider, confirm CTA), so a 390px column is
- * roughly the right shape.
+ * Trade tab body — chart yoke at top, TradePanel below.
  *
- * v2 will swap this for a phone-native ticket that drops the
- * multi-venue switcher + advanced order types into a "More" sheet
- * and surfaces the most common path (market long/short with
- * suggested size) as the default. For now we ship desktop parity.
+ * v3 moves the ChartYoke from shell-level (where v2 had it
+ * persisting across Agent↔Trade switches) into the Trade tab
+ * itself, since Friends and Portfolio don't need a chart and
+ * "chart context persists across tabs" stopped being a real
+ * requirement once the agent moved to a floating composer instead
+ * of a peer tab.
+ *
+ * The user can collapse the yoke to {0, 120, 360}px via its drag
+ * handle, so a heavy TradePanel session can fully hide the chart
+ * if they want vertical room.
  */
 export function TradeTab() {
   return (
-    <div className="scroll-thin flex h-full min-h-0 flex-col overflow-y-auto">
-      <TradePanel />
+    <div className="flex h-full min-h-0 flex-col overflow-hidden">
+      <ChartYoke />
+      <div className="scroll-thin flex min-h-0 flex-1 flex-col overflow-y-auto">
+        <TradePanel />
+      </div>
     </div>
   );
 }

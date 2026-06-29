@@ -6,52 +6,42 @@ import {
   ChevronDown,
   CandlestickChart,
   Compass,
-  Menu,
   Repeat,
-  Users,
 } from "lucide-react";
 import Jazzicon, { jsNumberForAddress } from "react-jazzicon";
 import { WALLET_ADDRESS } from "../../_data/mocks";
 import {
   useCommandBar,
   useDepositModal,
-  useFriendsSheet,
   usePortfolioSheet,
   useViewMode,
   type ViewMode,
 } from "../../_state/shells-context";
 import { useClickOutside } from "@/lib/hooks/useClickOutside";
 import { useActivity } from "../../_state/activity-context";
-import { MOCK_ACCOUNT } from "../PortfolioPanel";
 import { SearchIcon } from "../icons";
 import { shortAddress } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
-const USD_COMPACT = new Intl.NumberFormat("en-US", {
-  style: "currency",
-  currency: "USD",
-  notation: "compact",
-  maximumFractionDigits: 1,
-});
-
 /**
- * Top bar for the mobile shell v2.
+ * Top bar for the mobile shell v3.
  *
- *   [☰] [Trade ▾] · · · [👥] [🔔] [Earn $5] [$26K] [avatar]
+ *   [Trade ▾]                  [🔍] [🔔] [Earn $5] [wallet]
  *
- * - Hamburger opens MobileMenuSheet
- * - View-mode pill switches Trade / Paths / Loops via useViewMode
- * - Friends + Activity get promoted to top-bar quick-access (no
- *   buried-in-drawer trap)
- * - Earn $5 hides post-first-deposit
- * - Portfolio chip is the compact $26K format; click opens
- *   portfolio sheet (same target as the wallet avatar)
+ * The hamburger left the top bar — More tab in the bottom nav is
+ * the canonical menu now. Friends + portfolio total + portfolio
+ * toggle also left, since they're all bottom-nav tabs in v3.
+ *
+ * What stayed:
+ * - View-mode pill (Trade / Paths / Loops) — represents the
+ *   desktop LeftRail's view-mode switcher
+ * - Search button — opens CommandBar
+ * - Bell — Activity unread badge; full sheet TBD
+ * - Earn $5 chip — hides post-first-deposit
+ * - Wallet avatar — opens the portfolio sheet (shortcut for users
+ *   who want the rich portfolio view from any tab)
  */
-export function MobileTopBar({
-  onOpenMenu,
-}: {
-  onOpenMenu: () => void;
-}) {
+export function MobileTopBar() {
   return (
     <header
       className="flex shrink-0 items-center gap-1 px-3"
@@ -60,38 +50,18 @@ export function MobileTopBar({
         paddingBottom: "0.5rem",
       }}
     >
-      <HamburgerButton onClick={onOpenMenu} />
       <ViewModePill />
 
       <div className="flex flex-1 items-center justify-end gap-1">
-        <FriendsButton />
         <ActivityButton />
         <SearchButton />
         <EarnFiveChipMobile />
-        <PortfolioTotalChipMobile />
         <WalletAvatar address={WALLET_ADDRESS} />
       </div>
     </header>
   );
 }
 
-function HamburgerButton({ onClick }: { onClick: () => void }) {
-  return (
-    <button
-      type="button"
-      aria-label="Open menu"
-      onClick={onClick}
-      className="flex size-9 shrink-0 items-center justify-center rounded-md text-foreground transition-[background-color,scale] duration-150 ease-out hover:bg-surface-2 active:scale-[0.96]"
-    >
-      <Menu strokeWidth={1.75} className="size-5" aria-hidden />
-    </button>
-  );
-}
-
-/** View-mode pill — replaces the desktop LeftRail's Trade / Paths /
- *  Loops switcher. Tap opens a small dropdown of mode options;
- *  selecting one calls setViewMode. Compact label so the bar stays
- *  scan-friendly. */
 const VIEW_MODE_LABELS: Record<ViewMode, string> = {
   trading: "Trade",
   explore: "Paths",
@@ -105,14 +75,15 @@ const VIEW_MODE_ICONS = {
   loops: Repeat,
 };
 
+/** Replaces the desktop LeftRail's view-mode switcher. Tap opens a
+ *  small dropdown; selecting a mode calls setViewMode. Compact
+ *  label so the rest of the bar stays scannable. */
 function ViewModePill() {
   const { viewMode, setViewMode } = useViewMode();
   const [open, setOpen] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
   useClickOutside(wrapRef, () => setOpen(false), open);
 
-  // Settings mode shouldn't be reachable from this pill — that's
-  // the drawer's job. Restrict the pill to workspace modes.
   const workspaceMode = viewMode === "settings" ? "trading" : viewMode;
   const label = VIEW_MODE_LABELS[workspaceMode];
 
@@ -171,26 +142,6 @@ function ViewModePill() {
   );
 }
 
-function FriendsButton() {
-  const { open, toggleFriends } = useFriendsSheet();
-  return (
-    <button
-      type="button"
-      onClick={toggleFriends}
-      aria-label={open ? "Close friends" : "Open friends"}
-      aria-expanded={open}
-      className={cn(
-        "flex size-9 shrink-0 items-center justify-center rounded-md transition-[background-color,color] duration-150 ease-out",
-        open
-          ? "bg-surface-3 text-foreground"
-          : "text-muted-foreground hover:bg-surface-2 hover:text-foreground",
-      )}
-    >
-      <Users strokeWidth={1.75} className="size-5" aria-hidden />
-    </button>
-  );
-}
-
 function ActivityButton() {
   const { unreadCount } = useActivity();
   return (
@@ -242,20 +193,6 @@ function EarnFiveChipMobile() {
   );
 }
 
-function PortfolioTotalChipMobile() {
-  const { togglePortfolio } = usePortfolioSheet();
-  return (
-    <button
-      type="button"
-      onClick={togglePortfolio}
-      aria-label={`Portfolio total ${USD_COMPACT.format(MOCK_ACCOUNT.balance)}. Open portfolio.`}
-      className="inline-flex h-8 shrink-0 items-center rounded-md px-2 text-body font-semibold tabular-nums text-foreground transition-[background-color] duration-150 ease-out hover:bg-surface-2"
-    >
-      {USD_COMPACT.format(MOCK_ACCOUNT.balance)}
-    </button>
-  );
-}
-
 function WalletAvatar({ address }: { address: string }) {
   const { open, togglePortfolio } = usePortfolioSheet();
   const short = shortAddress(address);
@@ -275,4 +212,3 @@ function WalletAvatar({ address }: { address: string }) {
     </button>
   );
 }
-

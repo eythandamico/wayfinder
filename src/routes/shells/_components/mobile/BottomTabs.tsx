@@ -1,19 +1,27 @@
 "use client";
 
-import { LineChart, MessageCircle } from "lucide-react";
+import {
+  LayoutGrid,
+  LineChart,
+  Users,
+  Wallet,
+  type LucideIcon,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export type ShellTab = "agent" | "trade";
+export type ShellTab = "friends" | "trade" | "portfolio" | "more";
 
 /**
- * Two-tab bottom nav: Agent and Trade. The shell's twin primaries.
- * Tab switching is instant (no swipe between, no shared transition)
- * — that's the whole point of the new architecture. Chart context
- * lives in ChartYoke above, shared by both tabs.
+ * Four-tab bottom nav. Friends / Trade / Portfolio are the real
+ * destinations the user goes between; More is the overflow page
+ * for secondary destinations (Settings, Deposit, Pricing, Help)
+ * — it replaces the v2 hamburger entirely.
  *
- * Active state mirrors LeftRail's rail-button treatment (neutral
- * surface-3 fill, no mint-tint) so mobile and desktop chrome read
- * in the same active-state vocabulary.
+ * The agent is NOT a tab here — it's a floating composer pinned
+ * above this bar that summons a chat takeover sheet from any tab.
+ *
+ * Active state uses neutral surface-3 fill (same vocabulary as
+ * LeftRail's RailButton on desktop). No mint-tints, no rings.
  */
 export function BottomTabs({
   active,
@@ -30,16 +38,28 @@ export function BottomTabs({
       style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 0.25rem)" }}
     >
       <TabButton
-        active={active === "agent"}
-        onClick={() => onChange("agent")}
-        label="Agent"
-        icon={MessageCircle}
+        active={active === "friends"}
+        onClick={() => onChange("friends")}
+        label="Friends"
+        icon={Users}
       />
       <TabButton
         active={active === "trade"}
         onClick={() => onChange("trade")}
         label="Trade"
         icon={LineChart}
+      />
+      <TabButton
+        active={active === "portfolio"}
+        onClick={() => onChange("portfolio")}
+        label="Portfolio"
+        icon={Wallet}
+      />
+      <TabButton
+        active={active === "more"}
+        onClick={() => onChange("more")}
+        label="More"
+        icon={LayoutGrid}
       />
     </nav>
   );
@@ -54,7 +74,7 @@ function TabButton({
   active: boolean;
   onClick: () => void;
   label: string;
-  icon: typeof MessageCircle;
+  icon: LucideIcon;
 }) {
   return (
     <button
