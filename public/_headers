@@ -1,0 +1,39 @@
+# Cloudflare Pages response-header rules.
+# Goal: hashed assets cache forever, SPA shells never cache so new
+# deploys propagate immediately. Without this the edge holds the
+# index.html for hours-to-days and users see stale builds despite
+# fresh pushes (the same trap as the Next.js → Vite cutover; see
+# scripts/post-build.mjs).
+
+# SPA shell + every direct entry point — must always re-fetch.
+/
+  Cache-Control: no-store, no-cache, must-revalidate
+
+/index.html
+  Cache-Control: no-store, no-cache, must-revalidate
+
+/shells
+  Cache-Control: no-store, no-cache, must-revalidate
+
+/shells/index.html
+  Cache-Control: no-store, no-cache, must-revalidate
+
+/paths
+  Cache-Control: no-store, no-cache, must-revalidate
+
+# Hashed bundles, fonts, brand art — Vite fingerprints these, safe
+# to cache forever.
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/brand/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/sounds/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/media/*
+  Cache-Control: public, max-age=31536000, immutable
