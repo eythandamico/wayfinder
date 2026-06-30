@@ -41,9 +41,10 @@ export function ChatTakeoverSheet({
             "shadow-[0_-20px_60px_-20px_rgba(0,0,0,0.65)]",
             "transition-transform duration-300 ease-[var(--ease-drawer)]",
             "data-[starting-style]:translate-y-full data-[ending-style]:translate-y-full",
-            // Leaves a sliver at the top so backdrop tap stays
-            // reachable. Respects the notch via env(safe-area).
-            "[height:calc(100dvh-env(safe-area-inset-top)-1.5rem)]",
+            // ~90% of viewport so the sheet reads as a tall bottom
+            // drawer — leaves a small backdrop strip at top to tap
+            // for dismiss, but gives the chat transcript enough room.
+            "[height:calc(90dvh-env(safe-area-inset-top))]",
           )}
         >
           <div className="flex shrink-0 items-center justify-center pt-2.5 pb-1.5">

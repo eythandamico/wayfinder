@@ -8,6 +8,7 @@ import {
   Eye,
   Flag,
   Globe2,
+  Grid3x3,
   LineChart,
   ListChecks,
   MessageCircle,
@@ -44,6 +45,7 @@ import {
   TradePanel,
   TradePanelHeaderActions,
 } from "../_components/TradePanel";
+import { TradesHeatmapPanel } from "../_components/TradesHeatmapPanel";
 import { VideoPanel } from "../_components/VideoPanel";
 import { VideoSearchPanel } from "../_components/VideoSearchPanel";
 import { WatchlistPanel } from "../_components/WatchlistPanel";
@@ -175,6 +177,13 @@ export const PANEL_REGISTRY: Record<PanelType, PanelDescriptor> = {
     Icon: Wallet,
     Component: PortfolioPanel,
     category: "markets",
+  },
+  tradesHeatmap: {
+    type: "tradesHeatmap",
+    label: "Trades Heatmap",
+    Icon: Grid3x3,
+    Component: TradesHeatmapPanel,
+    category: "insights",
   },
 
   // ─── Insights ────────────────────────────────────────────────────

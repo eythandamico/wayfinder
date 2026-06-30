@@ -32,6 +32,7 @@ export type PanelType =
   | "golf"
   | "video"
   | "media"
+  | "tradesHeatmap"
   // Extras — lifestyle utilities that sit alongside the trading desk.
   | "calendar"
   | "todo"

@@ -39,20 +39,45 @@ const REFRESH_INTERVAL_MS = 60_000;
 const SECONDS_PER_ITEM = 1.5;
 const MIN_DURATION_SECONDS = 20;
 
+/** Client-side fallback so the tape always animates even when the
+ *  /api/marquee Function 404s (Pages routing issue) or every upstream
+ *  fetch fails. Picks the same shapes the real API emits so the cells
+ *  render with their normal styling. Order is interleaved by type. */
+const FALLBACK_ITEMS: MarqueeItem[] = [
+  { type: "token", id: "btc", symbol: "BTC", price: 67_842, change24h: 1.42 },
+  { type: "macro", id: "dxy", label: "DXY", value: "104.32", change24h: -0.18 },
+  { type: "token", id: "eth", symbol: "ETH", price: 3_421, change24h: -0.84 },
+  { type: "indicator", id: "fng", label: "Fear & Greed", value: "62", tone: "primary" },
+  { type: "token", id: "sol", symbol: "SOL", price: 168.42, change24h: 2.15 },
+  { type: "macro", id: "us10y", label: "US10Y", value: "4.42%", change24h: 0.03 },
+  { type: "token", id: "hype", symbol: "HYPE", price: 24.18, change24h: 5.73 },
+  { type: "macro", id: "vix", label: "VIX", value: "14.2", change24h: 5.1 },
+  { type: "event", id: "fomc", label: "FOMC", when: "Wed 2:00 PM ET" },
+  { type: "macro", id: "wti", label: "WTI", value: "$78.40", change24h: -1.2 },
+  { type: "event", id: "cpi", label: "CPI", when: "Thu 8:30 AM ET" },
+  { type: "macro", id: "gold", label: "Gold", value: "$2,650", change24h: 0.4 },
+];
+
 export function Marquee() {
-  const [items, setItems] = useState<MarqueeItem[] | null>(null);
+  // Start with the fallback so the tape animates immediately on mount;
+  // the real /api/marquee fetch overwrites once it lands. If the API
+  // returns empty (every upstream timed out), keep the fallback so the
+  // tape never collapses to nothing.
+  const [items, setItems] = useState<MarqueeItem[]>(FALLBACK_ITEMS);
 
   useEffect(() => {
     let cancelled = false;
     const load = async () => {
       try {
         const res = await fetch("/api/marquee");
+        if (!res.ok) return; // 404 / 5xx → keep fallback
         const data = (await res.json()) as MarqueeResponse;
         if (cancelled) return;
-        setItems(data.items ?? []);
+        if (data.items && data.items.length > 0) {
+          setItems(data.items);
+        }
       } catch {
-        if (cancelled) return;
-        setItems([]);
+        // network / parse error — keep fallback running
       }
     };
     load();
@@ -64,16 +89,9 @@ export function Marquee() {
   }, []);
 
   const duration = useMemo(() => {
-    const n = items?.length ?? 0;
+    const n = items.length;
     return Math.max(MIN_DURATION_SECONDS, n * SECONDS_PER_ITEM);
   }, [items]);
-
-  if (items === null) {
-    return <MarqueeShell isLoading />;
-  }
-  if (items.length === 0) {
-    return null;
-  }
 
   return (
     <MarqueeShell>

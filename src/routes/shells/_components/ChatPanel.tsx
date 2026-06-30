@@ -589,11 +589,13 @@ export function ChatPanel({ embedded = false }: ChatPanelProps = {}) {
                   <OpenerChipRow chips={replyChips} onSelect={handleChipTap} />
                 )}
               </div>
-              {/* Composer block — suppressed in embedded mode (mobile,
-                  where MobileLayout owns a global sticky composer).
-                  The brief-delivery SMS toast moves up into the panel
-                  body in embedded mode so the user still sees it. */}
-              <div className={cn("relative z-[1] px-3 pb-3", embedded && "hidden")}>
+              {/* Composer block — visible in both standalone (desktop)
+                  and embedded (mobile chat takeover sheet) modes. The
+                  takeover-sheet variant is what the floating
+                  mini-composer "morphs into" when the user engages
+                  the bar on Home — same desktop ChatComposer shape,
+                  inherited here. */}
+              <div className="relative z-[1] px-3 pb-3">
                 <div className="relative">
                   {/* In-context toast — floats above the composer
                       when a job has run something worth acting on.
@@ -602,7 +604,7 @@ export function ChatPanel({ embedded = false }: ChatPanelProps = {}) {
                       of pushing the input down. Pattern is reusable;
                       right now it carries the SMS opt-in that pairs
                       with the Morning brief job. */}
-                  {briefToastVisible && (
+                  {!embedded && briefToastVisible && (
                     <div className="absolute inset-x-0 bottom-full mb-2">
                       <ComposerToast
                         label="Step away. Stay informed."
@@ -627,12 +629,11 @@ export function ChatPanel({ embedded = false }: ChatPanelProps = {}) {
                     value={input}
                     onChange={setInput}
                     onSubmit={startThinking}
-                    // Upgrade banner stays visible regardless of the
-                    // brief-delivery toast. Both live in the same
-                    // composer chrome but read as separate
-                    // information rows (status promo vs. action
-                    // toast); suppressing one for the other made the
-                    // chrome feel flickery on reload.
+                    // Upgrade banner stays visible in both standalone
+                    // (desktop) and embedded (mobile takeover sheet)
+                    // modes. UpgradeBannerPanel's surface is tuned so
+                    // it reads as a slightly elevated card on either
+                    // chrome rather than a harsh dark rectangle.
                     showUpgrade={showUpgrade}
                     onDismissUpgrade={dismissUpgrade}
                   />
@@ -843,7 +844,7 @@ function UpgradeBannerPanel({
       </span>
 
       {/* Announcement row */}
-      <div className="relative z-[1] flex items-center gap-3 px-3 pt-2 pb-2">
+      <div className="relative z-[1] flex items-center gap-3 px-3 pt-1 pb-1">
         <span className="min-w-0 flex-1 truncate text-body text-foreground">
           <span className="font-semibold">Agent always on.</span>
           <span className="text-muted-foreground">
@@ -870,9 +871,9 @@ function UpgradeBannerPanel({
       {/* Composer card — flush left + right with the outer panel so
           both surfaces share a single column width (matches the Claude
           reference where the input sits at the panel's full width).
-          Tiny bottom inset keeps the composer's rounded bottom corners
-          visible against the outer panel. */}
-      <div className="relative z-[1] pb-1">{children}</div>
+          No bottom inset — composer's rounded bottom edge aligns
+          with the banner's bottom edge. */}
+      <div className="relative z-[1]">{children}</div>
     </div>
   );
 }
