@@ -11,11 +11,13 @@ import {
   Coins,
   Download,
   Info,
+  Search,
   Share2,
   Shield,
   Star,
   TrendingUp,
   Wrench,
+  X,
   Zap,
   type LucideIcon,
 } from "lucide-react";
@@ -29,6 +31,7 @@ import {
   type PathStatus,
 } from "@/lib/paths";
 import { pathHeroUrl } from "@/lib/path-artwork";
+import { useChatSession } from "../_state/chat-context";
 
 /* ------------------------------------------------------------------ */
 /*  Constants                                                          */
@@ -97,38 +100,299 @@ const CATEGORY_GRID_DISCOVER = "grid grid-cols-2 sm:grid-cols-4 gap-3";
 /* ------------------------------------------------------------------ */
 
 export function ExplorePathsPanel() {
+  const [tab, setTab] = useState<"discover" | "library">("discover");
   const [selectedKind, setSelectedKind] = useState<PathKind | null>(null);
   const [selectedPath, setSelectedPath] = useState<Path | null>(null);
+  const { paths: installedPaths } = useChatSession();
 
-  // PathDetail wins over CategoryView wins over Discover. Closing the
-  // detail returns to whichever underlying view was open.
+  // Switching tabs clears any in-flight drill-in so the user lands on
+  // the tab's own root view, not someone else's PathDetail. selectedPath
+  // is rendered the same way in both tabs' branches below, so the back
+  // chevron naturally returns to whichever tab was active.
+  const goToTab = (next: "discover" | "library") => {
+    setTab(next);
+    setSelectedPath(null);
+    setSelectedKind(null);
+  };
+
   return (
     <div
       id="shells-view-explore"
       role="tabpanel"
       aria-label="Paths catalog"
-      className="flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-lg bg-card"
+      className="flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-lg bg-surface-1 ring-1 ring-inset ring-white/[0.06]"
     >
-      <div className="scroll-thin flex-1 overflow-y-auto px-6 pb-10 pt-20 sm:px-10 lg:px-16 xl:px-24 2xl:px-32">
-        {selectedPath ? (
-          <PathDetail
-            path={selectedPath}
-            onBack={() => setSelectedPath(null)}
-          />
-        ) : selectedKind ? (
-          <CategoryView
-            kind={selectedKind}
-            onBack={() => setSelectedKind(null)}
-            onSelectPath={setSelectedPath}
-          />
-        ) : (
-          <DiscoverView
-            onSelectKind={setSelectedKind}
-            onSelectPath={setSelectedPath}
-          />
-        )}
+      <div className="scroll-thin flex-1 overflow-y-auto">
+        {/* Sticky tab strip — full panel width with a backdrop blur
+            so scrolling content fades behind it instead of butting up
+            against an opaque header. Tab buttons themselves align with
+            the max-w-5xl content cap below. */}
+        <div className="sticky top-0 z-10 border-b border-white/[0.05] bg-surface-1/85 backdrop-blur">
+          <div className="mx-auto max-w-5xl px-6 sm:px-10 lg:px-12">
+            <div role="tablist" aria-label="Paths views" className="flex items-center gap-1">
+              <PathsTabButton
+                active={tab === "discover"}
+                onClick={() => goToTab("discover")}
+              >
+                Discover
+              </PathsTabButton>
+              <PathsTabButton
+                active={tab === "library"}
+                onClick={() => goToTab("library")}
+                count={installedPaths.length}
+              >
+                Library
+              </PathsTabButton>
+            </div>
+          </div>
+        </div>
+
+        <div className="px-6 pb-10 pt-8 sm:px-10 lg:px-12">
+          {/* Cap reading width at ~1024px and center within the panel.
+              Same comfortable ceiling Stripe / Linear / Notion docs
+              settle on — listing + category views stop sprawling on
+              ultrawides and the detail view's own max-w-5xl becomes a
+              no-op under this wrapper. */}
+          <div className="mx-auto w-full max-w-5xl">
+            {selectedPath ? (
+              <PathDetail
+                path={selectedPath}
+                onBack={() => setSelectedPath(null)}
+              />
+            ) : tab === "library" ? (
+              <LibraryView
+                onSelectPath={setSelectedPath}
+                onSwitchToDiscover={() => goToTab("discover")}
+              />
+            ) : selectedKind ? (
+              <CategoryView
+                kind={selectedKind}
+                onBack={() => setSelectedKind(null)}
+                onSelectPath={setSelectedPath}
+              />
+            ) : (
+              <DiscoverView
+                onSelectKind={setSelectedKind}
+                onSelectPath={setSelectedPath}
+              />
+            )}
+          </div>
+        </div>
       </div>
     </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Tab strip                                                          */
+/* ------------------------------------------------------------------ */
+
+function PathsTabButton({
+  active,
+  onClick,
+  count,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  count?: number;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      role="tab"
+      aria-selected={active}
+      onClick={onClick}
+      className={cn(
+        "relative px-3 py-3 text-body font-medium transition-[color,scale] duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 active:scale-[0.96]",
+        active ? "text-foreground" : "text-muted-foreground hover:text-foreground",
+      )}
+    >
+      <span className="inline-flex items-center gap-1.5">
+        {children}
+        {typeof count === "number" && (
+          <span className="tabular-nums text-muted-foreground">
+            · {count}
+          </span>
+        )}
+      </span>
+      {active && (
+        <span aria-hidden className="absolute inset-x-3 -bottom-px h-px bg-foreground" />
+      )}
+    </button>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Library — installed paths management surface                       */
+/* ------------------------------------------------------------------ */
+
+/**
+ * The Library tab body. Dense list, not a grid — installed paths are
+ * functional inventory the user manages, not browsable merchandise.
+ * Row click opens PathDetail; the trailing Uninstall icon removes the
+ * path from the user's collection. Search filters by name or author.
+ *
+ * Pause/Resume + last-used metadata were considered but cut for v1
+ * because the Path type doesn't carry the backing fields yet
+ * (`status` here is the bonded/curve life-cycle, not active/paused).
+ * Add when the data model grows.
+ */
+function LibraryView({
+  onSelectPath,
+  onSwitchToDiscover,
+}: {
+  onSelectPath: (p: Path) => void;
+  onSwitchToDiscover: () => void;
+}) {
+  const { paths, setPaths } = useChatSession();
+  const [query, setQuery] = useState("");
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return paths;
+    return paths.filter(
+      (p) =>
+        p.name.toLowerCase().includes(q) ||
+        p.author.toLowerCase().includes(q),
+    );
+  }, [paths, query]);
+
+  const uninstall = (id: string) =>
+    setPaths((prev) => prev.filter((p) => p.id !== id));
+
+  if (paths.length === 0) {
+    return (
+      <div className="flex min-h-[320px] flex-col items-center justify-center gap-2 text-center">
+        <p className="text-body text-foreground">
+          No paths installed yet.
+        </p>
+        <button
+          type="button"
+          onClick={onSwitchToDiscover}
+          className="text-body font-semibold text-foreground underline-offset-2 transition-colors duration-150 ease-out hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
+        >
+          Browse Discover →
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-5">
+      <LibrarySearchInput value={query} onChange={setQuery} />
+      {filtered.length === 0 ? (
+        <p className="px-3 py-10 text-center text-body text-muted-foreground">
+          No installed paths match &ldquo;{query}&rdquo;.
+        </p>
+      ) : (
+        <ul className="flex flex-col divide-y divide-white/[0.04]">
+          {filtered.map((p) => (
+            <InstalledRow
+              key={p.id}
+              path={p}
+              onOpen={() => onSelectPath(p)}
+              onUninstall={() => uninstall(p.id)}
+            />
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+function LibrarySearchInput({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  return (
+    <label className="flex items-center gap-2 rounded-md bg-surface-2 px-3 py-2 text-body text-foreground">
+      <Search
+        aria-hidden
+        strokeWidth={1.75}
+        className="size-4 shrink-0 text-muted-foreground"
+      />
+      <input
+        type="search"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder="Search your library"
+        aria-label="Search your installed paths"
+        className="min-w-0 flex-1 bg-transparent outline-none placeholder:text-muted-foreground"
+      />
+      {value && (
+        <button
+          type="button"
+          onClick={() => onChange("")}
+          aria-label="Clear search"
+          className="flex size-5 shrink-0 items-center justify-center rounded text-muted-foreground transition-colors hover:text-foreground"
+        >
+          <X strokeWidth={1.75} className="size-3.5" aria-hidden />
+        </button>
+      )}
+    </label>
+  );
+}
+
+function InstalledRow({
+  path,
+  onOpen,
+  onUninstall,
+}: {
+  path: Path;
+  onOpen: () => void;
+  onUninstall: () => void;
+}) {
+  const tone = KIND_TONES[path.kind];
+  const KindIcon = tone.icon;
+  return (
+    <li className="group relative flex items-center gap-3 px-2 py-3 transition-colors hover:bg-surface-2">
+      <button
+        type="button"
+        onClick={onOpen}
+        aria-label={`Open ${path.name}`}
+        className="flex min-w-0 flex-1 items-center gap-3 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:rounded-md"
+      >
+        <span
+          aria-hidden
+          className={cn(
+            "flex size-9 shrink-0 items-center justify-center rounded-md",
+            tone.bg,
+          )}
+        >
+          <KindIcon
+            strokeWidth={1.75}
+            className={cn("size-4", tone.iconClass)}
+          />
+        </span>
+        <div className="flex min-w-0 flex-1 flex-col leading-tight">
+          <div className="flex items-center gap-2">
+            <span className="truncate text-body font-medium text-foreground">
+              {path.name}
+            </span>
+            <span className="shrink-0 rounded bg-surface-3 px-1.5 py-0.5 text-micro uppercase tracking-[0.1em] text-muted-foreground">
+              {PATH_KIND_LABELS[path.kind]}
+            </span>
+          </div>
+          <span className="truncate text-caption text-muted-foreground tabular-nums">
+            {path.author} · v{path.version}
+          </span>
+        </div>
+      </button>
+      <button
+        type="button"
+        onClick={onUninstall}
+        aria-label={`Uninstall ${path.name}`}
+        title="Uninstall"
+        className="flex size-8 shrink-0 items-center justify-center rounded-md text-muted-foreground opacity-0 transition-[opacity,background-color,color] duration-150 ease-out hover:bg-surface-3 hover:text-foreground focus:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 group-hover:opacity-100"
+      >
+        <X strokeWidth={1.75} className="size-4" aria-hidden />
+      </button>
+    </li>
   );
 }
 
@@ -439,11 +703,10 @@ function DiscoverView({
 }) {
   const kindCounts = useKindCounts();
   const featured = useMemo(() => {
-    // Editorial pool — top six bonded paths by stars, grouped into
-    // three pairs the carousel cycles through. Deterministic so the
-    // page is stable on reload.
+    // Editorial pool — top bonded paths by stars, one per carousel
+    // slide. Deterministic so the page is stable on reload.
     const bonded = PATHS.filter((p) => p.status === "bonded");
-    return [...bonded].sort((a, b) => b.stars - a.stars).slice(0, 6);
+    return [...bonded].sort((a, b) => b.stars - a.stars).slice(0, 5);
   }, []);
   const featuredIds = useMemo(
     () => new Set(featured.map((p) => p.id)),
@@ -473,11 +736,6 @@ function DiscoverView({
           )
           .slice(0, 5),
       },
-      {
-        id: "stars",
-        title: "Most starred",
-        paths: [...pool].sort((a, b) => b.stars - a.stars).slice(0, 5),
-      },
     ];
   }, [featuredIds]);
 
@@ -490,12 +748,7 @@ function DiscoverView({
 
   return (
     <>
-      {/* Carousel sits in a slightly lighter band that extends all the
-       *  way to the panel edges. Negative horizontal margins cancel the
-       *  scroll container's responsive gutter; matching px brings the
-       *  carousel content back into alignment. -mt-20 cancels the
-       *  container's pt-20 so the band starts flush with the top. */}
-      <section className="relative -mx-6 -mt-20 bg-white/[0.025] px-6 pb-16 pt-20 sm:-mx-10 sm:px-10 lg:-mx-16 lg:px-16 xl:-mx-24 xl:px-24 2xl:-mx-32 2xl:px-32">
+      <section className="relative pb-16">
         <FeatureCarousel paths={featured} onSelectPath={onSelectPath} />
       </section>
 
@@ -542,40 +795,30 @@ function FeatureCarousel({
   paths: Path[];
   onSelectPath: (p: Path) => void;
 }) {
-  const pairs = useMemo(() => {
-    const out: Path[][] = [];
-    for (let i = 0; i < paths.length; i += 2) out.push(paths.slice(i, i + 2));
-    return out;
-  }, [paths]);
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const reducedMotion = useReducedMotion();
 
   useEffect(() => {
-    if (paused || reducedMotion || pairs.length <= 1) return;
+    if (paused || reducedMotion || paths.length <= 1) return;
     const id = window.setInterval(() => {
-      setIndex((i) => (i + 1) % pairs.length);
+      setIndex((i) => (i + 1) % paths.length);
     }, CAROUSEL_INTERVAL_MS);
     return () => window.clearInterval(id);
-  }, [paused, reducedMotion, pairs.length]);
+  }, [paused, reducedMotion, paths.length]);
 
-  if (pairs.length === 0) return null;
-  if (pairs.length === 1) {
+  if (paths.length === 0) return null;
+  if (paths.length === 1) {
     return (
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:gap-6">
-        {pairs[0].map((p) => (
-          <FeatureHero
-            key={p.id}
-            path={p}
-            onSelect={() => onSelectPath(p)}
-          />
-        ))}
-      </div>
+      <FeatureHero
+        path={paths[0]}
+        onSelect={() => onSelectPath(paths[0])}
+      />
     );
   }
 
-  const goPrev = () => setIndex((i) => (i - 1 + pairs.length) % pairs.length);
-  const goNext = () => setIndex((i) => (i + 1) % pairs.length);
+  const goPrev = () => setIndex((i) => (i - 1 + paths.length) % paths.length);
+  const goNext = () => setIndex((i) => (i + 1) % paths.length);
 
   const onKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "ArrowLeft") {
@@ -600,38 +843,42 @@ function FeatureCarousel({
       onKeyDown={onKeyDown}
       className="group/carousel rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
     >
-      <div className="relative overflow-hidden">
-        <div
-          className="flex transition-transform duration-500 ease-[var(--ease-strong,cubic-bezier(0.2,0,0,1))]"
-          style={{ transform: `translateX(-${index * 100}%)` }}
-          aria-live="off"
-        >
-          {pairs.map((pair, i) => (
-            <div
-              key={i}
-              role="group"
-              aria-roledescription="slide"
-              aria-label={`Slide ${i + 1} of ${pairs.length}`}
-              aria-hidden={i !== index}
-              className="grid w-full shrink-0 grid-cols-1 gap-4 md:grid-cols-2 lg:gap-6"
-            >
-              {pair.map((p) => (
+      {/* Slide takes the full content width — arrows hang into the
+       *  panel's outer padding gutter via absolute positioning so the
+       *  card stays the same width as the rest of the page. Arrows
+       *  hide below md where the gutter is too tight to host them
+       *  cleanly; users still have dots + touch swipe. */}
+      <div className="relative">
+        <div className="overflow-hidden rounded-2xl">
+          <div
+            className="flex transition-transform duration-500 ease-[var(--ease-strong,cubic-bezier(0.2,0,0,1))]"
+            style={{ transform: `translateX(-${index * 100}%)` }}
+            aria-live="off"
+          >
+            {paths.map((p, i) => (
+              <div
+                key={p.id}
+                role="group"
+                aria-roledescription="slide"
+                aria-label={`Slide ${i + 1} of ${paths.length}`}
+                aria-hidden={i !== index}
+                className="w-full shrink-0"
+              >
                 <FeatureHero
-                  key={p.id}
                   path={p}
                   onSelect={() => onSelectPath(p)}
                 />
-              ))}
-            </div>
-          ))}
+              </div>
+            ))}
+          </div>
         </div>
         <CarouselArrow side="left" onClick={goPrev} />
         <CarouselArrow side="right" onClick={goNext} />
       </div>
       <div className="mt-5 flex justify-center gap-2">
-        {pairs.map((_, i) => (
+        {paths.map((p, i) => (
           <button
-            key={i}
+            key={p.id}
             type="button"
             aria-label={`Show slide ${i + 1}`}
             aria-current={i === index}
@@ -664,10 +911,8 @@ function CarouselArrow({
       aria-label={`${side === "left" ? "Previous" : "Next"} slide`}
       onClick={onClick}
       className={cn(
-        "absolute top-1/2 z-10 inline-flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-background/80 text-foreground opacity-0 ring-1 ring-inset ring-white/[0.10] shadow-lg backdrop-blur transition-[opacity,background-color,scale] duration-150 ease-out hover:bg-background active:scale-[0.96]",
-        // Reveal on hover or keyboard focus anywhere in the carousel.
-        "group-hover/carousel:opacity-100 focus-visible:opacity-100",
-        side === "left" ? "left-3" : "right-3",
+        "absolute top-1/2 hidden size-10 -translate-y-1/2 items-center justify-center rounded-full bg-surface-2 text-foreground transition-[background-color,scale] duration-150 ease-out hover:bg-surface-3 active:scale-[0.96] md:inline-flex",
+        side === "left" ? "-left-14" : "-right-14",
       )}
     >
       <Icon strokeWidth={2} className="size-4" aria-hidden />
@@ -724,16 +969,10 @@ function FeatureHero({
               <button
                 type="button"
                 aria-label={`Install ${path.name}`}
-                className="group relative inline-flex h-9 items-center gap-1.5 overflow-hidden rounded-md bg-primary px-4 text-body font-semibold text-primary-foreground transition-[filter,scale] duration-150 ease-out hover:brightness-[1.04] active:scale-[0.96]"
+                className="inline-flex h-9 items-center gap-1.5 rounded-md bg-surface-3 px-4 text-body font-semibold text-foreground transition-[background-color,scale] duration-150 ease-out hover:bg-surface-2 active:scale-[0.96]"
               >
-                <span
-                  aria-hidden
-                  className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-b from-white/40 to-transparent"
-                />
-                <span className="relative inline-flex items-center gap-1.5">
-                  <Download strokeWidth={2} className="size-3.5" aria-hidden />
-                  Install
-                </span>
+                <Download strokeWidth={2} className="size-3.5" aria-hidden />
+                Install
               </button>
             </div>
             <div className="flex items-center gap-4 text-body text-muted-foreground">
@@ -1059,7 +1298,7 @@ function TopChartGroup({
   onSelectPath: (p: Path) => void;
 }) {
   return (
-    <div className="grid grid-cols-1 gap-x-14 gap-y-10 lg:grid-cols-3 xl:gap-x-20">
+    <div className="grid grid-cols-1 gap-x-14 gap-y-10 md:grid-cols-2 xl:gap-x-20">
       {columns.map((col) => (
         <div key={col.id} className="flex flex-col">
           <h4 className="font-heading text-title font-semibold leading-tight text-foreground">

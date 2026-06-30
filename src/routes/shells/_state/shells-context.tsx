@@ -14,7 +14,7 @@ import { CONTACTS } from "../_data/contacts";
 import type { Market } from "../_types";
 
 export type Density = "small" | "medium" | "large";
-export type ViewMode = "trading" | "explore" | "loops" | "settings";
+export type ViewMode = "trading" | "explore" | "loops" | "jobs" | "settings";
 
 /**
  * Prediction-market target — the single source of truth for "what's

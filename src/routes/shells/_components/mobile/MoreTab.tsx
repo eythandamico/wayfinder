@@ -2,6 +2,7 @@
 
 import { useState, type ReactNode } from "react";
 import {
+  Briefcase,
   ChevronLeft,
   ChevronRight,
   Compass,
@@ -14,7 +15,7 @@ import { usePlan } from "../../_state/plan-context";
 import { ExplorePathsPanel } from "../ExplorePathsPanel";
 import { SettingsPage } from "../SettingsPage";
 
-type MorePage = null | "paths" | "loops" | "settings";
+type MorePage = null | "paths" | "loops" | "jobs" | "settings";
 
 /**
  * More tab — the overflow page for secondary destinations.
@@ -47,7 +48,14 @@ export function MoreTab() {
   if (page === "loops") {
     return (
       <MoreSubPage title="Loops" onBack={() => setPage(null)}>
-        <LoopsComingSoon />
+        <ComingSoonView title="Loops" />
+      </MoreSubPage>
+    );
+  }
+  if (page === "jobs") {
+    return (
+      <MoreSubPage title="Jobs" onBack={() => setPage(null)}>
+        <ComingSoonView title="Jobs" />
       </MoreSubPage>
     );
   }
@@ -77,6 +85,12 @@ function MoreList({ onNavigate }: { onNavigate: (page: MorePage) => void }) {
           label="Loops"
           description="Automated trading routines"
           onClick={() => onNavigate("loops")}
+        />
+        <MoreRow
+          icon={Briefcase}
+          label="Jobs"
+          description="Background tasks the agent runs for you"
+          onClick={() => onNavigate("jobs")}
         />
         <MoreRow
           icon={SettingsIcon}
@@ -169,12 +183,12 @@ function MoreRow({
   );
 }
 
-function LoopsComingSoon() {
+function ComingSoonView({ title }: { title: string }) {
   return (
     <div className="flex h-full w-full items-center justify-center">
       <div className="flex flex-col items-center gap-2 text-center">
         <span className="text-caption uppercase tracking-[0.18em] text-muted-foreground">
-          Loops
+          {title}
         </span>
         <span className="text-display font-semibold text-foreground">
           Coming soon

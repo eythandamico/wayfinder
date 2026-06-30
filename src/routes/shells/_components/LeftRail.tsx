@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Briefcase,
   CandlestickChart,
   Compass,
   HelpCircle,
@@ -46,6 +47,7 @@ export function LeftRail() {
       <ViewModeRailButton mode="trading" icon={CandlestickChart} label="Trade" />
       <ViewModeRailButton mode="explore" icon={Compass} label="Paths" />
       <ViewModeRailButton mode="loops" icon={Repeat} label="Loops" />
+      <ViewModeRailButton mode="jobs" icon={Briefcase} label="Jobs" />
 
       {/* Spacer pushes the utility group to the bottom of the rail. */}
       <div className="flex-1" aria-hidden />
@@ -68,7 +70,7 @@ function ViewModeRailButton({
   icon: Icon,
   label,
 }: {
-  mode: "trading" | "explore" | "loops" | "settings";
+  mode: "trading" | "explore" | "loops" | "jobs" | "settings";
   icon: LucideIcon;
   label: string;
 }) {

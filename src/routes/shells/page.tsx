@@ -316,8 +316,10 @@ function DesktopShell() {
                 <ExplorePathsPanel />
               ) : viewMode === "settings" ? (
                 <SettingsPage />
+              ) : viewMode === "jobs" ? (
+                <ComingSoonView title="Jobs" />
               ) : (
-                <LoopsComingSoon />
+                <ComingSoonView title="Loops" />
               )}
             </div>
             <RightRail />
@@ -339,15 +341,16 @@ function DesktopShell() {
   );
 }
 
-/** Coming-soon placeholder for the Loops view mode. Renders inside
- *  the panel grid slot so the rails + top bar remain available;
- *  switching back to Trade restores the layout tree. */
-function LoopsComingSoon() {
+/** Coming-soon placeholder for view modes whose product surface
+ *  doesn't exist yet (Loops, Jobs). Renders inside the panel grid
+ *  slot so the rails + top bar remain available; switching back to
+ *  Trade restores the layout tree. */
+function ComingSoonView({ title }: { title: string }) {
   return (
     <div className="flex h-full w-full items-center justify-center rounded-lg bg-surface-1 ring-1 ring-inset ring-white/[0.06]">
       <div className="flex flex-col items-center gap-2 text-center">
         <span className="text-caption uppercase tracking-[0.18em] text-muted-foreground">
-          Loops
+          {title}
         </span>
         <span className="text-display font-semibold text-foreground">
           Coming soon

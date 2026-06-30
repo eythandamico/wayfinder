@@ -91,8 +91,6 @@ export type ChatSessionApi = {
   setInput: Dispatch<SetStateAction<string>>;
   activeSession: Session;
   setActiveSession: Dispatch<SetStateAction<Session>>;
-  tab: "chat" | "paths" | "jobs";
-  setTab: Dispatch<SetStateAction<"chat" | "paths" | "jobs">>;
 
   // Conversation + chips
   transcriptItems: TranscriptItem[];
@@ -128,7 +126,6 @@ export function ChatSessionProvider({ children }: { children: ReactNode }) {
   const [activeSession, setActiveSession] = useState<Session>(
     SAMPLE_SESSIONS[0],
   );
-  const [tab, setTab] = useState<"chat" | "paths" | "jobs">("chat");
   // Hydrated from localStorage so a reload doesn't wipe the chat
   // and re-stream the morning brief. Pure SPA — no SSR, so reading
   // localStorage in the lazy init is safe (no hydration mismatch).
@@ -171,8 +168,6 @@ export function ChatSessionProvider({ children }: { children: ReactNode }) {
         setInput,
         activeSession,
         setActiveSession,
-        tab,
-        setTab,
         transcriptItems,
         setTranscriptItems,
         replyChips,

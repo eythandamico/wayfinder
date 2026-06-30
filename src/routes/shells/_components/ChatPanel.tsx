@@ -1,15 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Link } from "react-router-dom";
 import { useClickOutside } from "@/lib/hooks/useClickOutside";
 import {
   Check,
   CornerDownRight,
   Copy,
   History,
-  Pause,
-  Play,
   RotateCw,
   Search,
   ThumbsDown,
@@ -17,8 +14,7 @@ import {
   X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { ChatMessage, Job, Session } from "../_types";
-import type { Path } from "@/lib/paths";
+import type { ChatMessage, Session } from "../_types";
 import {
   MARKETS,
   MODELS,
@@ -108,8 +104,6 @@ export function ChatPanel({ embedded = false }: ChatPanelProps = {}) {
     setInput,
     activeSession,
     setActiveSession,
-    tab,
-    setTab,
     transcriptItems,
     setTranscriptItems,
     replyChips,
@@ -122,10 +116,6 @@ export function ChatPanel({ embedded = false }: ChatPanelProps = {}) {
     setDismissedToastSessions,
     interviewState,
     setInterviewState,
-    jobs,
-    setJobs,
-    paths,
-    setPaths,
   } = useChatSession();
 
   const [thinking, setThinking] = useState(false);
@@ -253,7 +243,6 @@ export function ChatPanel({ embedded = false }: ChatPanelProps = {}) {
     const onGutCheck = (e: Event) => {
       const snapshot = (e as CustomEvent<GutCheckSnapshot>).detail;
       if (!snapshot) return;
-      setTab("chat");
       const reply = generateGutCheck(snapshot);
       runAgentReply(
         `${reply.summary}\n\n${reply.verdict.copy}`,
@@ -275,7 +264,6 @@ export function ChatPanel({ embedded = false }: ChatPanelProps = {}) {
     const onAskAgent = (e: Event) => {
       const payload = (e as CustomEvent<AskAgentPayload>).detail;
       if (!payload) return;
-      setTab("chat");
 
       // Pivot the desk when the payload names a tradeable market.
       const pivotMarket = resolveMarketFromPayload(payload);
@@ -306,7 +294,6 @@ export function ChatPanel({ embedded = false }: ChatPanelProps = {}) {
       if (streamTimer.current) window.clearInterval(streamTimer.current);
       if (openerTimer.current) window.clearTimeout(openerTimer.current);
       if (gutCheckTimer.current) window.clearTimeout(gutCheckTimer.current);
-      setTab("chat");
       setTranscriptItems([]);
       setReplyChips(null);
       setStreamingText(null);
@@ -503,33 +490,6 @@ export function ChatPanel({ embedded = false }: ChatPanelProps = {}) {
     };
   }, []);
 
-  const jumpToJob = (j: Job) => {
-    const target = SAMPLE_SESSIONS.find((s) => s.id === j.sessionId);
-    if (target) setActiveSession(target);
-    setTab("chat");
-  };
-
-  const toggleJob = (id: string) =>
-    setJobs((js) =>
-      js.map((j) =>
-        j.id === id
-          ? {
-              ...j,
-              status:
-                j.status === "paused" || j.status === "error"
-                  ? "active"
-                  : "paused",
-            }
-          : j,
-      ),
-    );
-
-  const deleteJob = (id: string) =>
-    setJobs((js) => js.filter((j) => j.id !== id));
-
-  const uninstallPath = (id: string) =>
-    setPaths((ps) => ps.filter((p) => p.id !== id));
-
   const [showUpgrade, setShowUpgrade] = useState(false);
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -556,49 +516,19 @@ export function ChatPanel({ embedded = false }: ChatPanelProps = {}) {
 
   return (
     <div className="flex h-full flex-col overflow-hidden">
-      {/* Agent sub-tabs. The chat panel is agent-only — no friend or
-          token-community surfaces in this build. */}
-      <div className="flex shrink-0 items-stretch border-b border-white/[0.05]">
-            <div
-              role="tablist"
-              aria-label="Agent, paths, and jobs"
-              className="flex px-2"
-            >
-              <TabButton
-                active={tab === "chat"}
-                onClick={() => setTab("chat")}
-                label="Agent"
-                controls="shells-panel-chat"
-              />
-              <TabButton
-                active={tab === "paths"}
-                onClick={() => setTab("paths")}
-                label="Paths"
-                count={paths.length}
-                controls="shells-panel-paths"
-              />
-              <TabButton
-                active={tab === "jobs"}
-                onClick={() => setTab("jobs")}
-                label="Jobs"
-                count={jobs.length}
-                controls="shells-panel-jobs"
-              />
-            </div>
-            <div className="ml-auto flex shrink-0 items-center gap-0.5 px-2">
-              <HistoryDropdown
-                active={activeSession}
-                onSelect={setActiveSession}
-              />
-            </div>
-          </div>
+      {/* Panel header — agent-only since Paths moved to the Paths
+          page's Library tab and Jobs is a top-level destination now.
+          The history dropdown stays as the panel's only chrome. */}
+      <div className="flex shrink-0 items-center justify-end gap-0.5 border-b border-white/[0.05] px-2 py-1.5">
+        <HistoryDropdown
+          active={activeSession}
+          onSelect={setActiveSession}
+        />
+      </div>
 
-          {tab === "chat" && (
-            <div
-              id="shells-panel-chat"
-              role="tabpanel"
-              className="relative flex min-h-0 flex-1 flex-col"
-            >
+          <div
+            className="relative flex min-h-0 flex-1 flex-col"
+          >
               {/* Bottom-edge thinking glow — lights the bottom 33% of
                   the panel while the agent is generating. Positioned
                   here (not on the composer wrapper) so the glow anchors
@@ -709,92 +639,12 @@ export function ChatPanel({ embedded = false }: ChatPanelProps = {}) {
                 </div>
               </div>
             </div>
-          )}
-
-          {tab === "paths" && (
-            <div
-              id="shells-panel-paths"
-              role="tabpanel"
-              className="flex min-h-0 flex-1 flex-col"
-            >
-              <PathsPanel paths={paths} onUninstall={uninstallPath} />
-            </div>
-          )}
-
-          {tab === "jobs" && (
-            <div
-              id="shells-panel-jobs"
-              role="tabpanel"
-              className="flex min-h-0 flex-1 flex-col"
-            >
-              <JobsPanel
-                jobs={jobs}
-                onSelect={jumpToJob}
-                onToggle={toggleJob}
-                onDelete={deleteJob}
-                onCreateJob={() => {
-                  // Free tier is capped at one job (the Morning brief).
-                  // Any additional create attempt routes to the
-                  // PricingModal via the requirePro gate. Pro users
-                  // continue straight to the chat-driven creation
-                  // flow.
-                  if (jobs.length >= 1 && !requirePro("jobs")) return;
-                  setTab("chat");
-                  runAgentReply(
-                    "Sure — let's set up a new job. What should it do? Tell me the trigger or cadence, and where you want the output delivered.",
-                    700,
-                  );
-                }}
-              />
-            </div>
-          )}
 
       <TradingCardSheet
         card={openCard}
         onOpenChange={(open) => !open && setOpenCard(null)}
       />
     </div>
-  );
-}
-
-function TabButton({
-  active,
-  onClick,
-  label,
-  count,
-  controls,
-}: {
-  active: boolean;
-  onClick: () => void;
-  label: string;
-  count?: number;
-  controls: string;
-}) {
-  return (
-    <button
-      type="button"
-      role="tab"
-      aria-selected={active}
-      aria-controls={controls}
-      onClick={onClick}
-      className={cn(
-        "relative px-4 py-3 text-body font-medium transition-[color,scale] duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 active:scale-[0.96]",
-        active
-          ? "text-foreground"
-          : "text-muted-foreground hover:text-foreground",
-      )}
-    >
-      {label}
-      {count !== undefined && (
-        <span className="ml-1.5 tabular-nums text-muted-foreground">{count}</span>
-      )}
-      {active && (
-        <span
-          aria-hidden
-          className="pointer-events-none absolute inset-x-2 bottom-0 h-px bg-foreground"
-        />
-      )}
-    </button>
   );
 }
 
@@ -932,261 +782,6 @@ function HistoryDropdown({
   );
 }
 
-function PathsPanel({
-  paths,
-  onUninstall,
-}: {
-  paths: Path[];
-  onUninstall: (id: string) => void;
-}) {
-  if (paths.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center gap-1.5 px-6 py-12 text-center">
-        <p className="text-body text-foreground">No paths installed.</p>
-        <p className="max-w-[260px] text-body text-muted-foreground">
-          Browse the catalog and install one to run here.
-        </p>
-        <Link
-          to="/paths"
-          className="mt-3 rounded-md bg-primary/15 px-3 py-1.5 text-body font-semibold text-primary ring-1 ring-inset ring-primary/20 transition-colors hover:bg-primary/15"
-        >
-          Browse paths →
-        </Link>
-      </div>
-    );
-  }
-  return (
-    <div className="scroll-thin flex min-h-0 flex-1 flex-col overflow-y-auto p-3">
-      {paths.map((p) => (
-        <PathRow
-          key={p.id}
-          path={p}
-          onUninstall={() => onUninstall(p.id)}
-        />
-      ))}
-      <Link
-        to="/paths"
-        className="mt-2 flex items-center justify-center gap-1 rounded-md px-3 py-2 text-body text-muted-foreground transition-colors hover:bg-surface-1 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
-      >
-        Browse more paths →
-      </Link>
-    </div>
-  );
-}
-
-function PathRow({
-  path,
-  onUninstall,
-}: {
-  path: Path;
-  onUninstall: () => void;
-}) {
-  return (
-    <div className="group flex items-center gap-2 rounded-md px-2 py-1.5 transition-colors hover:bg-surface-1">
-      <Link
-        to="/paths"
-        className="flex min-w-0 flex-1 items-center gap-2.5"
-      >
-        <span
-          aria-hidden
-          className="size-7 shrink-0 rounded-md"
-          style={{
-            background: `linear-gradient(135deg, color-mix(in oklch, var(--primary) 40%, transparent), color-mix(in oklch, var(--primary) 8%, transparent))`,
-          }}
-        />
-        <div className="flex min-w-0 flex-1 flex-col">
-          <span className="truncate text-body text-foreground">
-            {path.name}
-          </span>
-          <span className="truncate text-body text-muted-foreground">
-            {path.author}
-            {path.version ? ` · v${path.version}` : ""}
-          </span>
-        </div>
-      </Link>
-      <RowAction
-        aria-label={`Uninstall ${path.name}`}
-        onClick={onUninstall}
-        tone="danger"
-      >
-        <CloseIcon />
-      </RowAction>
-    </div>
-  );
-}
-
-function JobsPanel({
-  jobs,
-  onSelect,
-  onToggle,
-  onDelete,
-  onCreateJob,
-}: {
-  jobs: Job[];
-  onSelect: (j: Job) => void;
-  onToggle: (id: string) => void;
-  onDelete: (id: string) => void;
-  /** Switches the agent panel back to the chat tab and kicks off
-   *  an agent message asking what the new job should do. */
-  onCreateJob: () => void;
-}) {
-  return (
-    <div className="flex min-h-0 flex-1 flex-col">
-      {jobs.length === 0 ? (
-        <div className="flex flex-1 flex-col items-center justify-center gap-1.5 px-6 py-12 text-center">
-          <p className="text-body text-foreground">No jobs yet.</p>
-          <p className="max-w-[260px] text-body text-muted-foreground">
-            Ask your agent to set one up — e.g. &ldquo;every 15m monitor my
-            BTC funding&rdquo;.
-          </p>
-        </div>
-      ) : (
-        <div className="scroll-thin flex min-h-0 flex-1 flex-col overflow-y-auto p-3">
-          {jobs.map((j) => (
-            <JobRow
-              key={j.id}
-              job={j}
-              onSelect={() => onSelect(j)}
-              onToggle={() => onToggle(j.id)}
-              onDelete={() => onDelete(j.id)}
-            />
-          ))}
-        </div>
-      )}
-      {/* Subdued "create job" footer — anchors the panel and gives
-          the user one-tap access to the agent-driven job creation
-          flow. Quiet ghost button so it doesn't compete with the
-          job rows above. */}
-      <div className="shrink-0 border-t border-white/[0.05] p-2">
-        <SubduedButton onClick={onCreateJob} className="w-full px-3 py-2">
-          Create a new job
-        </SubduedButton>
-      </div>
-    </div>
-  );
-}
-
-function JobRow({
-  job,
-  onSelect,
-  onToggle,
-  onDelete,
-}: {
-  job: Job;
-  onSelect: () => void;
-  onToggle: () => void;
-  onDelete: () => void;
-}) {
-  // Left-edge status bar — taller and more legible than a 6px dot,
-  // tones map straight to the brand palette: mint=active,
-  // subdued white=paused, tone-down=error. Failed rows ALSO get a
-  // tone-down bg tint so a broken automation is impossible to miss
-  // scanning down the list.
-  const barClass =
-    job.status === "active"
-      ? "bg-primary"
-      : job.status === "paused"
-        ? "bg-white/15"
-        : "bg-tone-down";
-  const rowToneClass =
-    job.status === "error"
-      ? "bg-tone-down/[0.05] hover:bg-tone-down/[0.08]"
-      : "hover:bg-surface-1";
-  const toggleIcon =
-    job.status === "active" ? (
-      <PauseIcon />
-    ) : job.status === "error" ? (
-      <RetryIcon />
-    ) : (
-      <PlayIcon />
-    );
-  const toggleLabel =
-    job.status === "active"
-      ? `Pause ${job.name}`
-      : job.status === "error"
-        ? `Retry ${job.name}`
-        : `Resume ${job.name}`;
-  // Drop the "· paused" / "· failed" tails — the status bar +
-  // (for error) the bg tint carry that. Paused stays since a thin
-  // gray bar alone is subtle for an "intentionally off" state.
-  const metaTail =
-    job.lastRunAt ? ` · ran ${job.lastRunAt}` : "";
-  return (
-    <div
-      className={cn(
-        "relative flex flex-col overflow-hidden rounded-md transition-colors",
-        rowToneClass,
-      )}
-    >
-      {/* 2px left-edge status bar — slightly inset top/bottom so it
-          doesn't fight the row's rounded corners. */}
-      <span
-        aria-hidden
-        className={cn(
-          "pointer-events-none absolute bottom-1 left-0 top-1 w-[2px] rounded-r-sm",
-          barClass,
-        )}
-      />
-      <div className="group flex items-start gap-2 py-2 pl-3 pr-2">
-        <button
-          type="button"
-          onClick={onSelect}
-          className="flex min-w-0 flex-1 flex-col gap-0.5 text-left"
-        >
-          <span className="truncate text-body">{job.name}</span>
-          <span className="truncate text-body text-muted-foreground">
-            {job.cadence}
-            {metaTail}
-            {job.status === "paused" ? " · paused" : ""}
-          </span>
-        </button>
-        <div className="flex shrink-0 items-center gap-0.5">
-          <RowAction aria-label={toggleLabel} onClick={onToggle}>
-            {toggleIcon}
-          </RowAction>
-          <RowAction
-            aria-label={`Delete ${job.name}`}
-            onClick={onDelete}
-            tone="danger"
-          >
-            <CloseIcon />
-          </RowAction>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function RowAction({
-  children,
-  onClick,
-  tone,
-  "aria-label": ariaLabel,
-}: {
-  children: React.ReactNode;
-  onClick: () => void;
-  tone?: "danger";
-  "aria-label": string;
-}) {
-  return (
-    <button
-      type="button"
-      aria-label={ariaLabel}
-      onClick={(e) => {
-        e.stopPropagation();
-        onClick();
-      }}
-      className={cn(
-        "flex size-7 shrink-0 items-center justify-center rounded-md bg-surface-1 text-muted-foreground transition-[background-color,color,scale] duration-150 ease-out active:scale-[0.96]",
-        tone === "danger"
-          ? "hover:bg-tone-down/15 hover:text-tone-down"
-          : "hover:bg-surface-3 hover:text-foreground",
-      )}
-    >
-      {children}
-    </button>
-  );
-}
 
 /* ---------------------------------------------------------- */
 /*  Upgrade banner                                             */
@@ -1252,7 +847,7 @@ function UpgradeBannerPanel({
         <span className="min-w-0 flex-1 truncate text-body text-foreground">
           <span className="font-semibold">Agent always on.</span>
           <span className="text-muted-foreground">
-            {" "}Run jobs 24/7 with Pro.
+            {" "}Unlock the full toolkit with Pro.
           </span>
         </span>
         <button
@@ -1289,22 +884,6 @@ function UpgradeBannerPanel({
 
 function HistoryIcon() {
   return <History strokeWidth={1.5} className="size-[15px]" aria-hidden />;
-}
-
-function PauseIcon() {
-  return <Pause strokeWidth={0} fill="currentColor" className="size-3" aria-hidden />;
-}
-
-function PlayIcon() {
-  return <Play strokeWidth={0} fill="currentColor" className="size-3" aria-hidden />;
-}
-
-function RetryIcon() {
-  return <RotateCw strokeWidth={1.5} className="size-3" aria-hidden />;
-}
-
-function CloseIcon() {
-  return <X strokeWidth={1.75} className="size-3" aria-hidden />;
 }
 
 /* ---------------------------------------------------------- */
